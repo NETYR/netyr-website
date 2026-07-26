@@ -17,6 +17,8 @@ npm run check
 ```
 
 The formatter, ESLint, TypeScript, and production static export must all pass.
+Also run `npm audit` and review the generated `out` directory for the expected
+robots, sitemap, metadata, and downloadable assets.
 
 ## Content standards
 
@@ -25,6 +27,10 @@ The formatter, ESLint, TypeScript, and production static export must all pass.
 - Use explicit placeholders when approved material is unavailable.
 - Do not publish personal information without authorization.
 - Write clear headings and concise link text.
+- Record every unresolved item in `CONTENT_CHECKLIST.md` and source provenance
+  or conflicts in `SOURCE_NOTES.md`.
+- Do not put payment, contact, event, leader, or sponsor facts directly in page
+  markup; update the appropriate typed file in `data/`.
 
 ## Accessibility
 
@@ -46,6 +52,6 @@ The formatter, ESLint, TypeScript, and production static export must all pass.
 
 ## Static hosting
 
-The site is configured for Cloudflare Pages static export. Do not add
+The site is configured for GitHub Pages static export. Do not add
 server-only Next.js features unless the hosting strategy is intentionally
 changed and documented.

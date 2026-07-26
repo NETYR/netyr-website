@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  NEXT_PUBLIC_SITE_URL: https://netyr.org
+  NEXT_PUBLIC_EVENTS_ENDPOINT: ${{ vars.NEXT_PUBLIC_EVENTS_ENDPOINT }}
+  NEXT_PUBLIC_CONTACT_FORM_EMBED_URL: ${{ vars.NEXT_PUBLIC_CONTACT_FORM_EMBED_URL }}
+  NEXT_PUBLIC_SPONSORS_FEED_URL: ${{ vars.NEXT_PUBLIC_SPONSORS_FEED_URL }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate and build
+        run: npm run check
+
+      - name: Audit dependencies
+        run: npm audit
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static export
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: out
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

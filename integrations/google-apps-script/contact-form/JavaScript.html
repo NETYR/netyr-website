@@ -1,0 +1,231 @@
+<script>
+  (function () {
+    "use strict";
+
+    var form = document.getElementById("contact-form");
+    var submitButton = document.getElementById("submit-button");
+    var submitLabel = document.getElementById("submit-label");
+    var spinner = document.getElementById("spinner");
+    var retryButton = document.getElementById("retry-button");
+    var status = document.getElementById("submission-status");
+    var successPanel = document.getElementById("success-panel");
+    var successMessage = document.getElementById("success-message");
+    var inquiryTypes = [
+      "General Question",
+      "Membership",
+      "Upcoming Event",
+      "Volunteer",
+      "Sponsorship",
+      "Media",
+      "Other",
+    ];
+    var contactMethods = ["", "Email", "Phone", "Either"];
+
+    form.addEventListener("submit", handleSubmit);
+    retryButton.addEventListener("click", function () {
+      retryButton.hidden = true;
+      form.requestSubmit();
+    });
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      clearErrors();
+
+      var payload = getPayload();
+      var errors = validate(payload);
+
+      if (Object.keys(errors).length) {
+        showFieldErrors(errors);
+        setStatus("Please review the highlighted fields.", "error");
+        focusFirstError(errors);
+        return;
+      }
+
+      setLoading(true);
+      setStatus("Sending your message\u2026", "loading");
+
+      google.script.run
+        .withSuccessHandler(handleServerResult)
+        .withFailureHandler(function () {
+          handleRecoverableError(
+            "We could not send your message right now. Please wait a moment and try again.",
+          );
+        })
+        .submitContactForm(payload);
+    }
+
+    function getPayload() {
+      var data = new FormData(form);
+      return {
+        firstName: String(data.get("firstName") || ""),
+        lastName: String(data.get("lastName") || ""),
+        email: String(data.get("email") || ""),
+        phone: String(data.get("phone") || ""),
+        county: String(data.get("county") || ""),
+        inquiryType: String(data.get("inquiryType") || ""),
+        preferredContactMethod: String(
+          data.get("preferredContactMethod") || "",
+        ),
+        message: String(data.get("message") || ""),
+        consent: data.get("consent") === "on",
+        website: String(data.get("website") || ""),
+        sessionToken: String(data.get("sessionToken") || ""),
+      };
+    }
+
+    function validate(payload) {
+      var errors = {};
+      var firstName = payload.firstName.trim();
+      var lastName = payload.lastName.trim();
+      var email = payload.email.trim();
+      var phone = payload.phone.trim();
+      var county = payload.county.trim();
+      var message = payload.message.trim();
+
+      validateLength(errors, "firstName", firstName, 1, 60);
+      validateLength(errors, "lastName", lastName, 1, 60);
+
+      if (!email) {
+        errors.email = "Enter your email address.";
+      } else if (
+        email.length > 254 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      ) {
+        errors.email = "Enter a valid email address.";
+      }
+
+      if (phone.length > 30) {
+        errors.phone = "Phone number must be 30 characters or fewer.";
+      }
+
+      validateLength(errors, "county", county, 1, 80);
+
+      if (inquiryTypes.indexOf(payload.inquiryType) === -1) {
+        errors.inquiryType = "Choose an inquiry type.";
+      }
+
+      if (contactMethods.indexOf(payload.preferredContactMethod) === -1) {
+        errors.preferredContactMethod = "Choose Email, Phone, or Either.";
+      }
+
+      validateLength(errors, "message", message, 10, 2000);
+
+      if (!payload.consent) {
+        errors.consent = "Confirm that NETYR may contact you.";
+      }
+
+      return errors;
+    }
+
+    function validateLength(errors, field, value, minimum, maximum) {
+      if (value.length < minimum) {
+        errors[field] =
+          minimum === 1
+            ? "This field is required."
+            : "Use at least " + minimum + " characters.";
+      } else if (value.length > maximum) {
+        errors[field] = "Use " + maximum + " characters or fewer.";
+      }
+    }
+
+    function handleServerResult(result) {
+      setLoading(false);
+
+      if (result && result.ok) {
+        form.hidden = true;
+        successMessage.textContent = result.message;
+        successPanel.hidden = false;
+        successPanel.focus();
+        return;
+      }
+
+      if (result && result.fieldErrors) {
+        showFieldErrors(result.fieldErrors);
+        if (Object.keys(result.fieldErrors).length) {
+          setStatus(
+            result.message || "Please review the highlighted fields.",
+            "error",
+          );
+          focusFirstError(result.fieldErrors);
+          return;
+        }
+      }
+
+      handleRecoverableError(
+        (result && result.message) ||
+          "We could not send your message right now. Please try again.",
+      );
+    }
+
+    function handleRecoverableError(message) {
+      setLoading(false);
+      setStatus(message, "error");
+      retryButton.hidden = false;
+      status.focus();
+    }
+
+    function setLoading(isLoading) {
+      submitButton.disabled = isLoading;
+      submitLabel.textContent = isLoading ? "Sending" : "Send Message";
+      spinner.hidden = !isLoading;
+      if (isLoading) retryButton.hidden = true;
+    }
+
+    function setStatus(message, state) {
+      status.textContent = message;
+      if (state) {
+        status.setAttribute("data-state", state);
+      } else {
+        status.removeAttribute("data-state");
+      }
+    }
+
+    function clearErrors() {
+      var fields = form.querySelectorAll("[aria-invalid='true']");
+      fields.forEach(function (field) {
+        field.removeAttribute("aria-invalid");
+        var errorId = field.id + "-error";
+        var describedBy = field.getAttribute("aria-describedby");
+        var ids = describedBy ? describedBy.split(/\s+/) : [];
+        var remaining = ids.filter(function (id) {
+          return id && id !== errorId;
+        });
+
+        if (remaining.length) {
+          field.setAttribute("aria-describedby", remaining.join(" "));
+        } else {
+          field.removeAttribute("aria-describedby");
+        }
+      });
+
+      form.querySelectorAll(".field-error").forEach(function (error) {
+        error.textContent = "";
+      });
+
+      setStatus("", "");
+      retryButton.hidden = true;
+    }
+
+    function showFieldErrors(errors) {
+      Object.keys(errors).forEach(function (fieldName) {
+        var field = document.getElementById(fieldName);
+        var error = document.getElementById(fieldName + "-error");
+        if (!field || !error) return;
+
+        error.textContent = errors[fieldName];
+        field.setAttribute("aria-invalid", "true");
+
+        var describedBy = field.getAttribute("aria-describedby");
+        var ids = describedBy ? describedBy.split(/\s+/) : [];
+        if (ids.indexOf(error.id) === -1) ids.push(error.id);
+        field.setAttribute("aria-describedby", ids.join(" "));
+      });
+    }
+
+    function focusFirstError(errors) {
+      var firstFieldName = Object.keys(errors)[0];
+      var field = document.getElementById(firstFieldName);
+      if (field) field.focus();
+    }
+  })();
+</script>

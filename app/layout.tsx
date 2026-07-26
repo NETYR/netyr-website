@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { OrganizationJsonLd } from "@/components/seo/organization-json-ld";
 import { siteConfig } from "@/lib/site";
 import "@/styles/globals.css";
 
@@ -19,9 +20,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.svg",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
@@ -32,10 +33,10 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [
       {
-        url: "/images/og-default.svg",
+        url: siteConfig.socialImage,
         width: 1200,
         height: 630,
-        alt: `${siteConfig.shortName} placeholder social image`,
+        alt: siteConfig.name,
       },
     ],
   },
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
-    images: ["/images/og-default.svg"],
+    images: [siteConfig.socialImage],
   },
 };
 
@@ -55,6 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <OrganizationJsonLd />
         <a
           className="sr-only z-50 rounded-md bg-white px-4 py-3 text-slate-950 focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
           href="#main-content"

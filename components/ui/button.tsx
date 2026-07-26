@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
@@ -22,24 +21,34 @@ type NativeButtonProps = SharedProps &
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-blue-800 text-white hover:bg-blue-900 focus-visible:outline-blue-800",
+    "bg-brand-red-dark text-white shadow-sm hover:bg-red-800 focus-visible:outline-brand-red-dark",
   secondary:
-    "border border-slate-300 bg-white text-slate-950 hover:bg-slate-50 focus-visible:outline-blue-700",
+    "border border-brand-navy/25 bg-white text-brand-navy hover:border-brand-blue hover:bg-blue-50 focus-visible:outline-brand-blue",
 };
 
-export function Button(props: LinkButtonProps | NativeButtonProps) {
-  const { children, className, variant = "primary" } = props;
-  const classes = cn(
-    "inline-flex min-h-11 items-center justify-center rounded-md px-5 py-2.5 text-center font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
+export function buttonStyles({
+  className,
+  variant = "primary",
+}: {
+  className?: string;
+  variant?: ButtonVariant;
+} = {}) {
+  return cn(
+    "inline-flex min-h-11 items-center justify-center rounded-sm px-5 py-2.5 text-center text-sm font-bold tracking-wider uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
     variantClasses[variant],
     className,
   );
+}
+
+export function Button(props: LinkButtonProps | NativeButtonProps) {
+  const { children, className, variant = "primary" } = props;
+  const classes = buttonStyles({ className, variant });
 
   if ("href" in props && props.href) {
     return (
-      <Link className={classes} href={props.href}>
+      <a className={classes} href={props.href}>
         {children}
-      </Link>
+      </a>
     );
   }
 

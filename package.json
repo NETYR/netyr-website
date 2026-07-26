@@ -11,9 +11,11 @@
     "build": "next build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test:contact-integration": "node scripts/verify-contact-apps-script.mjs",
+    "test:contact-browser": "node scripts/verify-contact-browser.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm run build"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:contact-integration && npm run build"
   },
   "dependencies": {
     "next": "16.2.12",

@@ -6,6 +6,12 @@ import prettier from "eslint-config-prettier";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    // Plain anchors force reliable document navigation on GitHub Pages static exports.
+    rules: {
+      "@next/next/no-html-link-for-pages": "off",
+    },
+  },
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
