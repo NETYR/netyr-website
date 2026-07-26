@@ -1,0 +1,44 @@
+{
+  "name": "netyr-website",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "24.x",
+    "npm": ">=11"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:contact-integration": "node scripts/verify-contact-apps-script.mjs",
+    "test:contact-browser": "node scripts/verify-contact-browser.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:contact-integration && npm run build"
+  },
+  "dependencies": {
+    "next": "16.2.12",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.2.12",
+    "eslint-config-prettier": "^10",
+    "prettier": "^3",
+    "prettier-plugin-tailwindcss": "^0.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "brace-expansion": "^5.0.8",
+    "minimatch": "^10.2.5",
+    "postcss": "^8.5.23",
+    "sharp": "^0.35.3"
+  }
+}
