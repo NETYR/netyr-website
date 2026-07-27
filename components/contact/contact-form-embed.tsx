@@ -13,7 +13,11 @@ function isAllowedContactOrigin(origin: string) {
   try {
     const host = new URL(origin).hostname;
     return allowedContactFormHosts.some(
-      (allowedHost) => host === allowedHost || host.endsWith(`.${allowedHost}`),
+      (allowedHost) =>
+        host === allowedHost ||
+        host.endsWith(`.${allowedHost}`) ||
+        (allowedHost === "script.googleusercontent.com" &&
+          host.endsWith(`-${allowedHost}`)),
     );
   } catch {
     return false;
