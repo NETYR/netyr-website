@@ -21,7 +21,6 @@ function isAllowedContactOrigin(origin: string) {
 }
 
 export function ContactFormEmbed({ src }: { src: string }) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const trackedSuccess = useRef(false);
 
   useEffect(() => {
@@ -31,7 +30,6 @@ export function ContactFormEmbed({ src }: { src: string }) {
 
     function handleMessage(event: MessageEvent) {
       if (
-        event.source !== iframeRef.current?.contentWindow ||
         !isAllowedContactOrigin(event.origin) ||
         !event.data ||
         typeof event.data !== "object"
@@ -61,7 +59,6 @@ export function ContactFormEmbed({ src }: { src: string }) {
     <iframe
       className="block min-h-[1240px] w-full border-0 sm:min-h-[1100px] lg:min-h-[1040px]"
       loading="lazy"
-      ref={iframeRef}
       referrerPolicy="strict-origin-when-cross-origin"
       src={src}
       title="Contact North East Texas Young Republicans"

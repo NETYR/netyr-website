@@ -8,6 +8,9 @@
 - Analytics: the static-export-compatible GA4 loader and fixed conversion event
   names are implemented. Advertising storage, personalization, and Google
   signals are disabled. Contact-form contents are never passed to analytics.
+- Contact conversion tracking: the deployed Apps Script form sends a fixed
+  success-only message to the parent website after Google confirms a write. The
+  website validates the Google-hosted origin and records no field values.
 - Social: verified Facebook, Instagram, TikTok, and X profiles are centralized
   and presented in the footer, Contact page, Get Involved page, and Organization
   structured data.
@@ -134,6 +137,9 @@ the documented end-to-end tests.
 - `npm run typecheck`: pass.
 - `npm run build`: pass; 17 static artifacts generated in `out/`.
 - `npm audit`: pass; zero known vulnerabilities.
+- Production Lighthouse: all five tested routes scored 100 for Performance,
+  Accessibility, Best Practices, and SEO on both mobile and desktop, with no
+  console errors.
 - Contact Apps Script verification: pass; ten isolated tests, with no live
   Sheet writes.
 - Production contact-form deployment: pass; setup completed, embedded

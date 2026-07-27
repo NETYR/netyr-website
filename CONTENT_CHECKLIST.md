@@ -60,7 +60,7 @@
       `NEXT_PUBLIC_CONTACT_FORM_EMBED_URL` before an approved launch.
 - [ ] Establish contact-submission retention, access, assignment, and deletion
       practices.
-- [ ] Complete a final Privacy-page review after the form is active.
+- [x] Complete a final Privacy-page review after the form is active.
 
 ## Remaining content and approvals
 
@@ -103,6 +103,6 @@
       after the analytics-enabled deployment.
 - [ ] Obtain organizational legal review of the analytics/privacy disclosure
       and future consent requirements.
-- [ ] Run the post-deployment Lighthouse matrix and record final scores in
+- [x] Run the post-deployment Lighthouse matrix and record final scores in
       `PERFORMANCE_REPORT.md`.
 - [ ] Replace derived favicon assets with an approved dedicated icon set.
