@@ -56,7 +56,6 @@ const origin = `http://127.0.0.1:${address.port}`;
 
 try {
   const siteDom = await dumpDom(`${origin}/contact/`, 1500, "390,1400");
-  assert.match(siteDom, /mailto:president@netyr\.org/);
   assert.match(siteDom, /data-horizontal-overflow="false"/);
 
   if (expectedEmbed) {
@@ -66,19 +65,7 @@ try {
   } else {
     assert.doesNotMatch(siteDom, /<iframe/);
     assert.doesNotMatch(siteDom, /Open the contact form in a new window/);
-  }
-
-  const privacyDom = await dumpDom(`${origin}/privacy/`, 1500, "1280,1200");
-  if (expectedEmbed) {
-    assert.match(
-      privacyDom,
-      /uses a custom contact form hosted through Google Apps/,
-    );
-  } else {
-    assert.match(
-      privacyDom,
-      /may enable a custom contact form hosted through Google Apps/,
-    );
+    assert.match(siteDom, /contact form is temporarily unavailable/i);
   }
 
   const emptyDom = await dumpDom(
@@ -121,7 +108,7 @@ try {
   assert.match(errorDom, /data-horizontal-overflow="false"/);
 
   console.log(
-    `Chrome contact checks passed (${expectedEmbed ? "configured embed" : "email fallback"}, validation, loading, success, retry, mobile overflow).`,
+    `Chrome contact checks passed (${expectedEmbed ? "configured embed" : "unavailable-form state"}, validation, loading, success, retry, mobile overflow).`,
   );
 } finally {
   await new Promise((resolveClose) => server.close(resolveClose));

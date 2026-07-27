@@ -1,61 +1,44 @@
 # Sponsor Integration Guide
 
-## Current status
+## Production source and public contract
 
-The sponsor page and centralized provider adapter are ready, but no private
-sheet or live sponsor endpoint is connected. With no feed configured, the page
-shows a professional empty state and a contact path.
+`Website Sponsors` is a separate private sheet tab for approved sponsor names.
+The dedicated Apps Script project under
+`integrations/google-apps-script/website-sponsors/` accesses only this tab and
+returns only active sponsor names to the public website.
 
-## Recommended curated fields
+The public feed never returns a spreadsheet identifier, formulas, rows from
+other tabs, sponsor notes, contacts, contracts, tiers, logos, benefits, payment
+data, or workbook metadata.
 
-- Sponsor Name
-- Sponsorship Tier
-- Logo URL
-- Website URL
-- Short Description
-- Active
-- Display Order
-- Start Date
-- End Date
+## Sheet fields
 
-Only active, public, permission-cleared sponsor records should reach the
-website. Do not expose spreadsheet IDs, private sheet URLs, prices, benefits,
-contracts, internal notes, or credentials in browser code.
+| Field         | Use                             |
+| ------------- | ------------------------------- |
+| Sponsor Name  | Required public display name    |
+| Active        | Publish only when true          |
+| Display Order | Optional order for active names |
 
-## Future provider contract
+## Administrator workflow
 
-The website adapter accepts either an array of sponsor records or:
+1. Open only the `Website Sponsors` tab.
+2. Add the approved public sponsor name.
+3. Mark it active only after approval.
+4. Give active names an optional display order.
+5. Review `/sponsors/` after the feed cache refreshes.
+6. To remove a sponsor, set `Active` to false rather than modifying unrelated
+   tabs or exposing a private workbook.
 
-```json
-{
-  "sponsors": [
-    {
-      "sponsorName": "Public sponsor name",
-      "sponsorshipTier": "Public tier",
-      "logoUrl": "https://example.org/logo.png",
-      "websiteUrl": "https://example.org/",
-      "shortDescription": "Public description",
-      "active": true,
-      "displayOrder": 1,
-      "startDate": "2026-01-01",
-      "endDate": "2026-12-31"
-    }
-  ]
-}
-```
+## Endpoint maintenance
 
-The example describes the schema only; it is not displayed as sponsor content.
+1. Open the organization-owned **NETYR Website Sponsors** Apps Script project.
+2. Keep `SPREADSHEET_ID` in Script Properties only.
+3. Run `setupSponsorSheet()` and `runWebsiteSponsorsTests()` after a source
+   update.
+4. Deploy the web app as the organization account with public access.
+5. Add its public `/exec` URL to `NEXT_PUBLIC_SPONSORS_FEED_URL` locally and in
+   GitHub Actions repository variables.
+6. Build and review the Sponsors page before a production deployment.
 
-## Activation steps
-
-1. Approve the sponsor sheet, fields, content owners, and publication policy.
-2. Build a read-only Apps Script feed that returns only the fields above.
-3. Keep the sheet ID in Apps Script Properties.
-4. Test active/inactive filtering, order, broken-logo fallback, external-link
-   behavior, and date handling.
-5. Add the production public endpoint as the GitHub Actions repository variable
-   `NEXT_PUBLIC_SPONSORS_FEED_URL`.
-6. Rebuild and complete leadership review before publishing.
-
-No sponsor integration should be made live until sponsor names, logos, tiers,
-benefits, and links are authorized for public display.
+No sponsor is displayed until an active approved name is supplied. The website
+uses a professional empty state rather than sample sponsors.

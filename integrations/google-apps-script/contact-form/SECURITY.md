@@ -2,47 +2,34 @@
 
 ## Trust boundary
 
-The GitHub Pages site embeds a public Google Apps Script HTML Service web app.
-The form calls `google.script.run`; only server-side Apps Script opens the
-private workbook. The website never receives the spreadsheet ID, authorization
-credentials, existing rows, or another tab's data.
+The public site embeds an Apps Script HTML Service form. Only server-side Apps
+Script accesses the private workbook. The public site never receives a workbook
+identifier, credentials, existing rows, notification recipient, or any other
+sheet tab.
 
-## Data controls
+## Controls
 
-- The workbook ID is stored only in the `SPREADSHEET_ID` Script Property.
-- The sheet name is the fixed server constant `Website Contacts`.
-- Browser input cannot choose a workbook or tab.
-- The setup function verifies that it is being run interactively by the
-  deployment owner rather than by a public web-app visitor.
-- The server returns only structured success or error messages, never rows.
-- Server logs do not contain submitted names, contact details, or messages.
-- Submitted timestamps and UUIDs are generated on the server.
-- HTML-like input is rejected and submitted HTML is never rendered.
-- leading `=`, `+`, `-`, and `@` values are prefixed before spreadsheet writes
-  to prevent formula execution.
-- A honeypot, server-issued form session, minimum completion time, duplicate
-  cache, per-address hash rate limit, length limits, and enumeration checks
-  reduce basic abuse.
-- No IP address, device fingerprint, payment information, date of birth, voter
-  information, home street address, or political history is collected.
+- Script Properties hold the workbook identifier and notification recipient.
+- The destination tab is the fixed server constant `Website Contacts`; browser
+  input cannot choose a workbook or sheet.
+- Accepted submissions receive server-generated timestamps and UUIDs.
+- HTML-like input is rejected; leading spreadsheet-formula characters are
+  neutralized before writes.
+- A honeypot, server-issued session, minimum completion time, duplicate cache,
+  per-address hash rate limit, validation, and length limits reduce abuse.
+- The endpoint returns only generic success or error messages, never rows,
+  metadata, or stack traces.
+- Server logs never contain submitted personal content.
+- The notification is sent after a newly accepted write only. Failures to send
+  it do not expose content or cause a duplicate sheet write.
 
-## Iframe note
-
-Apps Script must use `XFrameOptionsMode.ALLOWALL` for the form to render inside
-`netyr.org`. Google Apps Script cannot set a custom `frame-ancestors` response
-header. The embedded page therefore contains no account controls, payment
-actions, private reads, or destructive operations. The public `/exec` URL must
-be treated as public.
-
-## Operational controls
+## Operational safeguards
 
 - Deploy from an organization-managed Google account.
-- Limit edit access to authorized administrators.
-- Review Apps Script deployments and workbook access periodically.
-- Establish retention, assignment, and deletion practices before launch.
-- Update the web-app deployment after every code change and repeat the
-  end-to-end tests.
-- Revoke the deployment immediately if unexpected access or submissions occur.
+- Limit project, sheet, and mailbox access to authorized administrators.
+- Use the existing production deployment when updating code, then test a single
+  non-sensitive submission and remove it afterward.
+- Revoke or disable the endpoint immediately if it behaves unexpectedly.
 
-Do not report suspected vulnerabilities in public issues with personal data.
-Use the approved organization email and omit sensitive submission content.
+Do not report suspected issues in a public issue with personal data. Use an
+organization-managed private reporting channel.

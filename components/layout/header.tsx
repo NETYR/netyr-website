@@ -4,6 +4,7 @@ import { MobileNavigation } from "@/components/layout/mobile-navigation";
 import { Navigation } from "@/components/layout/navigation";
 import { buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { cheddarUpLinks } from "@/data/cheddar-up";
 import { siteConfig } from "@/lib/site";
 
 export function Header() {
@@ -40,7 +41,9 @@ export function Header() {
               className: "px-4",
               variant: "secondary",
             })}
-            href="/donate/"
+            href={cheddarUpLinks.donations}
+            rel="noopener noreferrer"
+            target="_blank"
           >
             Donate
           </a>

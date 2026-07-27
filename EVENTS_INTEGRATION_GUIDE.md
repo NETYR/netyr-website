@@ -1,84 +1,74 @@
 # Events Integration Guide
 
-## Architecture
+## Production source of truth
 
-`Website Events` is the single event source for the public website:
+The dedicated **NETYR Public Events** Google Calendar is the only production
+event source. Administrators add approved events there; the website retrieves a
+sanitized public feed through the separate Apps Script project in
+`integrations/google-apps-script/website-events/`.
 
-```text
-Website Events tab
-        ↓
-Read-only Google Apps Script web endpoint
-        ↓
-NEXT_PUBLIC_EVENTS_ENDPOINT
-        ↓
-NETYR event cards
-```
+The public website never receives a Calendar ID, private Calendar URL,
+attendee data, organizer data, internal notes, or credentials.
 
-The browser receives only the public event JSON produced by Apps Script. It
-never receives the workbook ID, another sheet name, a Google credential, a
-formula, a note, or a roster row.
+## Public event fields
 
-## Website Events columns
+The endpoint returns only:
 
-| Column            | Purpose                                              |
-| ----------------- | ---------------------------------------------------- |
-| Event ID          | Optional stable public identifier                    |
-| Event Title       | Required public title                                |
-| Start Date        | Required event date                                  |
-| Start Time        | Optional; blank creates an all-day event             |
-| End Date          | Optional; defaults to Start Date                     |
-| End Time          | Optional; defaults to one hour after Start Time      |
-| Location          | Optional public location                             |
-| Short Description | Optional event-card summary                          |
-| Full Description  | Used when no short description is provided           |
-| Graphic URL       | Optional public HTTPS promotional image              |
-| Registration URL  | Optional public HTTPS registration/details link      |
-| Featured          | Adds featured styling without changing chronology    |
-| Active            | Required checkbox; only checked rows are published   |
-| Display Order     | Tie-breaker when two events have the same start time |
-| Last Updated      | Administrator-only tracking; never returned          |
+- title
+- start and end times
+- all-day status
+- public location
+- sanitized public description
+- optional approved registration link
+- optional approved graphic URL
+- featured status
 
-Only Event Title, Start Date, and Active are required. If a graphic is absent,
-invalid, or fails to load, the site uses the branded NETYR fallback.
+Past events are excluded. Events are ordered chronologically. The endpoint
+uses a short cache, so a calendar update may take a few minutes to appear.
 
-## Administrator event workflow
+## Calendar authoring workflow
 
-1. Open only the `Website Events` tab.
-2. Add one row per public event.
-3. Enter Event Title and Start Date.
-4. Add Start Time if the event is not all day.
-5. Add optional public location, descriptions, graphic, and registration link.
-6. Check Featured only when special visual emphasis is appropriate.
-7. Check Active only when the row is approved for public display.
-8. Review the public Events page after the endpoint's brief cache refresh.
-9. To remove an event, uncheck Active. Do not delete the private roster or edit
-   another workbook tab.
-
-Never enter attendee lists, private video links, internal notes, personal
-contact details, or draft operational information in a row marked Active.
-
-## Deployment
-
-1. Review
-   `integrations/google-apps-script/website-events/SETUP.md`,
-   `TESTING.md`, and `SECURITY.md`.
-2. Create the organization-owned Apps Script project.
-3. Store the real workbook ID only in Apps Script Properties as
-   `SPREADSHEET_ID`.
-4. Deploy as a web app and copy the production URL ending in `/exec`.
-5. Complete every endpoint test.
-6. Add the tested URL locally as:
+1. Use only **NETYR Public Events**.
+2. Add a clear public title and start date. Add end time, location, and public
+   description as appropriate.
+3. For optional enhancements, add these exact description markers on separate
+   lines:
 
    ```text
-   NEXT_PUBLIC_EVENTS_ENDPOINT=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+   Registration: https://public-registration.example/
+   Graphic: https://public-image.example/event.jpg
+   Featured: true
    ```
 
-7. Build and review `/events/` at mobile and desktop widths.
-8. Add the same URL as the GitHub Actions repository variable
-   `NEXT_PUBLIC_EVENTS_ENDPOINT`.
+4. Keep the URLs public and HTTPS. Leave a marker out when it is not needed.
+5. Do not put Google Meet links, attendee information, contact details, internal
+   notes, credentials, or administrative content in the event.
+6. Review `/events/` once the feed cache refreshes. The website uses a branded
+   fallback when no graphic is supplied.
 
-The organization-managed Apps Script project is deployed, the endpoint is
-configured locally and in GitHub, and the production JSON and temporary-event
-rendering tests pass. The endpoint uses a read-only advanced Sheets service and
-the fixed `Website Events` tab. An empty event list is expected until an
-administrator publishes an approved active event.
+## Apps Script deployment and maintenance
+
+1. Open the organization-owned **NETYR Website Events** Apps Script project.
+2. Keep `PUBLIC_CALENDAR_ID` in Script Properties only; do not put it in source
+   files, environment variables, or documentation.
+3. Confirm the code and `appsscript.json` match the repository package.
+4. Run `runWebsiteEventsTests()` after any source change.
+5. Deploy or update the web app to execute as the organization account with
+   public access.
+6. Test the `/exec` endpoint returns JSON containing no private information.
+7. Store the public endpoint only in `NEXT_PUBLIC_EVENTS_ENDPOINT` locally and
+   as the corresponding GitHub repository variable.
+8. Build and review `/events/` on mobile and desktop before deployment.
+
+## Safe test
+
+Create one temporary future Calendar event with a distinct test title and only
+non-sensitive public fields. Confirm it appears with the correct date, time,
+fallback graphic, and any approved link. Delete that exact test event afterward.
+Do not leave test events visible to the public.
+
+## Failure behavior
+
+If no endpoint is configured, the endpoint fails, or there are no approved
+upcoming events, the site displays its professional empty or unavailable state;
+it never shows sample events.

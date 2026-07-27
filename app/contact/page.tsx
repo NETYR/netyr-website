@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { ContactFormEmbed } from "@/components/contact/contact-form-embed";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
 import { contactConfig, isAppsScriptContactFormUrl } from "@/data/contact";
-import { socialLinks } from "@/data/social-links";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -28,50 +27,6 @@ export default function ContactPage() {
         eyebrow="Contact"
         title="Connect with NETYR"
       />
-      <Section
-        description="We welcome questions about membership, events, volunteering, sponsorship, media, and chapter activities."
-        eyebrow="Reach out"
-        title="We would be glad to hear from you"
-        tone="white"
-      >
-        <Card className="max-w-3xl">
-          <h3 className="text-brand-navy text-xl font-bold uppercase">
-            Email NETYR
-          </h3>
-          <p className="mt-3 leading-7 text-slate-600">
-            Send a message to{" "}
-            <a
-              className="text-brand-blue font-bold underline underline-offset-4"
-              data-analytics-context="contact_page"
-              data-analytics-event="contact_email_click"
-              data-analytics-label="president@netyr.org"
-              href={`mailto:${contactConfig.publicEmail}`}
-            >
-              {contactConfig.publicEmail}
-            </a>
-            .
-          </p>
-          <Button
-            className="mt-5"
-            data-analytics-context="contact_page"
-            data-analytics-event="contact_email_click"
-            data-analytics-label="compose_email"
-            href={`mailto:${contactConfig.publicEmail}`}
-            variant="secondary"
-          >
-            Compose an email
-          </Button>
-        </Card>
-      </Section>
-      <Section
-        description="Keep up with chapter news, events, and opportunities to get involved."
-        eyebrow="Social"
-        title="Follow NETYR"
-      >
-        <Card className="max-w-3xl">
-          <SocialLinks links={socialLinks} />
-        </Card>
-      </Section>
       {hasEmbeddedForm ? (
         <Section
           description="Complete the secure form below and the NETYR team will follow up."
@@ -105,9 +60,19 @@ export default function ContactPage() {
             </svg>
           </a>
         </Section>
-      ) : null}
+      ) : (
+        <Section
+          description="Please check back shortly while the contact form is being refreshed."
+          eyebrow="Contact"
+          title="The contact form is temporarily unavailable"
+          tone="white"
+        >
+          <EmptyState
+            description="NETYR is preparing a secure way to receive your message."
+            title="Please try again soon"
+          />
+        </Section>
+      )}
     </>
   );
 }
-import { ContactFormEmbed } from "@/components/contact/contact-form-embed";
-import { SocialLinks } from "@/components/social/social-links";

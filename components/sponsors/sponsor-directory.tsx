@@ -68,62 +68,14 @@ export function SponsorDirectory({
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {sponsors.map((sponsor) => (
         <Card key={sponsor.name}>
-          <SponsorLogo logo={sponsor.logo} name={sponsor.name} />
-          {sponsor.tier ? (
-            <p className="text-brand-blue mt-4 text-xs font-bold tracking-wider uppercase">
-              {sponsor.tier}
-            </p>
-          ) : null}
+          <p className="text-brand-blue text-xs font-bold tracking-wider uppercase">
+            Community partner
+          </p>
           <h3 className="text-brand-navy mt-2 text-xl font-bold uppercase">
-            {sponsor.href ? (
-              <a
-                className="underline-offset-4 hover:underline"
-                data-analytics-context="sponsor_directory"
-                data-analytics-event="sponsor_interest_click"
-                data-analytics-label={sponsor.name}
-                href={sponsor.href}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                {sponsor.name}
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            ) : (
-              sponsor.name
-            )}
+            {sponsor.name}
           </h3>
-          {sponsor.description ? (
-            <p className="mt-3 leading-7 text-slate-600">
-              {sponsor.description}
-            </p>
-          ) : null}
         </Card>
       ))}
     </div>
-  );
-}
-
-function SponsorLogo({
-  logo,
-  name,
-}: {
-  logo: string | undefined;
-  name: string;
-}) {
-  const [imageFailed, setImageFailed] = useState(false);
-
-  if (!logo || imageFailed) return null;
-
-  return (
-    // Remote sponsor logos are administered outside the repository.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      alt={`${name} logo`}
-      className="h-24 w-full object-contain object-left"
-      loading="lazy"
-      onError={() => setImageFailed(true)}
-      referrerPolicy="no-referrer"
-      src={logo}
-    />
   );
 }

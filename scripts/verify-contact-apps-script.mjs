@@ -24,7 +24,7 @@ assert.equal(
 
 const testResult = vm.runInContext("runContactSystemTests()", context);
 assert.equal(testResult.ok, true);
-assert.equal(testResult.passed, 10);
+assert.equal(testResult.passed, 11);
 
 const requiredFiles = [
   "Index.html",

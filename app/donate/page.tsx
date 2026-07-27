@@ -1,38 +1,43 @@
 import type { Metadata } from "next";
 
+import { DonateForward } from "@/components/donate/donate-forward";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
+import { cheddarUpLinks } from "@/data/cheddar-up";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
   title: "Donate",
   description:
-    "Review NETYR's external donation process and important payment disclosures.",
+    "Support NETYR through its approved external payment collection.",
   path: "/donate/",
 });
 
 export default function DonatePage() {
   return (
     <>
+      <DonateForward href={cheddarUpLinks.donations} />
       <Hero
         compact
-        description="Support helps NETYR create opportunities for young Republicans to connect, serve, and lead."
+        description="Support NETYR through the chapter's approved external payment collection."
         eyebrow="Donate"
         title="Support the next generation of Republican leadership"
       />
       <Section
-        description="Online giving is not available at this time."
-        eyebrow="Giving"
-        title="Donation information coming soon"
+        description="Payments are completed securely through Cheddar Up, an external provider. NETYR does not collect or process card information on this website."
+        eyebrow="Support NETYR"
+        title="Continue to the approved payment collection"
         tone="white"
       >
-        <EmptyState
-          action={<Button href="/contact/">Contact NETYR</Button>}
-          description="Please check back for future ways to support NETYR, or contact our team with a question."
-          title="Check back soon"
-        />
+        <Button
+          href={cheddarUpLinks.donations}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Continue to Cheddar Up
+          <span className="sr-only"> (opens in a new tab)</span>
+        </Button>
       </Section>
     </>
   );

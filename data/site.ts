@@ -6,7 +6,7 @@ export const organizationContent = {
   federation:
     "NETYR connects local members with the broader Young Republican movement across Texas.",
   geography:
-    "Active membership is centered in Van Zandt County and its adjoining counties.",
+    "Active membership is centered in Van Zandt County and its adjacent counties.",
   location: "Canton, Texas",
 } as const;
 

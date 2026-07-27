@@ -1,115 +1,79 @@
 # Content Update Guide
 
-Routine website content is centralized in typed files under `data/` or in the
-curated Google sources described below. Do not copy private workbook content
-into source files.
+This guide is for NETYR administrators updating approved public content without
+editing React components.
 
-## Common updates
+## Events
 
-| Content                            | Update location                                   | Notes                                                           |
-| ---------------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
-| Site identity and homepage summary | `data/site.ts`                                    | Keep claims accurate and concise.                               |
-| Navigation                         | `data/navigation.ts`                              | Preserve eight primary items and the Get Involved submenu.      |
-| Leadership                         | `data/leadership.ts`                              | Use public officer fields only; never copy private member data. |
-| Public events                      | `Website Events` sheet tab                        | Only Active rows with required fields are eligible.             |
-| Local event fallback               | `data/events.ts`                                  | Use only if the live endpoint is intentionally disabled.        |
-| News                               | `data/news.ts`                                    | Add approved articles and metadata only.                        |
-| Membership rules                   | `data/membership.ts`                              | Review governing documents before substantive changes.          |
-| Cheddar Up links                   | `data/cheddar-up.ts`                              | Public collection URLs only; never add admin links.             |
-| Social links                       | `data/social-links.ts`                            | Official public profiles only.                                  |
-| Sponsors                           | Future curated sponsor feed or `data/sponsors.ts` | Obtain permission for names, logos, tiers, and links.           |
-| Public contact configuration       | `data/contact.ts`                                 | Public email and tested Apps Script `/exec` URL only.           |
-| Contact submissions                | Private `Website Contacts` tab                    | Apps Script appends only; never expose workbook data.           |
-| Official social profiles           | `data/social-links.ts`                            | Add only ownership-verified public profiles.                    |
-| Social preview image               | `public/images/og-default.jpg`                    | Keep at 1200 × 630 with approved NETYR branding.                |
-| Governing documents                | `data/governing-documents.ts`                     | Publish only reviewed files in `public/documents/`.             |
+1. Open the dedicated **NETYR Public Events** Google Calendar.
+2. Create or update the event with only approved public details: title, dates,
+   times, location, and description.
+3. For optional website enhancements, place one marker per line in the event
+   description:
 
-## Event workflow
+   ```text
+   Registration: https://public-registration.example/
+   Graphic: https://public-image.example/event.jpg
+   Featured: true
+   ```
 
-1. Add or update the approved public event in `Website Events`.
-2. Enter Event Title, Start Date, and check Active.
-3. Add optional time, location, descriptions, public HTTPS Graphic URL,
-   Registration URL, Featured status, and Display Order.
-4. Uncheck Active to remove an event from the public feed.
-5. Test the Events page after the endpoint cache refreshes.
+4. Do not add attendee lists, private meeting links, internal notes, personal
+   contact details, or credentials.
+5. Publish the event only when its details are ready for public display.
+6. Allow the endpoint cache to refresh, then review `/events/` on desktop and
+   mobile. Remove or correct the Calendar event to remove it from the site.
 
-See `EVENTS_INTEGRATION_GUIDE.md` for field, deployment, and security details.
-
-## Contact workflow
-
-The Contact page always displays `president@netyr.org`. The custom Apps Script
-form appears only when `NEXT_PUBLIC_CONTACT_FORM_EMBED_URL` is a valid public
-Apps Script production URL ending in `/exec`. The same tested public URL powers
-the secondary new-window link.
-
-Administrators manage the server code in
-`integrations/google-apps-script/contact-form/`. The private workbook ID belongs
-only in the Apps Script `SPREADSHEET_ID` property. The script appends only to
-`Website Contacts` and never returns Sheet rows to the website. See
-`CONTACT_FORM_SETUP.md`.
-
-The organization-managed Apps Script project was deployed and its production
-`/exec` URL passed a local embedded end-to-end test on July 26, 2026. The URL is
-stored only in ignored local environment configuration. Before an approved
-GitHub Pages launch, add the same public URL as the repository variable
-`NEXT_PUBLIC_CONTACT_FORM_EMBED_URL`.
-
-After changing any Apps Script source, rerun the isolated tests and update the
-existing production deployment to a new version. Saving editor changes alone
-does not update the deployed web app.
+See [EVENTS_INTEGRATION_GUIDE.md](EVENTS_INTEGRATION_GUIDE.md) for endpoint
+maintenance and testing.
 
 ## Sponsors
 
-Until a curated sponsor feed is approved, update `data/sponsors.ts`. A future
-feed should return only active, public sponsor fields and must never expose the
-source spreadsheet or credentials. See `SPONSOR_INTEGRATION_GUIDE.md`.
+1. Open only the private `Website Sponsors` sheet tab.
+2. Enter the approved sponsor name.
+3. Set `Active` to `true` only after publication approval.
+4. Use `Display Order` to order names when needed.
+5. Review `/sponsors/` after the feed cache refresh.
 
-## Images
+Do not add sponsor contracts, payment records, prices, tiers, notes, logos, or
+private contacts to this public-data tab. The website deliberately displays
+only active sponsor names.
 
-Place approved web images under `public/images/` in a descriptive subfolder.
-Retain original sources separately, create a suitably sized WebP or JPEG for the
-website, and write meaningful alternative text whenever the image conveys
-information.
+## Leadership and organization copy
 
-## News article routes
+- Update centralized typed records under `data/` only after approval.
+- Use current officer names, offices, and approved terms; do not add private
+  contact information.
+- Preserve the Governing Documents link and do not alter the approved PDF.
 
-When the first article is ready:
+## News
 
-1. Add its content to `data/news.ts`.
-2. Create `app/news/[slug]/page.tsx`.
-3. Export every public slug from `generateStaticParams()`.
-4. Use `components/news/article.tsx`.
-5. Add Article structured data and verify the exported route.
+- Add only a leadership-approved announcement or article in the existing static
+  news content structure.
+- Use an accurate title, date, category, excerpt, and approved image.
+- Do not publish drafts, internal recaps, personal data, or unverified claims.
 
-The shared article component also emits breadcrumb data and a
-`news_article_view` analytics event containing only the approved article slug
-and category.
+## Cheddar Up links
 
-## Social profiles and previews
+`data/cheddar-up.ts` is the only place to update public collection URLs. Use
+the approved public collection link, never an administrative or edit URL.
 
-Update verified public profile URLs only in `data/social-links.ts`; the footer,
-Contact page, Get Involved page, and Organization structured data all consume
-that source. Never infer a handle from another platform.
+## Social links and preview artwork
 
-The default social image is `public/images/og-default.jpg` at 1200 × 630. Page
-titles, descriptions, canonical URLs, Open Graph fields, and X card fields are
-generated centrally. After changing a preview:
+- Update verified social profile URLs in `data/social-links.ts`.
+- Update the branded social-preview asset in `public/images/` if needed, then
+  retain the 1200 × 630 composition and review page metadata after deployment.
+- Never guess a social profile URL.
 
-1. Build and deploy the site.
-2. Inspect page source for the new absolute image URL.
-3. Use the destination platform's sharing debugger or card validator.
-4. Request a fresh scrape; platform caches may retain an older image.
+## Before publishing
 
-## Analytics events
+```bash
+npm run format
+npm run lint
+npm run typecheck
+npm run test:contact-integration
+npm run build
+npm audit
+```
 
-Public interaction event names are centralized in `lib/analytics.ts`; delivery
-is configured in `components/analytics/site-analytics.tsx`. Never send names,
-email addresses, phone numbers, messages, form values, spreadsheet data, or
-other personally identifying information as analytics parameters.
-
-## Before publication
-
-Run `npm run format`, `npm run lint`, `npm run typecheck`, `npm run build`, and
-`npm audit`. Review affected pages at mobile and desktop widths. Remove an item
-from `CONTENT_CHECKLIST.md` only after its content, privacy, and operational
-checks are complete.
+Review the changed page locally, commit a focused change, push `main`, monitor
+the Pages workflow, then verify the live route.

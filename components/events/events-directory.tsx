@@ -1,6 +1,7 @@
 "use client";
 
 import { EventCard } from "@/components/events/event-card";
+import { EventCalendar } from "@/components/events/event-calendar";
 import { useEvents } from "@/components/events/use-events";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Section } from "@/components/ui/section";
@@ -27,9 +28,9 @@ export function EventsDirectory({
   return (
     <>
       <Section
-        description="Plan your next chance to connect with NETYR."
+        description="Browse the NETYR calendar, select a date for details, and plan your next chance to connect."
         eyebrow="Calendar"
-        title="Upcoming events"
+        title="NETYR event calendar"
         tone="white"
       >
         {isLoading ? (
@@ -37,11 +38,7 @@ export function EventsDirectory({
             Loading upcoming events…
           </p>
         ) : upcomingEvents.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {upcomingEvents.map((event) => (
-              <EventCard event={event} key={event.id ?? event.slug} />
-            ))}
-          </div>
+          <EventCalendar events={upcomingEvents} />
         ) : (
           <EmptyState
             description={
@@ -57,6 +54,19 @@ export function EventsDirectory({
           />
         )}
       </Section>
+      {upcomingEvents.length > 0 ? (
+        <Section
+          description="Every upcoming event from the NETYR public calendar, ordered by date."
+          eyebrow="Coming up"
+          title="Upcoming events"
+        >
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {upcomingEvents.map((event) => (
+              <EventCard event={event} key={event.id ?? event.slug} />
+            ))}
+          </div>
+        </Section>
+      ) : null}
       {pastEvents.length > 0 ? (
         <Section
           description="Look back at recent NETYR meetings and activities."

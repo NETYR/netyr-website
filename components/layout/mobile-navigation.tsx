@@ -3,17 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 
 import { buttonStyles } from "@/components/ui/button";
+import { cheddarUpLinks } from "@/data/cheddar-up";
 import { navigationItems } from "@/data/navigation";
 
 export function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isGetInvolvedOpen, setIsGetInvolvedOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsGetInvolvedOpen(false);
+        setOpenMenu(null);
         setIsOpen(false);
         menuButtonRef.current?.focus();
       }
@@ -30,7 +31,7 @@ export function MobileNavigation() {
         aria-expanded={isOpen}
         className="border-brand-navy/25 text-brand-navy focus-visible:outline-brand-blue inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm border hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2"
         onClick={() => {
-          if (isOpen) setIsGetInvolvedOpen(false);
+          if (isOpen) setOpenMenu(null);
           setIsOpen((open) => !open);
         }}
         ref={menuButtonRef}
@@ -71,6 +72,10 @@ export function MobileNavigation() {
           <ul className="mx-auto grid max-w-3xl gap-1">
             {navigationItems.map((item) => {
               const hasChildren = Boolean(item.children?.length);
+              const isExpanded = openMenu === item.href;
+              const submenuId = `mobile-${item.label
+                .toLowerCase()
+                .replaceAll(/[^a-z0-9]+/g, "-")}-menu`;
 
               return (
                 <li key={item.href}>
@@ -81,26 +86,28 @@ export function MobileNavigation() {
                           className="text-brand-navy hover:text-brand-blue focus-visible:outline-brand-blue flex min-h-11 flex-1 items-center rounded-sm px-4 py-3 font-bold tracking-wide uppercase hover:bg-blue-50 focus-visible:outline-2"
                           href={item.href}
                           onClick={() => {
-                            setIsGetInvolvedOpen(false);
+                            setOpenMenu(null);
                             setIsOpen(false);
                           }}
                         >
                           {item.label}
                         </a>
                         <button
-                          aria-controls="mobile-get-involved-menu"
-                          aria-expanded={isGetInvolvedOpen}
-                          aria-label={`${isGetInvolvedOpen ? "Close" : "Open"} ${item.label} menu`}
+                          aria-controls={submenuId}
+                          aria-expanded={isExpanded}
+                          aria-label={`${isExpanded ? "Close" : "Open"} ${item.label} menu`}
                           className="text-brand-navy hover:text-brand-blue focus-visible:outline-brand-blue inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm hover:bg-blue-50 focus-visible:outline-2"
                           onClick={() =>
-                            setIsGetInvolvedOpen((current) => !current)
+                            setOpenMenu((current) =>
+                              current === item.href ? null : item.href,
+                            )
                           }
                           type="button"
                         >
                           <svg
                             aria-hidden="true"
                             className={`size-4 transition-transform ${
-                              isGetInvolvedOpen ? "rotate-180" : ""
+                              isExpanded ? "rotate-180" : ""
                             }`}
                             fill="none"
                             viewBox="0 0 12 12"
@@ -115,10 +122,10 @@ export function MobileNavigation() {
                           </svg>
                         </button>
                       </div>
-                      {isGetInvolvedOpen ? (
+                      {isExpanded ? (
                         <ul
                           className="ml-4 grid gap-1 border-l-2 border-blue-100 pl-3"
-                          id="mobile-get-involved-menu"
+                          id={submenuId}
                         >
                           {item.children?.map((child) => (
                             <li key={child.href}>
@@ -126,7 +133,7 @@ export function MobileNavigation() {
                                 className="text-brand-navy hover:text-brand-blue focus-visible:outline-brand-blue block min-h-11 rounded-sm px-4 py-3 font-semibold hover:bg-blue-50 focus-visible:outline-2"
                                 href={child.href}
                                 onClick={() => {
-                                  setIsGetInvolvedOpen(false);
+                                  setOpenMenu(null);
                                   setIsOpen(false);
                                 }}
                               >
@@ -153,7 +160,9 @@ export function MobileNavigation() {
           <div className="mx-auto mt-4 grid max-w-3xl grid-cols-2 gap-3 border-t border-slate-200 pt-4">
             <a
               className={buttonStyles({ variant: "secondary" })}
-              href="/donate/"
+              href={cheddarUpLinks.donations}
+              rel="noopener noreferrer"
+              target="_blank"
               onClick={() => setIsOpen(false)}
             >
               Donate

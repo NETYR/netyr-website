@@ -2,7 +2,6 @@ import Image from "next/image";
 
 import { Container } from "@/components/ui/container";
 import { SocialLinks } from "@/components/social/social-links";
-import { contactConfig } from "@/data/contact";
 import { footerNavigationItems } from "@/data/navigation";
 import { organizationContent } from "@/data/site";
 import { socialLinks } from "@/data/social-links";
@@ -37,14 +36,7 @@ export function Footer() {
           <nav aria-label="Footer navigation" className="mt-5">
             <ul className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-3">
               {footerNavigationItems.map((item) => (
-                <li key={item.href}>
-                  <a
-                    className="inline-flex min-h-11 items-center text-sm text-slate-200 hover:text-white hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
-                    href={item.href}
-                  >
-                    {item.label}
-                  </a>
-                </li>
+                <FooterNavigationLink item={item} key={item.href} />
               ))}
             </ul>
           </nav>
@@ -55,31 +47,43 @@ export function Footer() {
             className="mt-3 text-sm text-slate-200"
             links={socialLinks}
           />
-          <p className="mt-6 text-sm text-slate-300">
-            Email{" "}
-            <a
-              className="font-semibold text-white underline underline-offset-4"
-              data-analytics-context="footer"
-              data-analytics-event="contact_email_click"
-              data-analytics-label="president@netyr.org"
-              href={`mailto:${contactConfig.publicEmail}`}
-            >
-              {contactConfig.publicEmail}
-            </a>
-          </p>
         </div>
       </Container>
       <div className="border-t border-white/15">
         <Container className="flex flex-col gap-2 py-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {siteConfig.name}
+            &copy; {new Date().getFullYear()} {siteConfig.name}
           </p>
           <p>
             Based in {organizationContent.location}. Serving Van Zandt County
-            and adjoining counties.
+            and adjacent counties.
           </p>
         </Container>
       </div>
     </footer>
+  );
+}
+
+function FooterNavigationLink({
+  item,
+}: {
+  item: (typeof footerNavigationItems)[number];
+}) {
+  const external = item.href.startsWith("https://");
+
+  return (
+    <li>
+      <a
+        className="inline-flex min-h-11 items-center text-sm text-slate-200 hover:text-white hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+        href={item.href}
+        rel={external ? "noopener noreferrer" : undefined}
+        target={external ? "_blank" : undefined}
+      >
+        {item.label}
+        {external ? (
+          <span className="sr-only"> (opens in a new tab)</span>
+        ) : null}
+      </a>
+    </li>
   );
 }

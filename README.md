@@ -1,10 +1,10 @@
 # NETYR Website
 
-Official public website for the North East Texas Young Republicans.
+Official public website for the North East Texas Young Republicans (NETYR).
 
 The project uses Next.js, React, TypeScript, Tailwind CSS, the App Router,
-ESLint, and Prettier. It is configured as a static export for deployment to
-GitHub Pages.
+ESLint, and Prettier. It statically exports to GitHub Pages for
+`https://netyr.org`.
 
 ## Prerequisites
 
@@ -21,27 +21,23 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Quality checks
+## Validation
 
 ```bash
-npm run format:check
+npm run format
 npm run lint
 npm run typecheck
 npm run test:contact-integration
 npm run build
+npm audit
 ```
 
-Run the complete validation sequence with:
+`npm run check` runs the project’s combined validation sequence.
 
-```bash
-npm run check
-```
+## Public build configuration
 
-## Environment variables
-
-Copy `.env.example` to `.env.local`. The site URL is required; integration
-values stay blank until the related Google service has been published and
-tested:
+Copy `.env.example` to `.env.local` for local work. The GitHub Pages workflow
+receives the same public values through repository variables:
 
 ```text
 NEXT_PUBLIC_SITE_URL=https://netyr.org
@@ -51,58 +47,34 @@ NEXT_PUBLIC_SPONSORS_FEED_URL=
 NEXT_PUBLIC_GA_MEASUREMENT_ID=
 ```
 
-These are browser-visible values. Use only public feed or web-app URLs. Never
-put a spreadsheet ID, private Drive URL, OAuth token, API key, or credential in
-any `NEXT_PUBLIC_*` variable.
+These values are visible in a built site. Store only public web-app/feed URLs
+or the public analytics measurement ID. Never store spreadsheet or calendar
+identifiers, private Drive links, credentials, tokens, or Apps Script editor
+URLs in a `NEXT_PUBLIC_*` value.
 
-`NEXT_PUBLIC_GA_MEASUREMENT_ID` enables the reduced-data Google Analytics
-configuration and matching Privacy-page disclosure at build time. The
-measurement ID is public website configuration, but it remains centralized in
-local and GitHub Actions environment configuration instead of being duplicated
-across components.
+## Publishing model
 
-## GitHub Pages
+- **Events:** NETYR administrators create approved events in the dedicated
+  `NETYR Public Events` Google Calendar. The read-only Apps Script endpoint
+  returns only public event fields to the Events page.
+- **Contact:** The custom Apps Script HTML Service form writes only to the
+  `Website Contacts` sheet and sends one private notification after each newly
+  accepted submission. The website does not expose the workbook or submission
+  data.
+- **Sponsors:** The isolated `Website Sponsors` sheet supplies approved active
+  sponsor names through a separate public Apps Script feed. The public site
+  displays names only.
+- **Membership and donations:** The approved public Cheddar Up collection is
+  the external destination for membership, dues, and Donate calls to action.
 
-The workflow at `.github/workflows/deploy-pages.yml`:
+## Deployment
 
-- runs for pushes to `main` and supports manual dispatch;
-- installs with `npm ci`;
-- runs the combined validation, production build, and dependency audit;
-- uploads `out/` as the GitHub Pages artifact; and
-- deploys with the official GitHub Pages actions and required permissions.
+`.github/workflows/deploy-pages.yml` runs on pushes to `main` and manual
+dispatch. It installs with `npm ci`, validates, builds the static `out/`
+directory, uploads the Pages artifact, and deploys it with the official GitHub
+Pages actions. Do not add server-only Next.js features without changing the
+hosting architecture.
 
-The application uses `output: "export"` in `next.config.ts`. Avoid features
-that require a runtime server, including Server Actions, request-time cookies,
-and dynamic routes without `generateStaticParams`.
-
-The custom domain is `https://netyr.org`; it must be configured in the
-repository's Pages settings when deployment is approved. GitHub's custom
-Actions workflow ignores `CNAME` files, so none is required. DNS and Google
-Workspace records are outside this repository and must not be changed as part
-of normal application development.
-
-## Documentation
-
-- [Project structure](./PROJECT_STRUCTURE.md)
-- [Contributing](./CONTRIBUTING.md)
-- [Content update guide](./CONTENT_UPDATE_GUIDE.md)
-- [Deployment guide](./DEPLOYMENT_GUIDE.md)
-- [Events integration guide](./EVENTS_INTEGRATION_GUIDE.md)
-- [Sponsor integration guide](./SPONSOR_INTEGRATION_GUIDE.md)
-- [Contact form setup](./CONTACT_FORM_SETUP.md)
-- [Content checklist](./CONTENT_CHECKLIST.md)
-- [Source notes](./SOURCE_NOTES.md)
-- [Final review](./FINAL_REVIEW.md)
-- [Operations guide](./OPERATIONS_GUIDE.md)
-- [Performance report](./PERFORMANCE_REPORT.md)
-
-## Current content state
-
-The public architecture, refined organization copy, current officer names and
-terms, official federation link, public email, and approved membership Cheddar
-Up destination are integrated. The custom Apps Script contact form has been
-created, deployed, and tested end to end in the local production build. Its
-public `/exec` URL and the Website Events endpoint are environment-configured in
-the live GitHub Pages build. The sponsor provider remains inactive until an
-approved source is supplied. Review `CONTENT_CHECKLIST.md` for post-launch
-content and operational tasks.
+See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md),
+[CONTENT_UPDATE_GUIDE.md](CONTENT_UPDATE_GUIDE.md), and
+[OPERATIONS_GUIDE.md](OPERATIONS_GUIDE.md) for operating procedures.

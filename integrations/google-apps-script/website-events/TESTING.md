@@ -1,25 +1,21 @@
-# Website Events Endpoint Testing
+# NETYR Public Events Endpoint Testing
 
-Complete these checks before adding the endpoint to GitHub Pages:
+1. Run `runWebsiteEventsTests()` and confirm the isolated tests pass.
+2. Create one temporary future event in **NETYR Public Events** with a distinct
+   test title and non-sensitive public details.
+3. Leave the graphic marker out and confirm the website uses the branded
+   fallback.
+4. Open the deployed `/exec` URL and confirm it returns `ok: true` and only
+   public event fields.
+5. Add valid public `Registration`, `Graphic`, and `Featured` markers. Confirm
+   the public interface handles them correctly.
+6. Confirm a malformed optional marker does not break the feed.
+7. Confirm a past Calendar event is absent from the endpoint.
+8. Confirm events are chronological and no Google Meet link, attendee,
+   organizer, Calendar identifier, metadata, or private description is exposed.
+9. Configure the public endpoint locally, build, and review `/events/` on
+   mobile and desktop.
+10. Delete only the temporary test event afterward.
 
-1. Add one future test event to `Website Events`.
-2. Enter an Event Title and Start Date, then check Active.
-3. Leave Graphic URL blank and confirm the website uses its branded fallback.
-4. Open the deployed `/exec` URL in a private browser window.
-5. Confirm the response has `ok: true` and contains only the test event's public
-   fields.
-6. Uncheck Active, reload after 60 seconds, and confirm the event is absent.
-7. Re-enable the event and add a valid public HTTPS Graphic URL.
-8. Confirm the graphic loads and a broken or non-HTTPS URL falls back safely.
-9. Add an incomplete row without a title or start date and confirm it is
-   skipped without breaking the response.
-10. Add a formula to a test row and confirm that entire row is skipped.
-11. Confirm past events are excluded unless `INCLUDE_PAST_EVENTS` is `true`.
-12. Confirm events are chronological.
-13. Confirm the response does not contain other tab names, workbook metadata,
-    formulas, notes, or roster data.
-14. Set `NEXT_PUBLIC_EVENTS_ENDPOINT` locally, run `npm run build`, and review
-    `/events/` at mobile and desktop widths.
-15. Remove all test rows that are not approved for public display.
-
-The endpoint is not live until the deployed URL has passed these checks.
+The feed is not production-ready until the public response and website review
+pass without private data exposure.

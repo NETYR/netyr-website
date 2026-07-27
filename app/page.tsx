@@ -8,6 +8,7 @@ import { FeatureCard } from "@/components/ui/feature-card";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
 import { events } from "@/data/events";
+import { cheddarUpLinks } from "@/data/cheddar-up";
 import { membershipContent } from "@/data/membership";
 import { newsArticles } from "@/data/news";
 import { homepageContent, organizationContent } from "@/data/site";
@@ -197,7 +198,13 @@ export default function HomePage() {
         title="Help build what comes next"
         tone="white"
       >
-        <Button href="/donate/">Support NETYR</Button>
+        <Button
+          href={cheddarUpLinks.donations}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Support NETYR
+        </Button>
       </Section>
 
       <Callout

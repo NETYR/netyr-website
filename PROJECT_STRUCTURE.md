@@ -1,91 +1,57 @@
 # Project Structure
 
-## Top-level directories
-
 ```text
-app/                  App Router routes, layouts, and metadata routes
-components/           Shared React components
-  events/             Event loading, cards, previews, and directory
-  layout/             Site-wide header, footer, and navigation
-  news/               Reusable article presentation
-  seo/                Structured-data components
-  sponsors/           Sponsor feed and directory presentation
-  ui/                 Reusable presentation primitives
-data/                 Typed, non-secret site data
-hooks/                Shared client-side React hooks
-integrations/         Undeployed external-service source and setup notes
-  google-apps-script/ Privacy-scoped events and contact-form web apps
-lib/                  Utilities and site-wide configuration
-  events/             Event provider and normalization
-  sponsors/           Sponsor provider and normalization
-public/               Static files copied directly to the build output
-  documents/          Approved, privacy-reviewed public downloads when supplied
-  images/             Approved images and social artwork
+app/                  Static App Router routes and metadata routes
+components/           Reusable interface components
+  donate/             External Donate forwarding
+  events/             Calendar, feed state, cards, and previews
+  layout/             Header, footer, and accessible navigation
+  sponsors/           Sponsor-name feed presentation
+  ui/                 Shared visual primitives
+data/                 Typed, non-secret organization content
+integrations/         Version-controlled Apps Script source and safe setup notes
+  google-apps-script/
+    contact-form/     HTML Service contact form and server validation
+    website-events/   Dedicated Calendar public-events endpoint
+    website-sponsors/ Sponsor-name public-feed endpoint
+lib/                  Site configuration and provider utilities
+public/               Static website assets
+  documents/          Approved public governing-document PDF
+  images/             Brand and social-preview images
 styles/               Global styles and design tokens
 types/                Shared TypeScript types
 ```
 
-## Architecture guidelines
+## Architecture rules
 
-- Keep route files focused on composition and route-specific metadata.
-- Put reusable layout elements in `components/layout`.
-- Put general-purpose visual primitives in `components/ui`.
-- Prefer Server Components. Add `"use client"` only when browser state, event
-  handlers, or browser APIs are required.
-- Keep organization content in `data` once approved instead of embedding it
-  repeatedly in components.
-- Keep secrets out of `NEXT_PUBLIC_*` variables and out of the repository.
-- Use semantic HTML before adding ARIA. Every interactive control must support
-  keyboard use and visible focus.
-- Add meaningful alternative text for informative images and empty alternative
-  text for decorative images.
+- Keep route files focused on composition and route metadata.
+- Keep repeated organization facts in `data/`, never in multiple page files.
+- Use Server Components by default; use a client component only for genuine
+  browser interaction such as menus and the event calendar.
+- Keep sensitive identifiers and credentials out of the repository and out of
+  all `NEXT_PUBLIC_*` variables.
+- Treat the three Apps Script packages as separate trust boundaries. Each
+  package accesses only its fixed private resource and returns only approved
+  public data.
+- Use semantic HTML, keyboard access, visible focus, and meaningful image
+  alternatives before adding ARIA.
 
-## Static export constraints
+## Static-export constraints
 
-GitHub Pages serves the generated `out` directory uploaded by
-`.github/workflows/deploy-pages.yml`. Every route must be renderable at build
-time. Dynamic routes must provide `generateStaticParams`. The production site
-uses the custom root domain, so no repository-name base path is configured.
-Do not introduce request-time server features without an explicit hosting
-architecture review.
+GitHub Pages serves the generated `out/` directory from
+`.github/workflows/deploy-pages.yml`. Routes must render at build time. Do not
+introduce request-time cookies, API routes, middleware, Server Actions, or
+other server-runtime features without an explicit hosting review.
 
-Internal navigation intentionally uses semantic anchors instead of Next.js
-client-navigation links. This avoids exported React Server Component prefetch
-paths that generic GitHub Pages hosting cannot rewrite, while preserving normal
-URLs, keyboard behavior, and static document navigation.
-
-## Deployment workflow
-
-The GitHub Actions workflow has separate build and deploy jobs. It runs
-validation and a static build with Node 24, uploads `out/` using the official
-Pages artifact action, and deploys only from `main` with Pages and OIDC
-permissions. Concurrency prevents overlapping deployments.
+The production domain is the root domain, `https://netyr.org`; no repository
+base path is configured. Internal navigation uses semantic anchors so exported
+URLs remain reliable on generic static hosting.
 
 ## Core components
 
-- `Header`: site identity and navigation shell
-- `Footer`: site-wide footer
-- `Navigation`: desktop primary navigation
-- `MobileNavigation`: accessible mobile menu
-- `EventsDirectory` and `EventsPreview`: runtime public event-feed views
-- `EventCard`: event graphic, fallback, details, and add-to-calendar actions
-- Contact page: responsive custom Apps Script form embed with an email fallback
-- `SponsorDirectory`: curated sponsor-feed presentation
-- `Hero`: reusable page introduction
-- `Button`: link and native-button variants
-- `Card`: bordered content surface
-- `Section`: consistent vertical section spacing and headings
-- `Container`: responsive maximum-width wrapper
-- `CheddarUpButton`: safe external payment/registration action with a disabled
-  state when an approved URL is absent
-- `EmptyState`: non-misleading presentation for content awaiting approval
-- `Callout` and `FeatureCard`: reusable action and information surfaces
-
-## Public routes
-
-`/`, `/about`, `/leadership`, `/events`, `/membership`, `/get-involved`,
-`/news`, `/sponsors`, `/donate`, `/contact`, `/governing-documents`,
-`/privacy`, and `/accessibility`, plus a custom not-found page.
-
-The individual news route is intentionally deferred until an approved article
-exists. Static export requires every dynamic slug to be known at build time.
+- `Header`, `Navigation`, and `MobileNavigation`: accessible global navigation
+- `Footer`: organization summary, public navigation, and verified social links
+- `EventCalendar`, `EventsDirectory`, and `EventCard`: public Calendar feed UI
+- `SponsorDirectory`: public sponsor-name feed UI
+- `CheddarUpButton`: safe external payment and registration action
+- `Hero`, `Button`, `Card`, `Section`, and `Container`: shared layout primitives

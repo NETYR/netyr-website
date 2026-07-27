@@ -2,7 +2,11 @@ import type { NavigationItem } from "@/types/navigation";
 
 export const navigationItems: NavigationItem[] = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about/" },
+  {
+    label: "About",
+    href: "/about/",
+    children: [{ label: "Governing Documents", href: "/governing-documents/" }],
+  },
   { label: "Leadership", href: "/leadership/" },
   { label: "Events", href: "/events/" },
   {
@@ -28,8 +32,9 @@ export const footerNavigationItems: NavigationItem[] = [
   { label: "News", href: "/news/" },
   { label: "Sponsors", href: "/sponsors/" },
   { label: "Contact Us", href: "/contact/" },
-  { label: "Donate", href: "/donate/" },
+  {
+    label: "Donate",
+    href: "https://my.cheddarup.com/c/north-east-tx-young-republicans-dues/items",
+  },
   { label: "Governing Documents", href: "/governing-documents/" },
-  { label: "Privacy Policy", href: "/privacy/" },
-  { label: "Accessibility", href: "/accessibility/" },
 ];

@@ -98,7 +98,7 @@ export default function AboutPage() {
         </a>
       </Section>
       <Section
-        description="NETYR is rooted in Van Zandt County and connected to adjoining communities across Northeast Texas."
+        description="NETYR is rooted in Van Zandt County and connected to adjacent communities across Northeast Texas."
         eyebrow="Our region"
         title="Local roots. Regional impact."
         tone="white"

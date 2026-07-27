@@ -1,300 +1,144 @@
 const EVENTS_CONFIG = Object.freeze({
-  spreadsheetProperty: "SPREADSHEET_ID",
+  publicCalendarProperty: "PUBLIC_CALENDAR_ID",
   includePastProperty: "INCLUDE_PAST_EVENTS",
-  sheetName: "Website Events",
+  cacheSeconds: 300,
+  maximumFutureDays: 548,
   timeZone: "America/Chicago",
-  cacheSeconds: 60,
-  maximumRows: 5000,
 });
-
-const EVENT_HEADERS = Object.freeze([
-  "Event ID",
-  "Event Title",
-  "Start Date",
-  "Start Time",
-  "End Date",
-  "End Time",
-  "Location",
-  "Short Description",
-  "Full Description",
-  "Graphic URL",
-  "Registration URL",
-  "Featured",
-  "Active",
-  "Display Order",
-  "Last Updated",
-]);
 
 function doGet() {
   try {
     const cache = CacheService.getScriptCache();
-    const cached = cache.get("public-website-events");
+    const cached = cache.get("netyr-public-events-v2");
     if (cached) return jsonText_(cached);
 
     const properties = PropertiesService.getScriptProperties();
-    const spreadsheetId = properties.getProperty(
-      EVENTS_CONFIG.spreadsheetProperty,
-    );
-    if (!spreadsheetId) {
-      return jsonResponse_({
-        ok: false,
-        message: "Events are temporarily unavailable.",
-        events: [],
-      });
-    }
+    const calendarId = String(
+      properties.getProperty(EVENTS_CONFIG.publicCalendarProperty) || "",
+    ).trim();
+    if (!calendarId) return unavailableResponse_();
 
     const includePast =
       properties.getProperty(EVENTS_CONFIG.includePastProperty) === "true";
-    const events = readPublicEvents_(spreadsheetId, includePast);
-    const result = JSON.stringify({
-      ok: true,
-      generatedAt: new Date().toISOString(),
-      events: events,
-    });
-
-    cache.put("public-website-events", result, EVENTS_CONFIG.cacheSeconds);
-    return jsonText_(result);
-  } catch (error) {
-    return jsonResponse_({
-      ok: false,
-      message: "Events are temporarily unavailable.",
-      events: [],
-    });
+    const events = readPublicCalendarEvents_(calendarId, includePast);
+    const response = JSON.stringify({ ok: true, events: events });
+    cache.put("netyr-public-events-v2", response, EVENTS_CONFIG.cacheSeconds);
+    return jsonText_(response);
+  } catch (_error) {
+    return unavailableResponse_();
   }
 }
 
-function readPublicEvents_(spreadsheetId, includePast) {
-  const rangeName =
-    "'" +
-    EVENTS_CONFIG.sheetName.replace(/'/g, "''") +
-    "'!A1:O" +
-    (EVENTS_CONFIG.maximumRows + 1);
-  const workbook = Sheets.Spreadsheets.get(spreadsheetId, {
-    fields: "properties.timeZone",
-  });
-  const valueResult = Sheets.Spreadsheets.Values.get(spreadsheetId, rangeName, {
-    majorDimension: "ROWS",
-    valueRenderOption: "UNFORMATTED_VALUE",
-    dateTimeRenderOption: "SERIAL_NUMBER",
-  });
-  const formulaResult = Sheets.Spreadsheets.Values.get(
-    spreadsheetId,
-    rangeName,
-    {
-      majorDimension: "ROWS",
-      valueRenderOption: "FORMULA",
-      dateTimeRenderOption: "SERIAL_NUMBER",
-    },
-  );
-  const rows = valueResult.values || [];
-  const formulaRows = formulaResult.values || [];
-  const headers = rows[0] || [];
-  const hasExpectedHeaders = EVENT_HEADERS.every(function (header, index) {
-    return headers[index] === header;
-  });
-  if (!hasExpectedHeaders) throw new Error("Unexpected event sheet structure.");
-  if (rows.length < 2) return [];
+function readPublicCalendarEvents_(calendarId, includePast) {
+  const calendar = CalendarApp.getCalendarById(calendarId);
+  if (!calendar) throw new Error("Public calendar is unavailable.");
 
-  const spreadsheetTimeZone =
-    (workbook.properties && workbook.properties.timeZone) ||
-    EVENTS_CONFIG.timeZone;
   const now = new Date();
+  const earliest = includePast
+    ? new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+    : new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const latest = new Date(
+    now.getTime() + EVENTS_CONFIG.maximumFutureDays * 24 * 60 * 60 * 1000,
+  );
 
-  return rows
-    .slice(1)
-    .map(function (row, index) {
-      const formulaRow = formulaRows[index + 1] || [];
-      if (
-        formulaRow.some(function (value) {
-          return typeof value === "string" && value.trim().startsWith("=");
-        })
-      ) {
-        return null;
-      }
-
-      return publicEvent_(row, spreadsheetTimeZone);
-    })
+  return calendar
+    .getEvents(earliest, latest)
+    .map(publicEvent_)
+    .filter(Boolean)
     .filter(function (event) {
-      if (!event || event.active !== true) return false;
       return includePast || new Date(event.end).getTime() >= now.getTime();
     })
     .sort(function (left, right) {
-      const dateDifference =
-        new Date(left.start).getTime() - new Date(right.start).getTime();
-      if (dateDifference !== 0) return dateDifference;
-      return left.displayOrder - right.displayOrder;
-    })
-    .map(function (event) {
-      delete event.active;
-      delete event.displayOrder;
-      return event;
+      return new Date(left.start).getTime() - new Date(right.start).getTime();
     });
 }
 
-function publicEvent_(row, spreadsheetTimeZone) {
-  const title = cleanText_(row[1], 160);
-  const datePart = datePart_(row[2], spreadsheetTimeZone);
-  const active = boolean_(row[12]);
-  if (!title || !datePart || active !== true) return null;
+function publicEvent_(calendarEvent) {
+  const title = cleanText_(calendarEvent.getTitle(), 160);
+  if (!title) return null;
 
-  const startTime = timePart_(row[3], spreadsheetTimeZone);
-  const allDay = !startTime;
-  const endDatePart = datePart_(row[4], spreadsheetTimeZone) || datePart;
-  const endTime = timePart_(row[5], spreadsheetTimeZone);
-  const start = zonedIso_(datePart, startTime || "00:00:00");
-  let end;
-
-  if (allDay) {
-    end = zonedIso_(addDays_(endDatePart, 1), "00:00:00");
-  } else {
-    end = zonedIso_(endDatePart, endTime || addMinutes_(startTime, 60));
-  }
-
+  const allDay = calendarEvent.isAllDayEvent();
+  const start = formatIso_(calendarEvent.getStartTime(), allDay);
+  const end = formatIso_(calendarEvent.getEndTime(), allDay);
   if (!start || !end) return null;
 
-  const shortDescription = cleanText_(row[7], 600);
-  const fullDescription = cleanText_(row[8], 4000);
-  const eventId =
-    cleanText_(row[0], 200) ||
-    slugify_(title + "-" + datePart + "-" + (startTime || "all-day"));
+  const details = publicDetails_(calendarEvent.getDescription());
+  const location = cleanText_(calendarEvent.getLocation(), 240);
+  const stableId = digest_(title + "|" + start + "|" + end).slice(0, 24);
 
   return {
-    id: eventId,
+    id: stableId,
     title: title,
-    description: shortDescription || fullDescription,
     start: start,
     end: end,
     allDay: allDay,
-    location: cleanText_(row[6], 240),
-    graphicUrl: publicUrl_(row[9]),
-    registrationUrl: publicUrl_(row[10]),
-    featured: boolean_(row[11]),
-    status:
-      new Date(end).getTime() < new Date().getTime() ? "completed" : "upcoming",
-    active: active,
-    displayOrder: finiteNumber_(row[13]),
+    location: location,
+    description: details.description,
+    registrationUrl: details.registrationUrl,
+    graphicUrl: details.graphicUrl,
+    featured: details.featured,
   };
 }
 
-function datePart_(value, sourceTimeZone) {
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return Utilities.formatDate(value, sourceTimeZone, "yyyy-MM-dd");
-  }
-  if (typeof value === "number" && Number.isFinite(value)) {
-    const milliseconds = Math.round((Math.floor(value) - 25569) * 86400000);
-    return Utilities.formatDate(new Date(milliseconds), "UTC", "yyyy-MM-dd");
-  }
-  const candidate = String(value || "").trim();
-  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(candidate);
-  if (isoMatch) return candidate;
-  const usMatch = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(candidate);
-  if (!usMatch) return "";
-  return [
-    usMatch[3],
-    String(usMatch[1]).padStart(2, "0"),
-    String(usMatch[2]).padStart(2, "0"),
-  ].join("-");
+function publicDetails_(description) {
+  const lines = cleanText_(description, 5000).split("\n");
+  let registrationUrl = "";
+  let graphicUrl = "";
+  let featured = false;
+  const publicLines = [];
+
+  lines.forEach(function (line) {
+    const registrationMatch = /^registration\s*:\s*(.+)$/i.exec(line);
+    const graphicMatch = /^graphic\s*:\s*(.+)$/i.exec(line);
+    const featuredMatch = /^featured\s*:\s*(true|yes)$/i.exec(line);
+
+    if (registrationMatch) {
+      registrationUrl = publicUrl_(registrationMatch[1]);
+      return;
+    }
+    if (graphicMatch) {
+      graphicUrl = publicUrl_(graphicMatch[1]);
+      return;
+    }
+    if (featuredMatch) {
+      featured = true;
+      return;
+    }
+
+    const safeLine = line
+      .replace(/https?:\/\/meet\.google\.com\/[^\s]+/gi, "")
+      .replace(/\b[^\s@]+@[^\s@]+\.[^\s@]+\b/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+    if (safeLine) publicLines.push(safeLine);
+  });
+
+  return {
+    description: publicLines.join("\n").slice(0, 1200),
+    registrationUrl: registrationUrl,
+    graphicUrl: graphicUrl,
+    featured: featured,
+  };
 }
 
-function timePart_(value, sourceTimeZone) {
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return Utilities.formatDate(value, sourceTimeZone, "HH:mm:ss");
+function formatIso_(value, allDay) {
+  if (!(value instanceof Date) || Number.isNaN(value.getTime())) return "";
+  if (allDay) {
+    return (
+      Utilities.formatDate(value, EVENTS_CONFIG.timeZone, "yyyy-MM-dd") +
+      "T00:00:00" +
+      Utilities.formatDate(value, EVENTS_CONFIG.timeZone, "XXX")
+    );
   }
-  if (typeof value === "number" && Number.isFinite(value)) {
-    const fraction = ((value % 1) + 1) % 1;
-    const totalSeconds = Math.round(fraction * 86400) % 86400;
-    return [
-      String(Math.floor(totalSeconds / 3600)).padStart(2, "0"),
-      String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0"),
-      String(totalSeconds % 60).padStart(2, "0"),
-    ].join(":");
-  }
-  const candidate = String(value || "").trim();
-  const twelveHourMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(
-    candidate,
-  );
-  if (twelveHourMatch) {
-    let hour = Number(twelveHourMatch[1]) % 12;
-    if (twelveHourMatch[4].toUpperCase() === "PM") hour += 12;
-    return [
-      String(hour).padStart(2, "0"),
-      twelveHourMatch[2],
-      twelveHourMatch[3] || "00",
-    ].join(":");
-  }
-  const twentyFourHourMatch =
-    /^([01]?\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/.exec(candidate);
-  if (!twentyFourHourMatch) return "";
-  return [
-    String(Number(twentyFourHourMatch[1])).padStart(2, "0"),
-    twentyFourHourMatch[2],
-    twentyFourHourMatch[3] || "00",
-  ].join(":");
-}
-
-function zonedIso_(datePart, timePart) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datePart);
-  const timeMatch = /^(\d{2}):(\d{2}):(\d{2})$/.exec(timePart);
-  if (!match || !timeMatch) return "";
-
-  const utcGuess = new Date(
-    Date.UTC(
-      Number(match[1]),
-      Number(match[2]) - 1,
-      Number(match[3]),
-      Number(timeMatch[1]),
-      Number(timeMatch[2]),
-      Number(timeMatch[3]),
-    ),
-  );
-  const offsetText = Utilities.formatDate(
-    utcGuess,
-    EVENTS_CONFIG.timeZone,
-    "Z",
-  );
-  const offsetSign = offsetText[0] === "-" ? -1 : 1;
-  const offsetMinutes =
-    offsetSign *
-    (Number(offsetText.slice(1, 3)) * 60 + Number(offsetText.slice(3, 5)));
-  const instant = new Date(utcGuess.getTime() - offsetMinutes * 60000);
-
   return Utilities.formatDate(
-    instant,
+    value,
     EVENTS_CONFIG.timeZone,
     "yyyy-MM-dd'T'HH:mm:ssXXX",
   );
 }
 
-function addDays_(datePart, days) {
-  const parts = datePart.split("-").map(Number);
-  const date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2] + days));
-  return Utilities.formatDate(date, "UTC", "yyyy-MM-dd");
-}
-
-function addMinutes_(timePart, minutes) {
-  const parts = timePart.split(":").map(Number);
-  const date = new Date(
-    Date.UTC(1970, 0, 1, parts[0], parts[1] + minutes, parts[2]),
-  );
-  return Utilities.formatDate(date, "UTC", "HH:mm:ss");
-}
-
-function boolean_(value) {
-  return value === true || String(value).toLowerCase() === "true";
-}
-
-function finiteNumber_(value) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : Number.MAX_SAFE_INTEGER;
-}
-
-function publicUrl_(value) {
-  const candidate = cleanText_(value, 2000);
-  return /^https:\/\//i.test(candidate) ? candidate : "";
-}
-
 function cleanText_(value, maxLength) {
-  return String(value || "")
+  return String(value == null ? "" : value)
     .replace(/<[^>]*>/g, "")
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
     .replace(/\r\n?/g, "\n")
@@ -302,21 +146,70 @@ function cleanText_(value, maxLength) {
     .slice(0, maxLength);
 }
 
-function slugify_(value) {
-  return (
-    value
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || "event"
-  );
+function publicUrl_(value) {
+  const candidate = cleanText_(value, 2000);
+  return /^https:\/\//i.test(candidate) ? candidate : "";
 }
 
-function jsonResponse_(payload) {
-  return jsonText_(JSON.stringify(payload));
+function digest_(value) {
+  const bytes = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    value,
+    Utilities.Charset.UTF_8,
+  );
+  return Utilities.base64EncodeWebSafe(bytes).replace(/=+$/, "");
+}
+
+function unavailableResponse_() {
+  return jsonText_(
+    JSON.stringify({
+      ok: false,
+      message: "Events are temporarily unavailable.",
+      events: [],
+    }),
+  );
 }
 
 function jsonText_(value) {
   return ContentService.createTextOutput(value).setMimeType(
     ContentService.MimeType.JSON,
   );
+}
+
+function runWebsiteEventsTests() {
+  const results = [];
+  const test = function (name, callback) {
+    callback();
+    results.push(name);
+  };
+
+  test("extracts approved public event markers", function () {
+    const details = publicDetails_(
+      "Open meeting.\nRegistration: https://example.org/register\nGraphic: https://example.org/graphic.png\nFeatured: true",
+    );
+    if (
+      details.description !== "Open meeting." ||
+      details.registrationUrl !== "https://example.org/register" ||
+      details.graphicUrl !== "https://example.org/graphic.png" ||
+      details.featured !== true
+    ) {
+      throw new Error("Public marker parsing failed.");
+    }
+  });
+
+  test("does not return private contact or Meet details", function () {
+    const details = publicDetails_(
+      "Email person@example.org\nhttps://meet.google.com/abc-defg-hij\nPublic note",
+    );
+    if (/example\.org|meet\.google\.com/i.test(details.description)) {
+      throw new Error("Private detail filtering failed.");
+    }
+  });
+
+  test("requires https marker links", function () {
+    const details = publicDetails_("Registration: http://example.org");
+    if (details.registrationUrl) throw new Error("Insecure link accepted.");
+  });
+
+  return { ok: true, passed: results.length, tests: results };
 }

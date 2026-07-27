@@ -3,11 +3,11 @@ export const membershipContent = {
   activeMember: {
     ageMaximum: 40,
     ageMinimum: 18,
-    geography: "Van Zandt County or an adjoining county",
+    geography: "Van Zandt County or an adjacent county",
     requirements: [
       "Be a United States citizen or have a currently pending application for citizenship.",
       "Be a registered voter.",
-      "Maintain a primary residence in Van Zandt County or an adjoining county.",
+      "Maintain a primary residence in Van Zandt County or an adjacent county.",
       "Be between 18 and 40 years old, inclusive.",
       "Pay annual NETYR dues.",
     ],

@@ -1,97 +1,66 @@
 # Deployment Guide
 
-## GitHub Pages architecture
+## Production model
 
-GitHub Actions builds the Next.js static export and uploads `out/` to GitHub
-Pages. The workflow is `.github/workflows/deploy-pages.yml`.
+```text
+main branch -> GitHub Actions -> GitHub Pages -> https://netyr.org
+```
 
-- Automatic trigger: pushes to `main`.
-- Manual trigger: `workflow_dispatch`.
-- Node.js: 24 LTS, matching `.node-version`.
-- Install command: `npm ci`.
-- Validation and build: `npm run check` and `npm audit`.
-- Artifact directory: `out`.
-- Deployment environment: `github-pages`.
-- Production origin: `https://netyr.org`.
+The Pages workflow is `.github/workflows/deploy-pages.yml`. It uses `npm ci`,
+runs the project validation, produces the static `out/` export, uploads it to
+GitHub Pages, and deploys with the official Pages actions.
 
-The workflow uses official GitHub Pages actions with Pages/OIDC permissions and
-deployment concurrency. Public integration URLs are supplied through GitHub
-Actions repository variables; they must never contain spreadsheet IDs,
-credentials, edit links, OAuth tokens, or API keys.
+## Required public repository variables
 
-## Public integration variables
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_EVENTS_ENDPOINT`
+- `NEXT_PUBLIC_CONTACT_FORM_EMBED_URL`
+- `NEXT_PUBLIC_SPONSORS_FEED_URL`
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID`
 
-| Variable                             | Purpose                              | Enable only after                          |
-| ------------------------------------ | ------------------------------------ | ------------------------------------------ |
-| `NEXT_PUBLIC_EVENTS_ENDPOINT`        | Public read-only event JSON endpoint | Apps Script deployment and event tests     |
-| `NEXT_PUBLIC_CONTACT_FORM_EMBED_URL` | Public contact-form `/exec` URL      | Apps Script setup and end-to-end form test |
-| `NEXT_PUBLIC_SPONSORS_FEED_URL`      | Future public sponsor feed           | Sponsor approval and feed test             |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID`      | Public GA4 web-stream measurement ID | GA4 Realtime verification                  |
+Values may contain only public production endpoints or the public analytics
+measurement ID. Never put credentials, private spreadsheet or Calendar IDs,
+private recipient addresses, administrative URLs, or tokens in repository
+variables.
 
-An unset event value leaves a professional empty state. An unset contact-form
-value leaves the public email as the Contact page's working contact method.
+The Events and Sponsors values must be updated after creating a replacement
+Apps Script web-app deployment. Updating the existing contact web-app
+deployment retains its public endpoint.
 
-The contact-form and Website Events production `/exec` endpoints were deployed,
-passed local end-to-end tests on July 26, 2026, and are stored in ignored
-`.env.local` plus the corresponding GitHub Actions repository variables. The
-Events service uses the advanced Sheets API with a read-only OAuth scope.
+## Release steps
 
-## Release procedure
+1. Verify the working tree contains only intended changes.
+2. Run:
 
-1. Resolve or approve each launch-blocking item in `CONTENT_CHECKLIST.md`.
-2. Deploy and test any integration intended to be live.
-3. Add only tested public `/exec` and feed URLs to GitHub Actions repository
-   variables.
-4. Run `npm ci`, `npm run check`, and `npm audit`.
-5. Inspect `out/` and test navigation, the form embed, event graphics, external
-   destinations, metadata, and the custom 404 page.
-6. Review the Privacy page against the exact enabled services.
-7. Confirm `netyr.org` remains configured in GitHub Pages settings.
-8. Merge through the approved Git workflow, allow the `main` workflow to run,
-   and verify HTTPS and production routes.
+   ```bash
+   npm run format
+   npm run lint
+   npm run typecheck
+   npm run test:contact-integration
+   npm run build
+   npm audit
+   ```
 
-## Static-export guardrails
+3. Review the generated static site locally.
+4. Commit a focused change and push `main`.
+5. Monitor the Pages workflow until both build and deployment jobs succeed.
+6. Verify the live homepage and changed route on desktop and mobile.
+7. Verify sitemap, robots, images, metadata, external Cheddar Up actions, and
+   any affected Apps Script feed.
 
-Do not add API routes, middleware, Server Actions, request-time authentication,
-or dynamic routes without complete `generateStaticParams()` coverage. Preserve
-trailing slashes and root-domain paths; do not add a repository-name base path.
-Payment and registration remain on public Cheddar Up collections.
+## Domain safeguards
 
-Runtime Google event data reaches the browser only through the explicitly
-deployed read-only Apps Script endpoint. The custom contact form runs inside a
-separate Apps Script HTML Service web app and uses `google.script.run` for
-server-side validation and append-only submission handling. Spreadsheet IDs,
-private Sheet URLs, edit links, OAuth tokens, API keys, and service-account
-files remain outside the website repository and browser bundle.
-
-Updating the Apps Script editor does not update the production web app. For
-future contact-form changes, rerun `runContactSystemTests()`, update the existing
-deployment to a new version, repeat the embedded end-to-end test, and retain the
-production `/exec` URL unless Google replaces it.
-
-## Domain and email safeguards
-
-The custom domain is set to `netyr.org` in GitHub Pages settings. During DNS
-cutover, replace only the existing Squarespace web-hosting A records and the
-`www` CNAME. Do not remove or alter Google Workspace MX, SPF, DKIM, DMARC, TXT,
-or verification records.
+GitHub Pages owns the website deployment for `netyr.org`. Do not remove or
+alter Google Workspace MX, SPF, DKIM, DMARC, verification, or other mail
+records when maintaining website DNS. Confirm both apex and `www` behavior,
+HTTPS, and the Pages custom-domain status after DNS changes.
 
 ## Rollback
 
-Use the previous successful GitHub Pages deployment. Do not rewrite Git history.
-Correct the issue on a new branch and repeat the release checks.
-
-## Analytics deployment
-
-The workflow reads `NEXT_PUBLIC_GA_MEASUREMENT_ID` from a GitHub Actions
-repository variable. Configure or rotate that public value under **Settings →
-Secrets and variables → Actions → Variables**, then run the Pages workflow. Do
-not place Analytics account credentials, Google login details, or administrator
-links in the repository.
-
-After deployment, open the live website and confirm a page view in GA4 Realtime.
-Tracked actions must use only fixed event names and non-personal labels;
-form-field values must never become analytics parameters.
-
-See `OPERATIONS_GUIDE.md` for Search Console, rollback, social preview, access,
-and quarterly maintenance procedures.
+1. Find the last known good commit on `main`.
+2. Revert the problematic commit with a new commit; do not rewrite shared
+   history.
+3. Push `main`, wait for GitHub Pages, and verify production again.
+4. If an endpoint itself is faulty, first disable the affected public source or
+   update its Apps Script deployment; do not expose a private source as a
+   workaround.

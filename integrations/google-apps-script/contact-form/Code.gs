@@ -20,6 +20,7 @@ const CONTACT_HEADERS = Object.freeze([
 
 const CONTACT_CONFIG = Object.freeze({
   spreadsheetProperty: "SPREADSHEET_ID",
+  notificationRecipientProperty: "NOTIFICATION_RECIPIENT",
   minimumCompletionMilliseconds: 4000,
   sessionLifetimeSeconds: 1800,
   duplicateWindowSeconds: 600,
@@ -186,8 +187,9 @@ function processApprovedSubmission_(values, rateKey, duplicateKey, cache) {
     if (isRateLimited_(rateKey, cache)) return "rate-limited";
     if (isDuplicate_(duplicateKey, cache)) return "duplicate";
 
-    appendSubmission_(values);
+    const rowByHeader = appendSubmission_(values);
     cache.put(duplicateKey, "1", CONTACT_CONFIG.duplicateWindowSeconds);
+    sendContactNotification_(rowByHeader);
     return "written";
   } finally {
     lock.releaseLock();
@@ -236,6 +238,89 @@ function appendSubmission_(values) {
   });
 
   sheet.appendRow(output);
+  return rowByHeader;
+}
+
+function sendContactNotification_(rowByHeader) {
+  const recipient = getNotificationRecipient_();
+  if (!recipient) {
+    console.log("Contact notification recipient is not configured.");
+    return;
+  }
+
+  try {
+    const notification = buildContactNotification_(rowByHeader);
+    MailApp.sendEmail({
+      to: recipient,
+      subject: notification.subject,
+      body: notification.body,
+      name: "NETYR Website",
+    });
+  } catch (_error) {
+    // A notification failure must never discard an accepted submission.
+    console.error("Contact notification could not be sent.");
+  }
+}
+
+function getNotificationRecipient_() {
+  const configured = normalizeText_(
+    PropertiesService.getScriptProperties().getProperty(
+      CONTACT_CONFIG.notificationRecipientProperty,
+    ),
+  ).toLowerCase();
+
+  return isValidEmail_(configured) ? configured : "";
+}
+
+function buildContactNotification_(rowByHeader) {
+  const displayName = cleanNotificationLine_(
+    [rowByHeader["First Name"], rowByHeader["Last Name"]]
+      .filter(Boolean)
+      .join(" "),
+  );
+  const subjectSuffix = displayName ? ": " + displayName : "";
+  const fields = [
+    "Submission ID",
+    "Submitted At",
+    "First Name",
+    "Last Name",
+    "Email",
+    "Phone",
+    "County",
+    "Inquiry Type",
+    "Preferred Contact Method",
+    "Message",
+    "Status",
+  ];
+  const body = fields
+    .filter(function (field) {
+      return rowByHeader[field] !== "" && rowByHeader[field] != null;
+    })
+    .map(function (field) {
+      return field + ": " + cleanNotificationText_(rowByHeader[field]);
+    })
+    .join("\n");
+
+  return {
+    subject: "NETYR website contact" + subjectSuffix,
+    body: body,
+  };
+}
+
+function cleanNotificationLine_(value) {
+  return String(value == null ? "" : value)
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120);
+}
+
+function cleanNotificationText_(value) {
+  return String(value == null ? "" : value)
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+    .trim()
+    .slice(0, 2400);
 }
 
 function validateSubmission_(payload, options) {
@@ -720,6 +805,33 @@ function runContactSystemTests() {
           CONTACT_HEADERS.indexOf("Date of Birth") === -1 &&
           CONTACT_HEADERS.indexOf("Address") === -1,
         "Private roster field detected.",
+      );
+    },
+    tests,
+  );
+
+  runTest_(
+    "notification rendering safety",
+    function () {
+      const notification = buildContactNotification_({
+        "First Name": "Test\r\nVisitor",
+        "Last Name": "Example",
+        "Submission ID": "test-id",
+        "Submitted At": "2026-07-26T12:00:00Z",
+        Email: "visitor@example.com",
+        Phone: "",
+        County: "Example County",
+        "Inquiry Type": "General Question",
+        "Preferred Contact Method": "Email",
+        Message: "A safe test message.",
+        Status: "New",
+      });
+      assert_(
+        notification.subject ===
+          "NETYR website contact: Test Visitor Example" &&
+          notification.body.indexOf("Message: A safe test message.") !== -1 &&
+          notification.subject.indexOf("\n") === -1,
+        "Notification content was not rendered safely.",
       );
     },
     tests,

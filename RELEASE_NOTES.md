@@ -1,25 +1,18 @@
 # Release Notes
 
-## Production website review build
+## Production integration refinement
 
-- Added the complete static public route architecture.
-- Replaced generic foundation styling with a logo-derived NETYR design system.
-- Added accessible desktop and mobile navigation, skip link, focus treatment,
-  reduced-motion support, reusable calls to action, cards, and empty states.
-- Added centralized typed content for membership, leadership, events, news,
-  sponsors, contacts, social links, governing documents, and Cheddar Up URLs.
-- Added source-supported mission, membership, and governance content.
-- Added page metadata, Open Graph defaults, structured organization data,
-  sitemap, robots directives, favicon assets, and a custom 404 page.
-- Added deployment, content, source, design, architecture, roadmap, checklist,
-  and final-review documentation.
-- Deployed and tested the isolated Website Events reader with a read-only
-  advanced Sheets service.
-- Deployed and tested the custom contact form, and configured both public
-  Apps Script endpoints as GitHub Actions repository variables.
-- Configured GitHub Pages to use the existing Actions workflow and `netyr.org`
-  as the custom domain.
-
-No unapproved leader, event, sponsor, contact, social, payment, or news facts
-were added. The public Events feed intentionally remains empty until an
-administrator adds an approved active event.
+- Published the approved NETYR constitution and bylaws PDF through a dedicated
+  Governing Documents page and About submenu.
+- Routed all Donate calls to action to the approved external Cheddar Up
+  collection and updated public copy to use “adjacent counties.”
+- Removed the former public Privacy and Accessibility routes, links, and public
+  contact-email display while preserving accessibility implementation.
+- Updated the custom contact form to send a single private notification after
+  each newly accepted submission; 11 isolated Apps Script tests pass.
+- Replaced the old sheet-based events model with the dedicated `NETYR Public
+Events` Calendar and responsive branded event-calendar interface.
+- Added the isolated Sponsor-name feed using `Website Sponsors`; only active
+  approved names are eligible for public display.
+- Updated deployment, content, source, security, review, and operations
+  documentation for the current production architecture.

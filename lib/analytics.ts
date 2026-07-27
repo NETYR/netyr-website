@@ -2,7 +2,6 @@ export const analyticsEventNames = [
   "membership_link_click",
   "contact_form_view",
   "contact_form_submission_success",
-  "contact_email_click",
   "social_link_click",
   "event_link_click",
   "sponsor_interest_click",
