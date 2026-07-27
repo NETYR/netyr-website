@@ -136,6 +136,13 @@
         successMessage.textContent = result.message;
         successPanel.hidden = false;
         successPanel.focus();
+        window.parent.postMessage(
+          {
+            source: "netyr-contact-form",
+            event: "submission_success",
+          },
+          "*",
+        );
         return;
       }
 

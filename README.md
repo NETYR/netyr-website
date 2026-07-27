@@ -48,11 +48,18 @@ NEXT_PUBLIC_SITE_URL=https://netyr.org
 NEXT_PUBLIC_EVENTS_ENDPOINT=
 NEXT_PUBLIC_CONTACT_FORM_EMBED_URL=
 NEXT_PUBLIC_SPONSORS_FEED_URL=
+NEXT_PUBLIC_GA_MEASUREMENT_ID=
 ```
 
 These are browser-visible values. Use only public feed or web-app URLs. Never
 put a spreadsheet ID, private Drive URL, OAuth token, API key, or credential in
 any `NEXT_PUBLIC_*` variable.
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` enables the reduced-data Google Analytics
+configuration and matching Privacy-page disclosure at build time. The
+measurement ID is public website configuration, but it remains centralized in
+local and GitHub Actions environment configuration instead of being duplicated
+across components.
 
 ## GitHub Pages
 
@@ -86,6 +93,8 @@ of normal application development.
 - [Content checklist](./CONTENT_CHECKLIST.md)
 - [Source notes](./SOURCE_NOTES.md)
 - [Final review](./FINAL_REVIEW.md)
+- [Operations guide](./OPERATIONS_GUIDE.md)
+- [Performance report](./PERFORMANCE_REPORT.md)
 
 ## Current content state
 
@@ -93,7 +102,7 @@ The public architecture, refined organization copy, current officer names and
 terms, official federation link, public email, and approved membership Cheddar
 Up destination are integrated. The custom Apps Script contact form has been
 created, deployed, and tested end to end in the local production build. Its
-public `/exec` URL remains environment-configured and still must be added as a
-GitHub Actions repository variable before an approved website launch. The event
-endpoint and sponsor provider remain inactive. Review `CONTENT_CHECKLIST.md`
-before launch.
+public `/exec` URL and the Website Events endpoint are environment-configured in
+the live GitHub Pages build. The sponsor provider remains inactive until an
+approved source is supplied. Review `CONTENT_CHECKLIST.md` for post-launch
+content and operational tasks.

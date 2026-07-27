@@ -9,4 +9,5 @@ export const siteConfig = {
   locale: "en_US",
   logo: "/images/brand/netyr-logo.webp",
   socialImage: "/images/og-default.jpg",
+  xHandle: "@NET_YR25",
 } as const;

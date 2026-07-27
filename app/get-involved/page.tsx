@@ -5,6 +5,8 @@ import { Callout } from "@/components/ui/callout";
 import { FeatureCard } from "@/components/ui/feature-card";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
+import { SocialLinks } from "@/components/social/social-links";
+import { socialLinks } from "@/data/social-links";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -80,6 +82,19 @@ export default function GetInvolvedPage() {
               <p>{opportunity.description}</p>
               <Button
                 className="mt-5"
+                data-analytics-context={
+                  opportunity.href === "/sponsors/" ? "get_involved" : undefined
+                }
+                data-analytics-event={
+                  opportunity.href === "/sponsors/"
+                    ? "sponsor_interest_click"
+                    : undefined
+                }
+                data-analytics-label={
+                  opportunity.href === "/sponsors/"
+                    ? "explore_sponsorship"
+                    : undefined
+                }
                 href={opportunity.href}
                 variant="secondary"
               >
@@ -88,6 +103,13 @@ export default function GetInvolvedPage() {
             </FeatureCard>
           ))}
         </div>
+      </Section>
+      <Section
+        description="Follow NETYR for public updates and new ways to participate."
+        eyebrow="Stay connected"
+        title="Follow the organization"
+      >
+        <SocialLinks links={socialLinks} />
       </Section>
       <Callout
         actions={

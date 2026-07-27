@@ -78,6 +78,9 @@ export function SponsorDirectory({
             {sponsor.href ? (
               <a
                 className="underline-offset-4 hover:underline"
+                data-analytics-context="sponsor_directory"
+                data-analytics-event="sponsor_interest_click"
+                data-analytics-label={sponsor.name}
                 href={sponsor.href}
                 rel="noopener noreferrer"
                 target="_blank"

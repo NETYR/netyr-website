@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Container } from "@/components/ui/container";
+import { SocialLinks } from "@/components/social/social-links";
 import { contactConfig } from "@/data/contact";
 import { footerNavigationItems } from "@/data/navigation";
 import { organizationContent } from "@/data/site";
@@ -47,27 +48,20 @@ export function Footer() {
               ))}
             </ul>
           </nav>
-          {socialLinks.length > 0 ? (
-            <ul className="mt-6 flex flex-wrap gap-4">
-              {socialLinks.map((item) => (
-                <li key={item.href}>
-                  <a
-                    className="text-sm text-slate-200 underline-offset-4 hover:text-white hover:underline"
-                    href={item.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {item.label}
-                    <span className="sr-only"> (opens in a new tab)</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          <h2 className="mt-7 text-sm font-bold tracking-[0.18em] text-blue-300 uppercase">
+            Follow NETYR
+          </h2>
+          <SocialLinks
+            className="mt-3 text-sm text-slate-200"
+            links={socialLinks}
+          />
           <p className="mt-6 text-sm text-slate-300">
             Email{" "}
             <a
               className="font-semibold text-white underline underline-offset-4"
+              data-analytics-context="footer"
+              data-analytics-event="contact_email_click"
+              data-analytics-label="president@netyr.org"
               href={`mailto:${contactConfig.publicEmail}`}
             >
               {contactConfig.publicEmail}

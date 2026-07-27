@@ -16,6 +16,9 @@ export default function PrivacyPage() {
   const hasContactForm = isAppsScriptContactFormUrl(
     contactConfig.contactFormEmbedUrl,
   );
+  const hasAnalytics = Boolean(
+    process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim(),
+  );
 
   return (
     <>
@@ -28,20 +31,48 @@ export default function PrivacyPage() {
       <Section tone="white">
         <div className="max-w-3xl space-y-10">
           <PrivacySection title="Website use">
-            <p>
-              NETYR does not offer website accounts, use advertising trackers,
-              or set organization-managed cookies. Website analytics are not
-              currently in use.
-            </p>
+            {hasAnalytics ? (
+              <p>
+                NETYR uses Google Analytics to understand which public pages are
+                visited and how visitors use important website links. This
+                information helps the organization improve its website and
+                public communications. NETYR does not use this website analytics
+                setup for advertising.
+              </p>
+            ) : (
+              <p>
+                NETYR does not offer website accounts or use advertising
+                trackers. Website analytics are not active in this build.
+              </p>
+            )}
           </PrivacySection>
           <PrivacySection title="Website hosting">
             <p>
               The hosting provider may process ordinary technical request
               information needed to deliver and secure the site, such as IP
               address, requested URL, browser information, and timestamps. NETYR
-              has not implemented separate website analytics.
+              may also process ordinary website interactions through Google
+              Analytics when analytics is active.
             </p>
           </PrivacySection>
+          {hasAnalytics ? (
+            <PrivacySection title="Analytics information">
+              <p>
+                Google Analytics may receive the page viewed, approximate
+                location, device and browser information, referring page, and
+                interactions such as clicks on membership, event, contact,
+                sponsor, news, and social links. Google Analytics may use
+                first-party cookies or similar browser storage. Advertising
+                storage, advertising personalization, and Google advertising
+                signals are disabled in this site&apos;s configuration.
+              </p>
+              <p className="mt-3">
+                Names, email addresses, phone numbers, contact messages, and
+                other contact-form field values are not sent to Google
+                Analytics.
+              </p>
+            </PrivacySection>
+          ) : null}
           <PrivacySection title="External links and Cheddar Up">
             <p>
               Membership and dues buttons open NETYR&apos;s official Cheddar Up
@@ -59,7 +90,8 @@ export default function PrivacyPage() {
                 Script on Google-controlled domains. Contact information
                 voluntarily submitted through the form is stored in Google
                 Sheets so NETYR can review and respond to the inquiry. Google
-                may process technical information under its own terms.
+                may process technical information under its own terms. Contact
+                form contents are handled separately from website analytics.
               </p>
             ) : (
               <p>
@@ -67,8 +99,9 @@ export default function PrivacyPage() {
                 Apps Script on Google-controlled domains. When enabled,
                 information voluntarily submitted through the form will be
                 stored in Google Sheets, and Google may process technical
-                information under its own terms. Until then, visitors may
-                contact NETYR by email.
+                information under its own terms. Contact form contents are not
+                sent to website analytics. Until then, visitors may contact
+                NETYR by email.
               </p>
             )}
           </PrivacySection>

@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { SiteAnalytics } from "@/components/analytics/site-analytics";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { OrganizationJsonLd } from "@/components/seo/organization-json-ld";
@@ -42,10 +43,16 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: siteConfig.xHandle,
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.socialImage],
   },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#071a33",
 };
 
 export default function RootLayout({
@@ -56,6 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <SiteAnalytics />
         <OrganizationJsonLd />
         <a
           className="sr-only z-50 rounded-md bg-white px-4 py-3 text-slate-950 focus:not-sr-only focus:fixed focus:top-4 focus:left-4"

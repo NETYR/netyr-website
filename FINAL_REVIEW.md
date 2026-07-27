@@ -1,5 +1,26 @@
 # Final Review
 
+## Post-launch operations phase
+
+- Search Console: the `netyr.org` Domain property is verified, the production
+  sitemap is submitted, the live homepage passed URL inspection, and indexing
+  was requested.
+- Analytics: the static-export-compatible GA4 loader and fixed conversion event
+  names are implemented. Advertising storage, personalization, and Google
+  signals are disabled. Contact-form contents are never passed to analytics.
+- Social: verified Facebook, Instagram, TikTok, and X profiles are centralized
+  and presented in the footer, Contact page, Get Involved page, and Organization
+  structured data.
+- Search presentation: unique route metadata and canonical URLs are retained;
+  the branded 1200 × 630 preview, large X card, theme color, icons,
+  Organization schema, WebSite schema, Event schema, Article schema, and
+  article breadcrumbs are implemented.
+- Privacy: the policy distinguishes hosting logs, analytics, external Cheddar
+  Up processing, and separately handled contact-form content.
+- Operations: deployment, publishing, measurement, rollback, access
+  responsibility, and quarterly review procedures are recorded in
+  `OPERATIONS_GUIDE.md`.
+
 ## Review scope
 
 - Pages reviewed: Home, About, Leadership, Events, Membership, Get Involved,

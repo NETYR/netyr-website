@@ -1,4 +1,8 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  ReactNode,
+} from "react";
 
 import { cn } from "@/lib/cn";
 
@@ -10,9 +14,10 @@ type SharedProps = {
   variant?: ButtonVariant;
 };
 
-type LinkButtonProps = SharedProps & {
-  href: string;
-};
+type LinkButtonProps = SharedProps &
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
+    href: string;
+  };
 
 type NativeButtonProps = SharedProps &
   ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -45,8 +50,13 @@ export function Button(props: LinkButtonProps | NativeButtonProps) {
   const classes = buttonStyles({ className, variant });
 
   if ("href" in props && props.href) {
+    const linkProps = { ...(props as LinkButtonProps) };
+    delete linkProps.children;
+    delete linkProps.className;
+    delete linkProps.variant;
+
     return (
-      <a className={classes} href={props.href}>
+      <a className={classes} {...linkProps}>
         {children}
       </a>
     );

@@ -34,7 +34,16 @@ export default function SponsorsPage() {
       >
         {sponsorProgram.tiers.length === 0 ? (
           <EmptyState
-            action={<Button href="/contact/">Ask about sponsorship</Button>}
+            action={
+              <Button
+                data-analytics-context="sponsors_page"
+                data-analytics-event="sponsor_interest_click"
+                data-analytics-label="ask_about_sponsorship"
+                href="/contact/"
+              >
+                Ask about sponsorship
+              </Button>
+            }
             description="Interested in partnering with NETYR? Contact our team to start a conversation."
             title="Sponsorship opportunities are coming"
           />
@@ -56,7 +65,14 @@ export default function SponsorsPage() {
         title="Start a partnership conversation"
         tone="navy"
       >
-        <Button href="/contact/">Contact NETYR</Button>
+        <Button
+          data-analytics-context="sponsors_page"
+          data-analytics-event="sponsor_interest_click"
+          data-analytics-label="start_partnership_conversation"
+          href="/contact/"
+        >
+          Contact NETYR
+        </Button>
       </Section>
     </>
   );

@@ -1,5 +1,19 @@
 # Source Notes
 
+## Post-launch service verification
+
+- Google Search Console — Organization-managed account; Domain property
+  verified for `netyr.org`, sitemap submitted, and homepage indexing requested.
+- Google Analytics — Organization-managed account; GA4 property and production
+  web stream created for `https://netyr.org`. The public measurement ID remains
+  environment-configured and no account credentials are stored here.
+- Official social profiles — Facebook was cross-referenced through the Van
+  Zandt County Republican Party website and confirmed by profile identity;
+  Instagram and X were confirmed through public organization identity and
+  established Republican-organization references; TikTok was confirmed from
+  the signed-in organization-controlled profile. Only public profile URLs are
+  used by the website.
+
 ## Source inventory
 
 | Source                                    | Type                                     | Apparent purpose                                              | Public-facing                                          | Authority                                      | Pages influenced                                                         |

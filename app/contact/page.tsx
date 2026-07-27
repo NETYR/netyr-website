@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
 import { contactConfig, isAppsScriptContactFormUrl } from "@/data/contact";
+import { socialLinks } from "@/data/social-links";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -41,6 +42,9 @@ export default function ContactPage() {
             Send a message to{" "}
             <a
               className="text-brand-blue font-bold underline underline-offset-4"
+              data-analytics-context="contact_page"
+              data-analytics-event="contact_email_click"
+              data-analytics-label="president@netyr.org"
               href={`mailto:${contactConfig.publicEmail}`}
             >
               {contactConfig.publicEmail}
@@ -49,11 +53,23 @@ export default function ContactPage() {
           </p>
           <Button
             className="mt-5"
+            data-analytics-context="contact_page"
+            data-analytics-event="contact_email_click"
+            data-analytics-label="compose_email"
             href={`mailto:${contactConfig.publicEmail}`}
             variant="secondary"
           >
             Compose an email
           </Button>
+        </Card>
+      </Section>
+      <Section
+        description="Keep up with chapter news, events, and opportunities to get involved."
+        eyebrow="Social"
+        title="Follow NETYR"
+      >
+        <Card className="max-w-3xl">
+          <SocialLinks links={socialLinks} />
         </Card>
       </Section>
       {hasEmbeddedForm ? (
@@ -63,13 +79,7 @@ export default function ContactPage() {
           title="Send a message"
         >
           <div className="mx-auto max-w-4xl overflow-hidden rounded-sm border border-slate-200 bg-white shadow-sm">
-            <iframe
-              className="block min-h-[1240px] w-full border-0 sm:min-h-[1100px] lg:min-h-[1040px]"
-              loading="lazy"
-              referrerPolicy="strict-origin-when-cross-origin"
-              src={contactConfig.contactFormEmbedUrl}
-              title="Contact North East Texas Young Republicans"
-            />
+            <ContactFormEmbed src={contactConfig.contactFormEmbedUrl} />
           </div>
           <a
             aria-label="Open the contact form in a new window (opens in a new tab)"
@@ -99,3 +109,5 @@ export default function ContactPage() {
     </>
   );
 }
+import { ContactFormEmbed } from "@/components/contact/contact-form-embed";
+import { SocialLinks } from "@/components/social/social-links";

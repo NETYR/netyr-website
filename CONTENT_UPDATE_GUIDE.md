@@ -20,6 +20,8 @@ into source files.
 | Sponsors                           | Future curated sponsor feed or `data/sponsors.ts` | Obtain permission for names, logos, tiers, and links.           |
 | Public contact configuration       | `data/contact.ts`                                 | Public email and tested Apps Script `/exec` URL only.           |
 | Contact submissions                | Private `Website Contacts` tab                    | Apps Script appends only; never expose workbook data.           |
+| Official social profiles           | `data/social-links.ts`                            | Add only ownership-verified public profiles.                    |
+| Social preview image               | `public/images/og-default.jpg`                    | Keep at 1200 × 630 with approved NETYR branding.                |
 | Governing documents                | `data/governing-documents.ts`                     | Publish only reviewed files in `public/documents/`.             |
 
 ## Event workflow
@@ -78,6 +80,32 @@ When the first article is ready:
 3. Export every public slug from `generateStaticParams()`.
 4. Use `components/news/article.tsx`.
 5. Add Article structured data and verify the exported route.
+
+The shared article component also emits breadcrumb data and a
+`news_article_view` analytics event containing only the approved article slug
+and category.
+
+## Social profiles and previews
+
+Update verified public profile URLs only in `data/social-links.ts`; the footer,
+Contact page, Get Involved page, and Organization structured data all consume
+that source. Never infer a handle from another platform.
+
+The default social image is `public/images/og-default.jpg` at 1200 × 630. Page
+titles, descriptions, canonical URLs, Open Graph fields, and X card fields are
+generated centrally. After changing a preview:
+
+1. Build and deploy the site.
+2. Inspect page source for the new absolute image URL.
+3. Use the destination platform's sharing debugger or card validator.
+4. Request a fresh scrape; platform caches may retain an older image.
+
+## Analytics events
+
+Public interaction event names are centralized in `lib/analytics.ts`; delivery
+is configured in `components/analytics/site-analytics.tsx`. Never send names,
+email addresses, phone numbers, messages, form values, spreadsheet data, or
+other personally identifying information as analytics parameters.
 
 ## Before publication
 

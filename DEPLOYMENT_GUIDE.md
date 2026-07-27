@@ -26,6 +26,7 @@ credentials, edit links, OAuth tokens, or API keys.
 | `NEXT_PUBLIC_EVENTS_ENDPOINT`        | Public read-only event JSON endpoint | Apps Script deployment and event tests     |
 | `NEXT_PUBLIC_CONTACT_FORM_EMBED_URL` | Public contact-form `/exec` URL      | Apps Script setup and end-to-end form test |
 | `NEXT_PUBLIC_SPONSORS_FEED_URL`      | Future public sponsor feed           | Sponsor approval and feed test             |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`      | Public GA4 web-stream measurement ID | GA4 Realtime verification                  |
 
 An unset event value leaves a professional empty state. An unset contact-form
 value leaves the public email as the Contact page's working contact method.
@@ -79,3 +80,18 @@ or verification records.
 
 Use the previous successful GitHub Pages deployment. Do not rewrite Git history.
 Correct the issue on a new branch and repeat the release checks.
+
+## Analytics deployment
+
+The workflow reads `NEXT_PUBLIC_GA_MEASUREMENT_ID` from a GitHub Actions
+repository variable. Configure or rotate that public value under **Settings →
+Secrets and variables → Actions → Variables**, then run the Pages workflow. Do
+not place Analytics account credentials, Google login details, or administrator
+links in the repository.
+
+After deployment, open the live website and confirm a page view in GA4 Realtime.
+Tracked actions must use only fixed event names and non-personal labels;
+form-field values must never become analytics parameters.
+
+See `OPERATIONS_GUIDE.md` for Search Console, rollback, social preview, access,
+and quarterly maintenance procedures.

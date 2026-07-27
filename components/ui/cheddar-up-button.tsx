@@ -32,6 +32,9 @@ export function CheddarUpButton({
     <a
       aria-label={`${label} through Cheddar Up (opens in a new tab)`}
       className={cn(buttonStyles(), className)}
+      data-analytics-context="membership"
+      data-analytics-event="membership_link_click"
+      data-analytics-label={label}
       href={href}
       rel="noopener noreferrer"
       target="_blank"

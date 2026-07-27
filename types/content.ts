@@ -74,5 +74,5 @@ export type GoverningDocument = {
 
 export type SocialLink = {
   href: string;
-  label: string;
+  label: "Facebook" | "Instagram" | "TikTok" | "X";
 };

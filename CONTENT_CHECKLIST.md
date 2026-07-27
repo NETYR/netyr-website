@@ -69,7 +69,7 @@
 - [ ] Confirm the Treasurer vacancy is suitable for public display.
 - [ ] Supply approved officer biographies and headshots if leadership wants them
       displayed.
-- [ ] Supply official social-media profile URLs.
+- [x] Verify and connect official Facebook, Instagram, TikTok, and X profiles.
 - [ ] Supply approved sponsor tiers, benefits, current sponsor names, logos,
       descriptions, and links.
 - [ ] Supply or approve a curated sponsor feed and access method before setting
@@ -95,5 +95,14 @@
 ## Optional enhancements
 
 - [ ] Add captions or transcripts for future public videos.
-- [ ] Add privacy-respecting analytics only after approval and documentation.
+- [x] Complete Google Analytics service-terms approval in the
+      organization-managed account.
+- [x] Create the GA4 production property and web stream.
+- [x] Configure `NEXT_PUBLIC_GA_MEASUREMENT_ID` for GitHub Actions.
+- [ ] Confirm a production Realtime page view and reviewed conversion events
+      after the analytics-enabled deployment.
+- [ ] Obtain organizational legal review of the analytics/privacy disclosure
+      and future consent requirements.
+- [ ] Run the post-deployment Lighthouse matrix and record final scores in
+      `PERFORMANCE_REPORT.md`.
 - [ ] Replace derived favicon assets with an approved dedicated icon set.

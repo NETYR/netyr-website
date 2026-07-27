@@ -39,6 +39,7 @@ export function buildMetadata({
     },
     twitter: {
       card: "summary_large_image",
+      site: siteConfig.xHandle,
       title: `${title} | ${siteConfig.shortName}`,
       description,
       images: [siteConfig.socialImage],
