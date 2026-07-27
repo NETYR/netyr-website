@@ -7,7 +7,9 @@
   was requested.
 - Analytics: the static-export-compatible GA4 loader and fixed conversion event
   names are implemented. Advertising storage, personalization, and Google
-  signals are disabled. Contact-form contents are never passed to analytics.
+  signals are disabled. GA4 Realtime received production traffic, and the live
+  contact flow emitted its reviewed view and success events without form
+  contents.
 - Contact conversion tracking: the deployed Apps Script form sends a fixed
   success-only message to the parent website after Google confirms a write. The
   website validates the Google-hosted origin and records no field values.

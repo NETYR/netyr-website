@@ -99,7 +99,7 @@
       organization-managed account.
 - [x] Create the GA4 production property and web stream.
 - [x] Configure `NEXT_PUBLIC_GA_MEASUREMENT_ID` for GitHub Actions.
-- [ ] Confirm a production Realtime page view and reviewed conversion events
+- [x] Confirm a production Realtime page view and reviewed conversion events
       after the analytics-enabled deployment.
 - [ ] Obtain organizational legal review of the analytics/privacy disclosure
       and future consent requirements.
