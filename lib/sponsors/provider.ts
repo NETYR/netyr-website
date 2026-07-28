@@ -1,9 +1,5 @@
 import type { Sponsor, SponsorTier } from "@/types/content";
 
-export type SponsorProvider = {
-  getSponsors: () => Promise<Sponsor[]>;
-};
-
 const sponsorTiers: SponsorTier[] = ["Patron", "Sustaining", "Supporting"];
 const tierOrder = new Map(sponsorTiers.map((tier, index) => [tier, index]));
 

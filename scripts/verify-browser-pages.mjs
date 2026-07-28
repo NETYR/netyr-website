@@ -85,6 +85,41 @@ async function evaluate(expression) {
   return result.result.value;
 }
 
+async function assertPageHealth(path, viewport) {
+  await navigate(path, path === "/contact/" ? 6000 : 2500);
+  const page = await evaluate(`({
+    hasMain: Boolean(document.querySelector("main")),
+    hasPrimaryHeading: Boolean(document.querySelector("main h1")),
+    viewportWidth: document.documentElement.clientWidth,
+    pageWidth: document.documentElement.scrollWidth
+  })`);
+  assert.equal(page.hasMain, true, `${path} is missing its main landmark.`);
+  assert.equal(
+    page.hasPrimaryHeading,
+    true,
+    `${path} is missing its primary heading.`,
+  );
+  assert.ok(
+    page.pageWidth <= page.viewportWidth + 1,
+    `${path} has horizontal overflow at ${viewport}.`,
+  );
+  assert.deepEqual(
+    consoleErrors,
+    [],
+    `${path} logged a console error at ${viewport}.`,
+  );
+  assert.deepEqual(
+    runtimeErrors,
+    [],
+    `${path} raised a runtime error at ${viewport}.`,
+  );
+  assert.deepEqual(
+    failedRequests,
+    [],
+    `${path} had a failed network request at ${viewport}.`,
+  );
+}
+
 await send("Page.enable");
 await send("Runtime.enable");
 await send("Network.enable");
@@ -303,6 +338,45 @@ assert.equal(
   "Horizontal overflow was detected on the mobile Community Partners page.",
 );
 
+const publicRoutes = [
+  "/",
+  "/about/",
+  "/leadership/",
+  "/events/",
+  "/get-involved/",
+  "/membership/",
+  "/news/",
+  "/sponsors/",
+  "/donate/",
+  "/contact/",
+  "/privacy/",
+  "/accessibility/",
+];
+
+await send("Emulation.setDeviceMetricsOverride", {
+  deviceScaleFactor: 1,
+  height: 900,
+  mobile: false,
+  screenHeight: 900,
+  screenWidth: 1440,
+  width: 1440,
+});
+for (const path of publicRoutes) {
+  await assertPageHealth(path, "desktop");
+}
+
+await send("Emulation.setDeviceMetricsOverride", {
+  deviceScaleFactor: 1,
+  height: 844,
+  mobile: true,
+  screenHeight: 844,
+  screenWidth: 390,
+  width: 390,
+});
+for (const path of publicRoutes) {
+  await assertPageHealth(path, "mobile");
+}
+
 assert.deepEqual(consoleErrors, [], "Browser console errors were detected.");
 assert.deepEqual(
   runtimeErrors,
@@ -324,7 +398,7 @@ console.log(
     eventsFeedResults,
     homepageGoogleRequests,
     homepageFeedResults,
-    pagesChecked: 5,
+    pagesChecked: publicRoutes.length * 2,
     sponsorFeedCount: sponsorFeed.count,
   }),
 );
