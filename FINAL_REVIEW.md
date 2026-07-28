@@ -22,9 +22,9 @@
   accepted write. Its isolated test suite passes 11 tests.
 - Events use the dedicated `NETYR Public Events` Google Calendar through a
   public Apps Script feed, a native monthly list, and a next-event banner.
-- Sponsors use explicit public-recognition fields in the existing master
-  donor/contact source. The feed reads only identity and public sponsor fields,
-  and the page groups approved records as Patron, Sustaining, or Supporting.
+- Community Partners use cumulative valid donations from the existing master
+  workbook. The feed joins by Contact ID, requires Public Display, and returns
+  only approved names grouped as Patron, Sustaining, or Supporting.
 - The compact social utility bar uses only confirmed NETYR profile URLs.
 - The contact embed remains the existing Apps Script form, removes the external
   window option, and supports parent-driven responsive height updates.
@@ -38,10 +38,11 @@
 - The homepage repeated a large events section below the hero. It is replaced
   by a compact, automatically hidden next-event announcement above the social
   utility row and primary header.
-- Sponsor publishing previously assumed a separate website-specific table. The
-  public feed now reads only the approved identity and public-recognition
-  columns in the existing master donor/contact source. Its bounded read was
-  expanded so valid records beyond the first 1,000 rows are not omitted.
+- Community Partner publishing previously trusted a manually entered
+  Sponsorship Level on `Master Contacts` and never aggregated the transaction
+  table. The corrected feed sums valid donations by stable Contact ID, handles
+  duplicate/refund/reversal controls, and applies the constitutional thresholds
+  before publishing names.
 - Confirmed social links were previously concentrated in the footer. The same
   centralized, verified links now appear as accessible icons near the top
   without duplicating URLs.
@@ -59,10 +60,12 @@
   no-events message.
 - The homepage announcement displayed the next future event before and after
   temporary-event cleanup.
-- A temporary Patron record was added to the existing master source, displayed
-  on the Sponsors page, marked private, confirmed absent from the public feed,
-  and then deleted.
-- The sponsor response exposed none of the private contact-field categories.
+- Isolated Community Partner tests verify the $20, $250, and $500 thresholds,
+  under-threshold omission, refund/reversal handling, anonymous and private
+  omission, transaction and name deduplication, tier movement after an amount
+  change, and a response limited to `name` and `tier`.
+- The production Community Partners response exposes none of the private
+  contact or transaction-field categories.
 - The deployed contact form loaded, enforced required fields, accepted one
   non-sensitive validation submission, created a `New` row only in `Website
 Contacts`, and the exact test row was removed afterward.

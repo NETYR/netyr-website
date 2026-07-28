@@ -6,14 +6,14 @@ components/           Reusable interface components
   donate/             External Donate forwarding
   events/             Calendar, feed state, cards, and previews
   layout/             Header, footer, and accessible navigation
-  sponsors/           Sponsor-name feed presentation
+  sponsors/           Community Partner name-list presentation
   ui/                 Shared visual primitives
 data/                 Typed, non-secret organization content
 integrations/         Version-controlled Apps Script source and safe setup notes
   google-apps-script/
     contact-form/     HTML Service contact form and server validation
     website-events/   Dedicated Calendar public-events endpoint
-    website-sponsors/ Sponsor-name public-feed endpoint
+    website-sponsors/ Cumulative Community Partner public-feed endpoint
 lib/                  Site configuration and provider utilities
 public/               Static website assets
   documents/          Approved public governing-document PDF
@@ -52,6 +52,6 @@ URLs remain reliable on generic static hosting.
 - `Header`, `Navigation`, and `MobileNavigation`: accessible global navigation
 - `Footer`: organization summary, public navigation, and verified social links
 - `EventCalendar`, `EventsDirectory`, and `EventCard`: public Calendar feed UI
-- `SponsorDirectory`: tiered public sponsor feed with logo/link fallbacks
+- `SponsorDirectory`: tiered, names-only Community Partner feed
 - `CheddarUpButton`: safe external payment and registration action
 - `Hero`, `Button`, `Card`, `Section`, and `Container`: shared layout primitives

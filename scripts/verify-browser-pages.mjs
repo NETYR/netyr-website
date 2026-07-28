@@ -189,13 +189,36 @@ const sponsorFeed = sponsorsEndpoint
         status: result.status,
         count: Array.isArray(result.payload?.sponsors)
           ? result.payload.sponsors.length
-          : -1
+          : -1,
+        keys: Array.isArray(result.payload?.sponsors)
+          ? [...new Set(result.payload.sponsors.flatMap((sponsor) => Object.keys(sponsor)))].sort()
+          : [],
+        contractIsMinimal: Array.isArray(result.payload?.sponsors)
+          ? result.payload.sponsors.every((sponsor) =>
+              Object.keys(sponsor).sort().join(",") === "name,tier"
+            )
+          : false,
+        namesAreUnique: Array.isArray(result.payload?.sponsors)
+          ? new Set(result.payload.sponsors.map((sponsor) =>
+              String(sponsor.name).toLocaleLowerCase()
+            )).size === result.payload.sponsors.length
+          : false
       }))
       .catch((error) => ({ ok: false, status: 0, count: -1, error: error.name }))`)
   : { ok: false, status: 0, count: -1 };
 const sponsorPage = await evaluate(`document.body.innerText`);
 assert.equal(sponsorFeed.ok, true, "Browser could not load the Sponsors feed.");
 assert.ok(sponsorFeed.count >= 0);
+assert.equal(
+  sponsorFeed.contractIsMinimal,
+  true,
+  "The Community Partners response exposed fields beyond name and tier.",
+);
+assert.equal(
+  sponsorFeed.namesAreUnique,
+  true,
+  "The Community Partners response contained duplicate public names.",
+);
 assert.match(sponsorPage, /Patron/i);
 assert.match(sponsorPage, /Sustaining/i);
 assert.match(sponsorPage, /Supporting/i);
@@ -241,6 +264,19 @@ assert.equal(
   "Horizontal overflow was detected on mobile.",
 );
 
+await navigate("/sponsors/", 5000);
+const mobileSponsors = await evaluate(`({
+  hasCommunityPartnersHeading: /Community Partners/i.test(document.body.innerText),
+  viewportWidth: document.documentElement.clientWidth,
+  pageWidth: document.documentElement.scrollWidth
+})`);
+assert.equal(mobileSponsors.hasCommunityPartnersHeading, true);
+assert.equal(
+  mobileSponsors.pageWidth,
+  mobileSponsors.viewportWidth,
+  "Horizontal overflow was detected on the mobile Community Partners page.",
+);
+
 assert.deepEqual(consoleErrors, [], "Browser console errors were detected.");
 assert.deepEqual(
   runtimeErrors,
@@ -262,7 +298,7 @@ console.log(
     eventsFeedResults,
     homepageGoogleRequests,
     homepageFeedResults,
-    pagesChecked: 4,
+    pagesChecked: 5,
     sponsorFeedCount: sponsorFeed.count,
   }),
 );

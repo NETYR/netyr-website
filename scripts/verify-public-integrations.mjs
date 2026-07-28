@@ -18,6 +18,9 @@ const sponsorsPath = resolve(
 );
 const eventCalendarPath = resolve("components/events/event-calendar.tsx");
 const contactPagePath = resolve("app/contact/page.tsx");
+const sponsorDirectoryPath = resolve(
+  "components/sponsors/sponsor-directory.tsx",
+);
 
 const events = loadAppsScript(eventsPath);
 const eventTests = vm.runInContext("runWebsiteEventsTests()", events.context);
@@ -32,10 +35,17 @@ const sponsorTests = vm.runInContext(
   sponsors.context,
 );
 assert.equal(sponsorTests.ok, true);
-assert.equal(sponsorTests.passed, 5);
-assert.match(sponsors.code, /SPONSOR_SHEET_NAME = "Master Contacts"/);
-assert.match(sponsors.code, /getRange\(1, 1, rowCount, 3\)/);
-assert.match(sponsors.code, /getRange\(1, 10, rowCount, 5\)/);
+assert.equal(sponsorTests.passed, 12);
+assert.match(sponsors.code, /SPONSOR_CONTACT_SHEET_NAME = "Master Contacts"/);
+assert.match(sponsors.code, /SPONSOR_DONATION_SHEET_NAME = "Donations"/);
+assert.match(sponsors.code, /getRange\(2, 1, rowCount, 3\)/);
+assert.match(sponsors.code, /getRange\(2, 9, rowCount, 1\)/);
+assert.match(sponsors.code, /getRange\(2, 13, rowCount, 1\)/);
+assert.match(sponsors.code, /getRange\(firstDataRow, 4, rowCount, 5\)/);
+assert.match(
+  sponsors.code,
+  /tierForCents_\(cumulativeCentsById\[contactId\]\)/,
+);
 assert.doesNotMatch(sponsors.code, /Website Sponsors/);
 
 const eventCalendar = readFileSync(eventCalendarPath, "utf8");
@@ -46,6 +56,10 @@ assert.match(
 
 const contactPage = readFileSync(contactPagePath, "utf8");
 assert.doesNotMatch(contactPage, /Open the contact form in a new window/i);
+
+const sponsorDirectory = readFileSync(sponsorDirectoryPath, "utf8");
+assert.match(sponsorDirectory, /\{tier\} Community Partners/);
+assert.doesNotMatch(sponsorDirectory, /sponsor\.(logo|href)/);
 
 console.log(
   `Public integration verification passed (${eventTests.passed} event tests, ${sponsorTests.passed} sponsor tests).`,
