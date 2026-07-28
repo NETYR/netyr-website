@@ -17,8 +17,9 @@
 
 1. Enter valid transactions in the institutional donor workbook.
 2. Keep donor contact and operational notes private.
-3. The server adapter reads the fixed ledger mapping, totals positive valid
-   amounts, applies a real privacy field if present, and returns names/categories.
+3. The server adapter totals valid transactions by Contact ID when available,
+   applies the real Public Display and any transaction privacy/status controls,
+   and returns names and sponsorship levels only.
 4. Wait up to five minutes or run `clearSponsorCache`.
 5. Verify no amount or private field appears in the response, HTML, or page.
 

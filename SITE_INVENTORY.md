@@ -235,6 +235,6 @@ repository inventory or deployment artifact.
 
 - The public repository contains no spreadsheet/calendar/deployment ID value.
 - Public `/exec` endpoints are supplied only as build variables.
-- Browser responses contain approved event fields or partner `name`/`tier`.
+- Browser responses contain approved event fields or partner `name`/`level`.
 - Contact submissions, donor transactions, member/roster data, recovery data,
   and account credentials remain outside the repository.

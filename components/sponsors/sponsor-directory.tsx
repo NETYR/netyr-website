@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { parseSponsorFeed } from "@/lib/sponsors/provider";
-import type { Sponsor, SponsorTier } from "@/types/content";
+import { parseSponsorFeed, sponsorLevels } from "@/lib/sponsors/provider";
+import type { Sponsor } from "@/types/content";
 
 type SponsorDirectoryProps = {
   feedUrl?: string;
@@ -93,27 +93,27 @@ export function SponsorDirectory({
 
   return (
     <div className="grid gap-12">
-      {(["Patron", "Sustaining", "Supporting"] as SponsorTier[]).map((tier) => {
-        const tierSponsors = sponsors.filter(
-          (sponsor) => sponsor.tier === tier,
+      {sponsorLevels.map((level) => {
+        const levelSponsors = sponsors.filter(
+          (sponsor) => sponsor.level === level,
         );
-        if (tierSponsors.length === 0) return null;
+        if (levelSponsors.length === 0) return null;
 
         return (
-          <section aria-labelledby={`sponsor-tier-${tier}`} key={tier}>
+          <section aria-labelledby={`sponsor-level-${level}`} key={level}>
             <div className="mb-4 border-b border-slate-200 pb-3">
               <h3
                 className="text-brand-navy text-2xl font-bold uppercase"
-                id={`sponsor-tier-${tier}`}
+                id={`sponsor-level-${level}`}
               >
-                {tier} Partners
+                {level}s
               </h3>
             </div>
             <ul className="grid gap-x-10 border-y border-slate-200 bg-white px-5 py-2 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">
-              {tierSponsors.map((sponsor) => (
+              {levelSponsors.map((sponsor) => (
                 <li
                   className="text-brand-navy border-b border-slate-100 py-4 text-lg font-bold last:border-b-0 sm:last:border-b"
-                  key={`${tier}-${sponsor.name}`}
+                  key={`${level}-${sponsor.name}`}
                 >
                   {sponsor.name}
                 </li>

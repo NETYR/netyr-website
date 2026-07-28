@@ -89,7 +89,7 @@ The audited working tree passed:
 - Node.js 24 and npm 11 verification.
 - Formatting, lint, strict type checking, and static export.
 - Eleven isolated contact tests.
-- Three event-adapter and twelve Community Partners adapter tests.
+- Three event-adapter and eighteen Community Partners adapter tests.
 - Dependency audit with zero known vulnerabilities.
 - Unused-file/export analysis with no unresolved findings.
 - Twenty-four route/viewport browser checks covering every public route at
@@ -99,7 +99,7 @@ The audited working tree passed:
 - Live Events and Community Partners feed checks.
 - Live contact rendering, required-field validation, successful submission,
   default `New` status, and exact audit-row removal.
-- Minimal Community Partners response contract (`name` and `tier` only), two
+- Minimal Community Partners response contract (`name` and `level` only),
   unique alphabetized public names, no public currency, and working inquiry
   link.
 - Live robots, sitemap, favicon, DNS, custom 404, and HTTPS checks.
@@ -114,30 +114,30 @@ The audited commits were merged through pull request review, GitHub Pages
 completed successfully, and post-deployment route, integration, privacy, DNS,
 HTTPS, browser, and screenshot checks passed.
 
-## Community Partners required test results
+## Community Partners sponsorship-level update
 
-|   # | Test                                                                  | Result |
-| --: | --------------------------------------------------------------------- | ------ |
-|   1 | Production uses the managed institutional donor workbook              | Pass   |
-|   2 | Fixed worksheet is `Donations`                                        | Pass   |
-|   3 | Header row is 9                                                       | Pass   |
-|   4 | Donor Name maps to column B                                           | Pass   |
-|   5 | Donation Amount maps to column E and parses formatted currency        | Pass   |
-|   6 | Multiple donations aggregate case-insensitively by trimmed donor name | Pass   |
-|   7 | Public names are unique                                               | Pass   |
-|   8 | Cumulative totals select the correct internal category                | Pass   |
-|   9 | Names are alphabetized within categories                              | Pass   |
-|  10 | Empty categories are hidden                                           | Pass   |
-|  11 | No amount appears visually                                            | Pass   |
-|  12 | No amount appears in rendered HTML                                    | Pass   |
-|  13 | No amount appears in browser state                                    | Pass   |
-|  14 | No amount appears in the public response                              | Pass   |
-|  15 | Browser receives only `name` and `tier`                               | Pass   |
-|  16 | Ask About Sponsorship routes to the contact form section              | Pass   |
-|  17 | No invented approval or membership filter controls recognition        | Pass   |
-|  18 | Workbook and production script are managed by NETYR                   | Pass   |
+The adapter now uses Contact ID from the fixed `Donations` ledger when present,
+with a normalized-name fallback. It consults the real `Public Display` field in
+`Master Contacts`, honors real transaction privacy/status fields when present,
+totals valid transactions server-side, and returns only `name` and `level`.
 
-The production feed returned the two current public donor names exactly once,
-alphabetized, in the correct nonempty category. The names are public recognition
-data; amounts, transaction details, workbook metadata, and private contact
-fields never entered the browser.
+|   # | Test                                                   | Result |
+| --: | ------------------------------------------------------ | ------ |
+|   1 | A cumulative total below the public minimum is omitted | Pass   |
+|   2 | Piney Woods minimum classification                     | Pass   |
+|   3 | Lone Star minimum classification                       | Pass   |
+|   4 | Texas Pioneer minimum classification                   | Pass   |
+|   5 | President’s Posse minimum classification               | Pass   |
+|   6 | Multiple donations aggregate                           | Pass   |
+|   7 | Crossing a threshold changes the level                 | Pass   |
+|   8 | Stable Contact ID combines renamed records             | Pass   |
+|   9 | Name fallback is trimmed and case-insensitive          | Pass   |
+|  10 | Public names are unique                                | Pass   |
+|  11 | Names are alphabetized within levels                   | Pass   |
+|  12 | Invalid and nonpositive records are omitted            | Pass   |
+|  13 | Formatted currency parses correctly                    | Pass   |
+|  14 | Real status and privacy controls are honored           | Pass   |
+|  15 | Public Display is enforced                             | Pass   |
+|  16 | All four levels sort from highest to lowest            | Pass   |
+|  17 | Browser receives only `name` and `level`               | Pass   |
+|  18 | No amount or private donor field enters the browser    | Pass   |

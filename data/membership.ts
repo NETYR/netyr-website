@@ -26,7 +26,7 @@ export const membershipContent = {
         "Participation for people who do not qualify for Active Membership. Associate Members do not vote or hold office.",
     },
     {
-      name: "Contributing Member",
+      name: "Community Supporter",
       description:
         "A non-voting way to support NETYR and participate in chapter activities.",
     },

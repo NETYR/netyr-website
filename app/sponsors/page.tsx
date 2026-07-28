@@ -23,7 +23,7 @@ export default function SponsorsPage() {
         compact
         description="We are proud to recognize the community partners whose support helps NETYR connect, serve, and lead across Northeast Texas."
         eyebrow="Community Partners"
-        title="Supporting the next generation"
+        title="Investing in the next generation"
       />
       <Section
         description="We are proud to recognize the community partners who support NETYR."

@@ -46,16 +46,19 @@ const sponsorTests = vm.runInContext(
   sponsors.context,
 );
 assert.equal(sponsorTests.ok, true);
-assert.equal(sponsorTests.passed, 12);
+assert.equal(sponsorTests.passed, 18);
 assert.match(sponsors.code, /PARTNER_DONATION_SHEET_NAME = "Donations"/);
+assert.match(sponsors.code, /PARTNER_CONTACT_SHEET_NAME = "Master Contacts"/);
 assert.match(sponsors.code, /donationHeaderRow: 9/);
-assert.match(sponsors.code, /donorNameColumn: 2/);
-assert.match(sponsors.code, /donationAmountColumn: 5/);
-assert.match(sponsors.code, /getRange\(firstDataRow, 2, rowCount, 1\)/);
-assert.match(sponsors.code, /getRange\(firstDataRow, 5, rowCount, 1\)/);
-assert.doesNotMatch(sponsors.code, /Master Contacts/);
-assert.doesNotMatch(sponsors.code, /Public Display/);
-assert.doesNotMatch(sponsors.code, /Contact ID/);
+assert.match(sponsors.code, /contactHeaderRow: 1/);
+assert.match(sponsors.code, /DONOR_NAME_HEADER = "Donor Name"/);
+assert.match(sponsors.code, /DONATION_AMOUNT_HEADER = "Donation Amount"/);
+assert.match(sponsors.code, /CONTACT_ID_HEADER = "Contact ID"/);
+assert.match(sponsors.code, /PUBLIC_DISPLAY_HEADER = "Public Display"/);
+assert.match(sponsors.code, /amountCents >= 75000/);
+assert.match(sponsors.code, /amountCents >= 50000/);
+assert.match(sponsors.code, /amountCents >= 20000/);
+assert.match(sponsors.code, /amountCents >= 5000/);
 assert.doesNotMatch(sponsors.code, /Website Sponsors/);
 
 const eventCalendar = readFileSync(eventCalendarPath, "utf8");
@@ -68,13 +71,12 @@ const contactPage = readFileSync(contactPagePath, "utf8");
 assert.doesNotMatch(contactPage, /Open the contact form in a new window/i);
 
 const sponsorDirectory = readFileSync(sponsorDirectoryPath, "utf8");
-assert.match(sponsorDirectory, /\{tier\} Partners/);
+assert.match(sponsorDirectory, /\{level\}s/);
 assert.match(
   sponsorDirectory,
   /Community partner recognition will be updated soon\./,
 );
 assert.doesNotMatch(sponsorDirectory, /sponsor\.(logo|href)/);
-assert.doesNotMatch(sponsorDirectory, /approved contributing members/i);
 
 const publicSources = ["app", "components", "data", "lib", "types"].flatMap(
   (directory) => readPublicSourceTree(resolve(directory)),
@@ -89,7 +91,6 @@ assert.deepEqual(
   [],
   "Public source still contains governing-document language.",
 );
-
 console.log(
   `Public integration verification passed (${eventTests.passed} event tests, ${sponsorTests.passed} sponsor tests).`,
 );

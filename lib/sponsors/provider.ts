@@ -1,16 +1,21 @@
-import type { Sponsor, SponsorTier } from "@/types/content";
+import type { Sponsor, SponsorLevel } from "@/types/content";
 
-const sponsorTiers: SponsorTier[] = ["Patron", "Sustaining", "Supporting"];
-const tierOrder = new Map(sponsorTiers.map((tier, index) => [tier, index]));
+export const sponsorLevels: SponsorLevel[] = [
+  "President’s Posse Sponsor",
+  "Texas Pioneer Sponsor",
+  "Lone Star Sponsor",
+  "Piney Woods Sponsor",
+];
+const levelOrder = new Map(sponsorLevels.map((level, index) => [level, index]));
 
 function asString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function asTier(value: unknown) {
+function asLevel(value: unknown) {
   const candidate = asString(value);
-  return sponsorTiers.includes(candidate as SponsorTier)
-    ? (candidate as SponsorTier)
+  return sponsorLevels.includes(candidate as SponsorLevel)
+    ? (candidate as SponsorLevel)
     : null;
 }
 
@@ -19,13 +24,13 @@ function normalizeSponsor(value: unknown): Sponsor | null {
 
   const source = value as Record<string, unknown>;
   const name = asString(source.name);
-  const tier = asTier(source.tier);
+  const level = asLevel(source.level);
 
-  if (!name || !tier) return null;
+  if (!name || !level) return null;
 
   return {
+    level,
     name,
-    tier,
   };
 }
 
@@ -43,8 +48,8 @@ export function parseSponsorFeed(payload: unknown) {
     .filter((sponsor): sponsor is Sponsor => Boolean(sponsor))
     .sort(
       (left, right) =>
-        (tierOrder.get(left.tier) ?? Number.MAX_SAFE_INTEGER) -
-          (tierOrder.get(right.tier) ?? Number.MAX_SAFE_INTEGER) ||
+        (levelOrder.get(left.level) ?? Number.MAX_SAFE_INTEGER) -
+          (levelOrder.get(right.level) ?? Number.MAX_SAFE_INTEGER) ||
         left.name.localeCompare(right.name),
     );
 

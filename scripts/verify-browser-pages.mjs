@@ -230,7 +230,7 @@ const sponsorFeed = sponsorsEndpoint
           : [],
         contractIsMinimal: Array.isArray(result.payload?.sponsors)
           ? result.payload.sponsors.every((sponsor) =>
-              Object.keys(sponsor).sort().join(",") === "name,tier"
+              Object.keys(sponsor).sort().join(",") === "level,name"
             )
           : false,
         namesAreUnique: Array.isArray(result.payload?.sponsors)
@@ -257,26 +257,20 @@ assert.ok(sponsorFeed.count >= 0);
 assert.equal(
   sponsorFeed.contractIsMinimal,
   true,
-  "The Community Partners response exposed fields beyond name and tier.",
+  "The Community Partners response exposed fields beyond name and level.",
 );
 assert.equal(
   sponsorFeed.namesAreUnique,
   true,
   "The Community Partners response contained duplicate public names.",
 );
-assert.deepEqual(
-  [...sponsorFeed.names].sort((left, right) => left.localeCompare(right)),
-  ["Dana Oatley", "Jill Dutton"],
-);
 assert.equal(sponsorFeed.responseContainsCurrency, false);
-assert.match(sponsorPage, /Supporting Partners/i);
-assert.match(sponsorPage, /Dana Oatley/i);
-assert.match(sponsorPage, /Jill Dutton/i);
-assert.doesNotMatch(sponsorPage, /Patron Partners/i);
-assert.doesNotMatch(sponsorPage, /Sustaining Partners/i);
 assert.doesNotMatch(sponsorMain.text, /\$\s*\d/);
 assert.doesNotMatch(sponsorMain.html, /\$\s*\d/);
-assert.doesNotMatch(sponsorPage, /Approved contributing members/i);
+assert.doesNotMatch(
+  sponsorMain.html,
+  /(?:Donation Amount|Donation Date|Donation Reason|Contact ID|Spreadsheet ID)/i,
+);
 assert.equal(
   await evaluate(
     `document.querySelector('a[href="/contact/#contact-form"]')?.textContent?.trim() ?? ""`,

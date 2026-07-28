@@ -5,7 +5,7 @@
 | Feature                 | Source                                         | Server-side boundary                   | Public output                                       | Failure state                                             |
 | ----------------------- | ---------------------------------------------- | -------------------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
 | Events and announcement | `NETYR Public Events` calendar                 | NETYR Website Events Apps Script       | Approved event fields only                          | Explicit unavailable state; not treated as an empty month |
-| Community Partners      | Institutional donor workbook, `Donations` tab  | NETYR Website Sponsors Apps Script     | `name` and `tier` only                              | Explicit connection-error state                           |
+| Community Partners      | Institutional donor workbook, fixed donor tabs | NETYR Website Sponsors Apps Script     | `name` and `level` only                             | Explicit connection-error state                           |
 | Contact                 | Institutional workbook, `Website Contacts` tab | NETYR Website Contact Form Apps Script | Embedded HTML form and generic success/error result | Email alternative and unavailable message                 |
 | Membership and support  | Cheddar Up public collection                   | External Cheddar Up service            | Outbound link only                                  | Link remains a normal external destination                |
 | Analytics               | Browser page and approved interaction events   | Google Analytics 4                     | Aggregate analytics events                          | Site remains functional when disabled                     |
@@ -22,13 +22,13 @@ the public-data boundary.
 
 ## Community Partners
 
-The Apps Script opens only the configured workbook and fixed `Donations` tab.
-It verifies row 9 headers, reads donor names from column B and displayed
-currency from column E beginning at row 10, applies a real privacy column if
-present, normalizes names case-insensitively, aggregates positive valid amounts,
-assigns an internal recognition category, de-duplicates, sorts, and returns only
-the public display name and category. No amount, date, reason, note, contact
-field, row number, workbook metadata, or identifier enters the browser.
+The Apps Script opens only the configured workbook and fixed `Donations` and
+`Master Contacts` tabs. It verifies the live headers, aggregates valid ledger
+transactions by Contact ID when available, uses a normalized-name fallback,
+enforces the real Public Display control, assigns the finalized sponsorship
+level, de-duplicates, sorts, and returns only the public display name and level.
+No amount, date, reason, note, contact field, row number, workbook metadata, or
+identifier enters the browser.
 
 ## Contact
 

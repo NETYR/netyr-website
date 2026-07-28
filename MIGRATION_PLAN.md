@@ -12,8 +12,8 @@
    donor workbook.
 7. Updated the production Contact Form script property to the managed
    roster/contact workbook.
-8. Confirmed the Community Partners public response is successful, contains two
-   current public names, and exposes only `name` and `tier`.
+8. Confirmed the Community Partners public response is successful and exposes
+   only `name` and `level`.
 9. Confirmed the contact form still renders and exposes no workbook identifier.
 10. Confirmed the NETYR public-events calendar and all three production web-app
     projects are already owned by the managed NETYR account.

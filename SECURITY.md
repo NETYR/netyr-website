@@ -17,9 +17,11 @@ another person’s contact submission in a public issue.
   never returns private sheet data.
 - The Events feed reads only the dedicated public-events Calendar.
 - The Community Partners feed reads only fixed server-side fields from
-  `Donations`. It aggregates by normalized Donor Name and returns only the name
-  and calculated tier. Amounts, dates, reasons, notes, organizations, IDs,
-  contact details, row numbers, and workbook metadata are never returned.
+  `Donations` and `Master Contacts`. It aggregates by Contact ID when available,
+  applies the real Public Display and any transaction privacy/status controls,
+  and returns only the name and calculated level. Amounts, dates, reasons,
+  notes, organizations, IDs, contact details, row numbers, and workbook metadata
+  are never returned.
 
 See the integration-package security notes for the respective trust boundaries
 and operating controls.

@@ -59,9 +59,10 @@ is unchanged.
 
 ### Community Partners
 
-- Fixed `Donations` tab and verified header positions.
-- Server-side cumulative aggregation and privacy filtering.
-- Public response contains only `name` and `tier`.
+- Fixed `Donations` and `Master Contacts` tabs with verified header positions.
+- Contact ID-first cumulative aggregation with normalized-name fallback.
+- Real Public Display, transaction-status, and privacy filtering.
+- Public response contains only `name` and `level`.
 - No donor contact, transaction, amount, workbook, row, or identifier data.
 - Five-minute cache and explicit unavailable response.
 

@@ -49,11 +49,15 @@ export type NewsArticle = {
   title: string;
 };
 
-export type SponsorTier = "Patron" | "Sustaining" | "Supporting";
+export type SponsorLevel =
+  | "President’s Posse Sponsor"
+  | "Texas Pioneer Sponsor"
+  | "Lone Star Sponsor"
+  | "Piney Woods Sponsor";
 
 export type Sponsor = {
+  level: SponsorLevel;
   name: string;
-  tier: SponsorTier;
 };
 
 export type SocialLink = {
