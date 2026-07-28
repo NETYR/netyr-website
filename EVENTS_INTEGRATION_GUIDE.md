@@ -23,8 +23,10 @@ The endpoint returns only:
 - optional approved graphic URL
 - featured status
 
-Past events are excluded. Events are ordered chronologically. The endpoint
-uses a short cache, so a calendar update may take a few minutes to appear.
+The endpoint supplies a bounded history and future window so the public
+month selector can show only events belonging to the month currently viewed.
+Events are ordered chronologically. The endpoint uses a five-minute cache, so
+a Calendar update can take up to five minutes to appear automatically.
 
 ## Calendar authoring workflow
 
@@ -53,12 +55,14 @@ uses a short cache, so a calendar update may take a few minutes to appear.
    files, environment variables, or documentation.
 3. Confirm the code and `appsscript.json` match the repository package.
 4. Run `runWebsiteEventsTests()` after any source change.
-5. Deploy or update the web app to execute as the organization account with
+5. Run `clearEventsCache()` when an administrator must verify a Calendar edit
+   immediately rather than waiting for the five-minute cache.
+6. Deploy or update the web app to execute as the organization account with
    public access.
-6. Test the `/exec` endpoint returns JSON containing no private information.
-7. Store the public endpoint only in `NEXT_PUBLIC_EVENTS_ENDPOINT` locally and
+7. Test the `/exec` endpoint returns JSON containing no private information.
+8. Store the public endpoint only in `NEXT_PUBLIC_EVENTS_ENDPOINT` locally and
    as the corresponding GitHub repository variable.
-8. Build and review `/events/` on mobile and desktop before deployment.
+9. Build and review `/events/` on mobile and desktop before deployment.
 
 ## Safe test
 
@@ -69,6 +73,7 @@ Do not leave test events visible to the public.
 
 ## Failure behavior
 
-If no endpoint is configured, the endpoint fails, or there are no approved
-upcoming events, the site displays its professional empty or unavailable state;
-it never shows sample events.
+If no endpoint is configured or the endpoint fails, the site displays an
+unavailable state. If the viewed month has no events, it displays the monthly
+empty state. The compact homepage announcement hides when there is no future
+event; the site never shows sample events.

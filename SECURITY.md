@@ -16,8 +16,9 @@ another person’s contact submission in a public issue.
 - The custom contact-form Apps Script writes only to `Website Contacts` and
   never returns private sheet data.
 - The Events feed reads only the dedicated public-events Calendar.
-- The Sponsors feed reads only the separate `Website Sponsors` tab and returns
-  active sponsor names only.
+- The Sponsors feed reads only identity columns A:C and explicit public sponsor
+  columns J:N on `Master Contacts`; it never reads donor contact details,
+  donation data, notes, or other tabs.
 
 See the integration-package security notes for the respective trust boundaries
 and operating controls.

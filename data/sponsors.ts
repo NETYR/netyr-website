@@ -4,6 +4,9 @@ import type { Sponsor } from "@/types/content";
 export const sponsors: Sponsor[] = [];
 
 export const sponsorProgram = {
-  tiers: [],
-  benefits: [],
+  tiers: [
+    { amount: "$500", name: "Patron" },
+    { amount: "$250", name: "Sustaining" },
+    { amount: "$20", name: "Supporting" },
+  ],
 } as const;

@@ -1,32 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { EventCard } from "@/components/events/event-card";
+import { EventJsonLd } from "@/components/seo/event-json-ld";
 import { Card } from "@/components/ui/card";
+import {
+  eventMonthKey,
+  formatEventDate,
+  formatEventTime,
+} from "@/lib/events/format";
+import { buildAddToCalendarUrl } from "@/lib/events/provider";
 import type { Event } from "@/types/content";
-
-const centralTime = "America/Chicago";
-const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function dateKey(value: string) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.valueOf())) return "";
-
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: centralTime,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  })
-    .formatToParts(parsed)
-    .reduce<Record<string, string>>((result, part) => {
-      if (part.type !== "literal") result[part.type] = part.value;
-      return result;
-    }, {});
-
-  return `${parts.year}-${parts.month}-${parts.day}`;
-}
 
 function monthLabel(month: Date) {
   return new Intl.DateTimeFormat("en-US", {
@@ -36,154 +20,199 @@ function monthLabel(month: Date) {
   }).format(month);
 }
 
-function eventDateLabel(date: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "long",
-    timeZone: centralTime,
-    weekday: "long",
-  }).format(new Date(`${date}T12:00:00-05:00`));
+function monthKey(month: Date) {
+  return `${month.getUTCFullYear()}-${String(month.getUTCMonth() + 1).padStart(
+    2,
+    "0",
+  )}`;
+}
+
+function monthFromKey(value: string) {
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]) - 1;
+  if (!Number.isInteger(year) || month < 0 || month > 11) return null;
+
+  return new Date(Date.UTC(year, month, 1));
+}
+
+function currentCentralMonth() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+  })
+    .formatToParts(new Date())
+    .reduce<Record<string, string>>((result, part) => {
+      if (part.type !== "literal") result[part.type] = part.value;
+      return result;
+    }, {});
+
+  return new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, 1));
 }
 
 export function EventCalendar({ events }: { events: Event[] }) {
-  const currentMonth = new Date();
-  const [visibleMonth, setVisibleMonth] = useState(
-    new Date(Date.UTC(currentMonth.getFullYear(), currentMonth.getMonth(), 1)),
-  );
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [visibleMonth, setVisibleMonth] = useState(currentCentralMonth);
 
-  const eventsByDate = useMemo(() => {
-    const map = new Map<string, Event[]>();
-    events.forEach((event) => {
-      const key = dateKey(event.date);
-      if (!key) return;
-      map.set(key, [...(map.get(key) ?? []), event]);
-    });
-    return map;
-  }, [events]);
+  useEffect(() => {
+    const requestedMonth = new URLSearchParams(window.location.search).get(
+      "month",
+    );
+    const parsedMonth = requestedMonth ? monthFromKey(requestedMonth) : null;
+    if (!parsedMonth) return;
+
+    const update = window.setTimeout(() => setVisibleMonth(parsedMonth), 0);
+    return () => window.clearTimeout(update);
+  }, []);
+
+  const visibleMonthKey = monthKey(visibleMonth);
+  const monthEvents = useMemo(
+    () =>
+      events
+        .filter(
+          (event) =>
+            event.status !== "cancelled" &&
+            eventMonthKey(event.date) === visibleMonthKey,
+        )
+        .sort(
+          (left, right) =>
+            new Date(left.date).valueOf() - new Date(right.date).valueOf(),
+        ),
+    [events, visibleMonthKey],
+  );
 
   const year = visibleMonth.getUTCFullYear();
   const month = visibleMonth.getUTCMonth();
-  const firstWeekday = new Date(Date.UTC(year, month, 1)).getUTCDay();
-  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  const days = Array.from({ length: firstWeekday + daysInMonth }, (_, index) =>
-    index < firstWeekday ? null : index - firstWeekday + 1,
-  );
-  const selectedEvents = selectedDate
-    ? (eventsByDate.get(selectedDate) ?? [])
-    : [];
+  const previousMonth = new Date(Date.UTC(year, month - 1, 1));
+  const nextMonth = new Date(Date.UTC(year, month + 1, 1));
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.8fr)]">
+    <div>
       <Card className="p-4 sm:p-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3">
           <button
-            aria-label={`Show ${monthLabel(new Date(Date.UTC(year, month - 1, 1)))}`}
+            aria-label={`Show ${monthLabel(previousMonth)}`}
             className="text-brand-navy focus-visible:outline-brand-blue inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm border border-slate-200 font-bold hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2"
-            onClick={() =>
-              setVisibleMonth(new Date(Date.UTC(year, month - 1, 1)))
-            }
+            onClick={() => setVisibleMonth(previousMonth)}
             type="button"
           >
             <span aria-hidden="true">&larr;</span>
           </button>
-          <h3 className="text-brand-navy text-center text-xl font-bold uppercase sm:text-2xl">
-            {monthLabel(visibleMonth)}
-          </h3>
+          <div className="text-center">
+            <p className="text-brand-blue text-xs font-bold tracking-[0.14em] uppercase">
+              Public events
+            </p>
+            <h3 className="text-brand-navy mt-1 text-2xl font-bold uppercase sm:text-3xl">
+              {monthLabel(visibleMonth)}
+            </h3>
+          </div>
           <button
-            aria-label={`Show ${monthLabel(new Date(Date.UTC(year, month + 1, 1)))}`}
+            aria-label={`Show ${monthLabel(nextMonth)}`}
             className="text-brand-navy focus-visible:outline-brand-blue inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm border border-slate-200 font-bold hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2"
-            onClick={() =>
-              setVisibleMonth(new Date(Date.UTC(year, month + 1, 1)))
-            }
+            onClick={() => setVisibleMonth(nextMonth)}
             type="button"
           >
             <span aria-hidden="true">&rarr;</span>
           </button>
         </div>
-        <div className="mt-5 grid grid-cols-7 gap-px overflow-hidden rounded-sm border border-slate-200 bg-slate-200">
-          {weekdayLabels.map((label) => (
-            <div
-              className="bg-slate-50 px-1 py-2 text-center text-[0.65rem] font-bold tracking-wide text-slate-600 uppercase sm:text-xs"
-              key={label}
-            >
-              <span className="sm:hidden">{label.slice(0, 1)}</span>
-              <span className="hidden sm:inline">{label}</span>
-            </div>
-          ))}
-          {days.map((day, index) => {
-            if (!day) {
-              return (
-                <div className="min-h-20 bg-white sm:min-h-28" key={index} />
-              );
-            }
-
-            const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-            const dayEvents = eventsByDate.get(key) ?? [];
-            const isSelected = selectedDate === key;
-            const label = `${eventDateLabel(key)}${dayEvents.length ? `, ${dayEvents.length} event${dayEvents.length === 1 ? "" : "s"}` : ""}`;
-
-            return (
-              <button
-                aria-label={label}
-                aria-pressed={isSelected}
-                className={`focus-visible:outline-brand-blue min-h-20 bg-white p-1.5 text-left align-top hover:bg-blue-50 focus-visible:z-10 focus-visible:outline-2 sm:min-h-28 sm:p-2 ${
-                  isSelected
-                    ? "ring-brand-blue bg-blue-50 ring-2 ring-inset"
-                    : ""
-                }`}
-                key={key}
-                onClick={() => setSelectedDate(key)}
-                type="button"
-              >
-                <span className="text-brand-navy text-sm font-bold">{day}</span>
-                {dayEvents.slice(0, 2).map((event) => (
-                  <span
-                    className="bg-brand-blue mt-1 block truncate rounded-sm px-1.5 py-0.5 text-[0.6rem] font-bold text-white sm:text-xs"
-                    key={event.id ?? event.slug}
-                    title={event.title}
-                  >
-                    {event.title}
-                  </span>
-                ))}
-                {dayEvents.length > 2 ? (
-                  <span className="mt-1 block text-[0.6rem] font-bold text-slate-600 sm:text-xs">
-                    +{dayEvents.length - 2} more
-                  </span>
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
       </Card>
-      <aside aria-live="polite" className="self-start">
-        <Card className="bg-slate-50">
-          <p className="text-brand-blue text-xs font-bold tracking-[0.14em] uppercase">
-            {selectedDate ? eventDateLabel(selectedDate) : "Select a date"}
-          </p>
-          <h3 className="text-brand-navy mt-2 text-2xl font-bold uppercase">
-            {selectedDate
-              ? selectedEvents.length
-                ? "Events on this date"
-                : "No events scheduled"
-              : "Event details"}
-          </h3>
-          <p className="mt-3 leading-7 text-slate-600">
-            {selectedDate
-              ? selectedEvents.length
-                ? "Choose an event below for its full details."
-                : "Choose another date to see NETYR events."
-              : "Use the calendar to find a date and view every event scheduled for it."}
-          </p>
-        </Card>
-        {selectedEvents.length > 0 ? (
-          <div className="mt-5 grid gap-5">
-            {selectedEvents.map((event) => (
-              <EventCard event={event} key={event.id ?? event.slug} />
-            ))}
-          </div>
-        ) : null}
-      </aside>
+
+      <div aria-live="polite" className="mt-6">
+        {monthEvents.length === 0 ? (
+          <Card className="border-dashed bg-slate-50 text-center">
+            <p className="text-brand-navy text-lg font-bold">
+              No public events are currently scheduled for this month.
+            </p>
+          </Card>
+        ) : (
+          <ol className="grid gap-5">
+            {monthEvents.map((event) => {
+              const detailsUrl = event.registrationUrl ?? event.detailsUrl;
+              const eventId = `event-${event.id ?? event.slug}`;
+
+              return (
+                <li id={eventId} key={event.id ?? event.slug}>
+                  <EventJsonLd event={event} />
+                  <Card className="grid gap-5 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:p-7">
+                    <div className="border-brand-blue/25 bg-brand-paper flex min-h-24 flex-col items-center justify-center rounded-sm border px-3 py-4 text-center">
+                      <span className="text-brand-blue text-xs font-black tracking-[0.14em] uppercase">
+                        {formatEventDate(event, { month: "short" })}
+                      </span>
+                      <span className="text-brand-navy mt-1 text-4xl leading-none font-black">
+                        {formatEventDate(event, { day: "numeric" })}
+                      </span>
+                      <span className="mt-2 text-xs font-bold text-slate-600">
+                        {formatEventDate(event, { weekday: "short" })}
+                      </span>
+                    </div>
+
+                    <div className="min-w-0">
+                      <h3 className="text-brand-navy text-2xl font-bold uppercase">
+                        {event.title}
+                      </h3>
+                      <dl className="mt-3 grid gap-2 text-sm text-slate-700">
+                        <div className="flex flex-wrap gap-x-2">
+                          <dt className="font-bold">Time:</dt>
+                          <dd>{formatEventTime(event)}</dd>
+                        </div>
+                        {event.location ? (
+                          <div className="flex flex-wrap gap-x-2">
+                            <dt className="font-bold">Location:</dt>
+                            <dd>{event.location}</dd>
+                          </div>
+                        ) : null}
+                      </dl>
+                      {event.description ? (
+                        <p className="mt-4 max-w-3xl leading-7 text-slate-600">
+                          {event.description}
+                        </p>
+                      ) : null}
+                      <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
+                        {detailsUrl ? (
+                          <a
+                            className="text-brand-blue inline-flex min-h-11 items-center font-bold underline underline-offset-4"
+                            data-analytics-context="events"
+                            data-analytics-event="event_link_click"
+                            data-analytics-label="registration_or_details"
+                            href={detailsUrl}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            Event details or registration
+                            <span className="sr-only">
+                              {" "}
+                              (opens in a new tab)
+                            </span>
+                          </a>
+                        ) : null}
+                        {event.status !== "completed" ? (
+                          <a
+                            className="text-brand-blue inline-flex min-h-11 items-center font-bold underline underline-offset-4"
+                            data-analytics-context="events"
+                            data-analytics-event="event_link_click"
+                            data-analytics-label="add_to_google_calendar"
+                            href={buildAddToCalendarUrl(event)}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            Add to Google Calendar
+                            <span className="sr-only">
+                              {" "}
+                              (opens in a new tab)
+                            </span>
+                          </a>
+                        ) : null}
+                      </div>
+                    </div>
+                  </Card>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </div>
     </div>
   );
 }

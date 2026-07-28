@@ -21,17 +21,64 @@
   neutralizes submitted data, and sends one private notification after a newly
   accepted write. Its isolated test suite passes 11 tests.
 - Events use the dedicated `NETYR Public Events` Google Calendar through a
-  public Apps Script feed and a responsive branded month calendar.
-- Sponsors use the isolated `Website Sponsors` tab through a separate feed;
-  the public site displays active sponsor names only.
+  public Apps Script feed, a native monthly list, and a next-event banner.
+- Sponsors use explicit public-recognition fields in the existing master
+  donor/contact source. The feed reads only identity and public sponsor fields,
+  and the page groups approved records as Patron, Sustaining, or Supporting.
+- The compact social utility bar uses only confirmed NETYR profile URLs.
+- The contact embed remains the existing Apps Script form, removes the external
+  window option, and supports parent-driven responsive height updates.
+
+## Root-cause corrections
+
+- Events previously emphasized a general upcoming-events view instead of the
+  selected calendar month. The page now derives a month key from the URL,
+  filters the existing public Calendar feed by that month, and renders a native
+  NETYR list with an exact empty state.
+- The homepage repeated a large events section below the hero. It is replaced
+  by a compact, automatically hidden next-event announcement above the social
+  utility row and primary header.
+- Sponsor publishing previously assumed a separate website-specific table. The
+  public feed now reads only the approved identity and public-recognition
+  columns in the existing master donor/contact source. Its bounded read was
+  expanded so valid records beyond the first 1,000 rows are not omitted.
+- Confirmed social links were previously concentrated in the footer. The same
+  centralized, verified links now appear as accessible icons near the top
+  without duplicating URLs.
+- The contact page exposed an external-window escape link and used a fixed
+  iframe height. The escape link is removed, while the deployed form reports
+  its content height to the parent page for a responsive embedded experience.
+
+## Integration validation completed
+
+- A temporary event was added to `NETYR Public Events`, observed on the site,
+  edited, observed with the updated title, and then deleted. The public feed was
+  refreshed and confirmed to contain no temporary event.
+- July displayed only its July validation event during the test; other-month
+  events did not render in that view. After cleanup, July returned the exact
+  no-events message.
+- The homepage announcement displayed the next future event before and after
+  temporary-event cleanup.
+- A temporary Patron record was added to the existing master source, displayed
+  on the Sponsors page, marked private, confirmed absent from the public feed,
+  and then deleted.
+- The sponsor response exposed none of the private contact-field categories.
+- The deployed contact form loaded, enforced required fields, accepted one
+  non-sensitive validation submission, created a `New` row only in `Website
+Contacts`, and the exact test row was removed afterward.
+- Desktop and 390-pixel mobile browser checks found no console errors, runtime
+  exceptions, failed requests, or horizontal overflow. The embedded form
+  resized to its reported content height.
+- Review screenshots are stored outside the repository in the dated NETYR
+  review-screenshot folder on the project workstation.
 
 ## Accessibility and responsive review
 
 - Semantic landmarks, skip link, keyboard navigation, visible focus states,
   accessible menu controls, reduced-motion support, touch targets, and
   descriptive link text are retained.
-- Event-calendar controls use labels and selected-date announcements.
-- Header, dropdown navigation, event calendar, and form embed are designed for
+- Event-month controls have descriptive labels and a polite content region.
+- Header, social utility row, event list, and form embed are designed for
   mobile through wide desktop without intentional horizontal overflow.
 
 ## SEO and static-export review

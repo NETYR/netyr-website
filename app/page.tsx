@@ -1,13 +1,11 @@
 import Image from "next/image";
 
-import { EventsPreview } from "@/components/events/events-preview";
 import { Button } from "@/components/ui/button";
 import { Callout } from "@/components/ui/callout";
 import { Card } from "@/components/ui/card";
 import { FeatureCard } from "@/components/ui/feature-card";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
-import { events } from "@/data/events";
 import { cheddarUpLinks } from "@/data/cheddar-up";
 import { membershipContent } from "@/data/membership";
 import { newsArticles } from "@/data/news";
@@ -16,8 +14,6 @@ import { sponsors } from "@/data/sponsors";
 import { siteConfig } from "@/lib/site";
 
 export default function HomePage() {
-  const eventsEndpoint = process.env.NEXT_PUBLIC_EVENTS_ENDPOINT;
-
   return (
     <>
       <Hero
@@ -83,15 +79,6 @@ export default function HomePage() {
             Learn about NETYR
           </Button>
         </div>
-      </Section>
-
-      <Section
-        description="Find meetings, socials, volunteer opportunities, and other ways to connect with NETYR."
-        eyebrow="Calendar"
-        title="Upcoming events"
-        tone="white"
-      >
-        <EventsPreview endpoint={eventsEndpoint} initialEvents={events} />
       </Section>
 
       <Section

@@ -12,9 +12,11 @@ const iconPaths = {
 
 export function SocialLinks({
   className = "",
+  iconOnly = false,
   links,
 }: {
   className?: string;
+  iconOnly?: boolean;
   links: SocialLink[];
 }) {
   if (links.length === 0) return null;
@@ -24,8 +26,10 @@ export function SocialLinks({
       {links.map((item) => (
         <li key={item.href}>
           <a
-            aria-label={`Follow NETYR on ${item.label} (opens in a new tab)`}
-            className="focus-visible:outline-brand-blue inline-flex min-h-11 items-center gap-2 rounded-sm px-2 font-semibold underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+            aria-label={`Visit NETYR on ${item.label} (opens in a new tab)`}
+            className={`focus-visible:outline-brand-blue inline-flex min-h-11 items-center justify-center gap-2 rounded-sm font-semibold underline-offset-4 hover:bg-blue-50 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+              iconOnly ? "min-w-11 px-2" : "px-2"
+            }`}
             data-analytics-context="social_profiles"
             data-analytics-event="social_link_click"
             data-analytics-label={item.label}
@@ -41,7 +45,9 @@ export function SocialLinks({
             >
               <path d={iconPaths[item.label]} />
             </svg>
-            <span>{item.label}</span>
+            <span className={iconOnly ? "sr-only" : undefined}>
+              {item.label}
+            </span>
           </a>
         </li>
       ))}

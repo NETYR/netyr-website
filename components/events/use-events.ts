@@ -14,6 +14,7 @@ export function useEvents(initialEvents: Event[], endpoint?: string) {
     if (!endpoint) return;
     const requestUrl = endpoint;
     const controller = new AbortController();
+    let initialRequest = true;
 
     async function loadEvents() {
       try {
@@ -32,12 +33,23 @@ export function useEvents(initialEvents: Event[], endpoint?: string) {
           return;
         setCouldNotLoad(true);
       } finally {
-        setIsLoading(false);
+        if (initialRequest) {
+          initialRequest = false;
+          setIsLoading(false);
+        }
       }
     }
 
     void loadEvents();
-    return () => controller.abort();
+    const refreshTimer = window.setInterval(
+      () => void loadEvents(),
+      5 * 60 * 1000,
+    );
+
+    return () => {
+      controller.abort();
+      window.clearInterval(refreshTimer);
+    };
   }, [endpoint]);
 
   return { couldNotLoad, events, isLoading };

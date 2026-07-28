@@ -9,8 +9,8 @@
 - [x] About navigation includes Governing Documents.
 - [x] Dedicated `NETYR Public Events` Calendar and public calendar-feed
       endpoint architecture.
-- [x] Sponsor-name endpoint architecture using the separate `Website Sponsors`
-      sheet only.
+- [x] Sponsor endpoint reads only approved public-recognition fields from the
+      existing master donor/contact source.
 - [x] Custom contact form with server-side validation, private sheet write, and
       private submission-notification support.
 - [x] Current officer names, offices, and terms displayed without personal
@@ -22,10 +22,11 @@
 
 - [ ] Add an approved public event to `NETYR Public Events` when one is ready.
       Use only public title, time, location, description, and approved links.
-- [ ] Add approved sponsor names to `Website Sponsors`; set `Active` only after
-      publication approval.
-- [ ] Confirm the GitHub repository variables for the public Events and Sponsors
-      endpoints remain set after any Apps Script redeployment.
+- [ ] Complete sponsor level, optional public links, and `Public Display` for
+      each sponsor approved for recognition.
+- [x] GitHub repository variables for the current public Events and Sponsors
+      deployments are synchronized. Reconfirm them after any future Apps Script
+      deployment replacement.
 - [ ] Establish retention, access, assignment, and deletion practices for the
       private `Website Contacts` sheet and notification mailbox.
 

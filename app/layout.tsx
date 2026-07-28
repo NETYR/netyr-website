@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { SiteAnalytics } from "@/components/analytics/site-analytics";
+import { EventAnnouncement } from "@/components/events/event-announcement";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { OrganizationJsonLd } from "@/components/seo/organization-json-ld";
+import { SocialUtilityBar } from "@/components/social/social-utility-bar";
 import { siteConfig } from "@/lib/site";
 import "@/styles/globals.css";
 
@@ -60,6 +62,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const eventsEndpoint = process.env.NEXT_PUBLIC_EVENTS_ENDPOINT;
+
   return (
     <html lang="en">
       <body>
@@ -72,6 +76,8 @@ export default function RootLayout({
           Skip to main content
         </a>
         <div className="flex min-h-screen flex-col">
+          <EventAnnouncement endpoint={eventsEndpoint} />
+          <SocialUtilityBar />
           <Header />
           <main className="flex-1" id="main-content">
             {children}

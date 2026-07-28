@@ -13,9 +13,10 @@
     "typecheck": "tsc --noEmit",
     "test:contact-integration": "node scripts/verify-contact-apps-script.mjs",
     "test:contact-browser": "node scripts/verify-contact-browser.mjs",
+    "test:public-integrations": "node scripts/verify-public-integrations.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:contact-integration && npm run build"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:contact-integration && npm run test:public-integrations && npm run build"
   },
   "dependencies": {
     "next": "16.2.12",

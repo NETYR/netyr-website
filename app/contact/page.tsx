@@ -28,37 +28,10 @@ export default function ContactPage() {
         title="Connect with NETYR"
       />
       {hasEmbeddedForm ? (
-        <Section
-          description="Complete the secure form below and the NETYR team will follow up."
-          eyebrow="Message us"
-          title="Send a message"
-        >
-          <div className="mx-auto max-w-4xl overflow-hidden rounded-sm border border-slate-200 bg-white shadow-sm">
+        <Section className="py-10 sm:py-12 lg:py-16" tone="white">
+          <div className="mx-auto max-w-4xl overflow-hidden rounded-sm border border-slate-200 bg-white shadow-[0_12px_36px_-24px_rgba(7,26,51,0.35)]">
             <ContactFormEmbed src={contactConfig.contactFormEmbedUrl} />
           </div>
-          <a
-            aria-label="Open the contact form in a new window (opens in a new tab)"
-            className="text-brand-blue focus-visible:outline-brand-blue mx-auto mt-5 flex min-h-11 w-fit items-center gap-2 rounded-sm font-bold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
-            href={contactConfig.contactFormEmbedUrl}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Open the contact form in a new window
-            <svg
-              aria-hidden="true"
-              className="size-4"
-              fill="none"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M6 3h7v7M13 3 7.5 8.5M12 9v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </a>
         </Section>
       ) : (
         <Section

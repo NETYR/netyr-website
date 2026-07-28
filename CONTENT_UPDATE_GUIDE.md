@@ -28,15 +28,18 @@ maintenance and testing.
 
 ## Sponsors
 
-1. Open only the private `Website Sponsors` sheet tab.
-2. Enter the approved sponsor name.
-3. Set `Active` to `true` only after publication approval.
-4. Use `Display Order` to order names when needed.
-5. Review `/sponsors/` after the feed cache refresh.
+1. Open the existing master donor/contact workbook and use only the public
+   sponsor fields on `Master Contacts`.
+2. Choose `Patron`, `Sustaining`, or `Supporting` under Sponsorship Level.
+3. Add an optional public HTTPS website URL, logo URL, and display order.
+4. Check `Public Display` only after recognition is approved.
+5. Review `/sponsors/` after the five-minute feed cache refresh.
+6. To withdraw recognition, clear `Public Display`; do not delete unrelated
+   donor or contact information.
 
-Do not add sponsor contracts, payment records, prices, tiers, notes, logos, or
-private contacts to this public-data tab. The website deliberately displays
-only active sponsor names.
+The public endpoint reads only first name, last name, organization, and the
+five public sponsor fields. Phone, email, address, notes, contact IDs, donation
+amounts, and other workbook tabs are not read or returned.
 
 ## Leadership and organization copy
 
@@ -71,6 +74,7 @@ npm run format
 npm run lint
 npm run typecheck
 npm run test:contact-integration
+npm run test:public-integrations
 npm run build
 npm audit
 ```

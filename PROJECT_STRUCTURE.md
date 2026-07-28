@@ -52,6 +52,6 @@ URLs remain reliable on generic static hosting.
 - `Header`, `Navigation`, and `MobileNavigation`: accessible global navigation
 - `Footer`: organization summary, public navigation, and verified social links
 - `EventCalendar`, `EventsDirectory`, and `EventCard`: public Calendar feed UI
-- `SponsorDirectory`: public sponsor-name feed UI
+- `SponsorDirectory`: tiered public sponsor feed with logo/link fallbacks
 - `CheddarUpButton`: safe external payment and registration action
 - `Hero`, `Button`, `Card`, `Section`, and `Container`: shared layout primitives

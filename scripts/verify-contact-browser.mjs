@@ -61,7 +61,8 @@ try {
   if (expectedEmbed) {
     assert.match(siteDom, /Contact North East Texas Young Republicans/);
     assert.match(siteDom, new RegExp(escapeRegExp(testEndpoint)));
-    assert.match(siteDom, /Open the contact form in a new window/);
+    assert.doesNotMatch(siteDom, /Open the contact form in a new window/);
+    assert.match(siteDom, /<iframe/);
   } else {
     assert.doesNotMatch(siteDom, /<iframe/);
     assert.doesNotMatch(siteDom, /Open the contact form in a new window/);

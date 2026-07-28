@@ -1,7 +1,7 @@
 const EVENTS_CONFIG = Object.freeze({
   publicCalendarProperty: "PUBLIC_CALENDAR_ID",
-  includePastProperty: "INCLUDE_PAST_EVENTS",
   cacheSeconds: 300,
+  maximumPastDays: 366,
   maximumFutureDays: 548,
   timeZone: "America/Chicago",
 });
@@ -9,7 +9,7 @@ const EVENTS_CONFIG = Object.freeze({
 function doGet() {
   try {
     const cache = CacheService.getScriptCache();
-    const cached = cache.get("netyr-public-events-v2");
+    const cached = cache.get("netyr-public-events-v3");
     if (cached) return jsonText_(cached);
 
     const properties = PropertiesService.getScriptProperties();
@@ -18,25 +18,28 @@ function doGet() {
     ).trim();
     if (!calendarId) return unavailableResponse_();
 
-    const includePast =
-      properties.getProperty(EVENTS_CONFIG.includePastProperty) === "true";
-    const events = readPublicCalendarEvents_(calendarId, includePast);
+    const events = readPublicCalendarEvents_(calendarId);
     const response = JSON.stringify({ ok: true, events: events });
-    cache.put("netyr-public-events-v2", response, EVENTS_CONFIG.cacheSeconds);
+    cache.put("netyr-public-events-v3", response, EVENTS_CONFIG.cacheSeconds);
     return jsonText_(response);
   } catch (_error) {
     return unavailableResponse_();
   }
 }
 
-function readPublicCalendarEvents_(calendarId, includePast) {
+function clearEventsCache() {
+  CacheService.getScriptCache().remove("netyr-public-events-v3");
+  return { ok: true };
+}
+
+function readPublicCalendarEvents_(calendarId) {
   const calendar = CalendarApp.getCalendarById(calendarId);
   if (!calendar) throw new Error("Public calendar is unavailable.");
 
   const now = new Date();
-  const earliest = includePast
-    ? new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
-    : new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const earliest = new Date(
+    now.getTime() - EVENTS_CONFIG.maximumPastDays * 24 * 60 * 60 * 1000,
+  );
   const latest = new Date(
     now.getTime() + EVENTS_CONFIG.maximumFutureDays * 24 * 60 * 60 * 1000,
   );
@@ -45,9 +48,6 @@ function readPublicCalendarEvents_(calendarId, includePast) {
     .getEvents(earliest, latest)
     .map(publicEvent_)
     .filter(Boolean)
-    .filter(function (event) {
-      return includePast || new Date(event.end).getTime() >= now.getTime();
-    })
     .sort(function (left, right) {
       return new Date(left.start).getTime() - new Date(right.start).getTime();
     });
@@ -89,11 +89,16 @@ function publicDetails_(description) {
 
   lines.forEach(function (line) {
     const registrationMatch = /^registration\s*:\s*(.+)$/i.exec(line);
+    const detailsMatch = /^details?\s*:\s*(.+)$/i.exec(line);
     const graphicMatch = /^graphic\s*:\s*(.+)$/i.exec(line);
     const featuredMatch = /^featured\s*:\s*(true|yes)$/i.exec(line);
 
     if (registrationMatch) {
       registrationUrl = publicUrl_(registrationMatch[1]);
+      return;
+    }
+    if (detailsMatch) {
+      registrationUrl = publicUrl_(detailsMatch[1]);
       return;
     }
     if (graphicMatch) {
@@ -114,7 +119,7 @@ function publicDetails_(description) {
   });
 
   return {
-    description: publicLines.join("\n").slice(0, 1200),
+    description: publicLines.join("\n").slice(0, 600),
     registrationUrl: registrationUrl,
     graphicUrl: graphicUrl,
     featured: featured,

@@ -2,6 +2,8 @@
 
 Run `runWebsiteSponsorsTests()` in the Apps Script editor before deployment.
 Then verify the deployed `/exec` URL returns a JSON object with a `sponsors`
-array, contains only active sponsor names, and returns an empty array when no
-public sponsor is approved. Remove any temporary test record immediately after
-testing. Do not inspect or expose roster data during testing.
+array, groups only explicitly approved Patron, Sustaining, or Supporting
+records, and returns an empty array when no public sponsor is approved. Test
+Public Display on and off with one clearly labeled non-sensitive temporary
+record; delete only that record afterward. Do not inspect or expose donor
+contact data during testing.

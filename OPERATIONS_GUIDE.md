@@ -47,8 +47,10 @@ only its created row.
 
 ## Sponsor publishing
 
-Use only `Website Sponsors` for approved names. The public endpoint returns
-active names only. See [SPONSOR_INTEGRATION_GUIDE.md](SPONSOR_INTEGRATION_GUIDE.md).
+Use only the five public sponsor fields on `Master Contacts`. The public
+endpoint returns only explicitly approved identity, tier, public HTTPS links,
+and display order; private donor/contact fields are not read. See
+[SPONSOR_INTEGRATION_GUIDE.md](SPONSOR_INTEGRATION_GUIDE.md).
 After a replacement endpoint deployment, update the Sponsor repository variable
 and redeploy.
 

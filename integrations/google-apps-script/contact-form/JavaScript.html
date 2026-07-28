@@ -27,6 +27,12 @@
       form.requestSubmit();
     });
 
+    reportHeight();
+    window.addEventListener("load", reportHeight);
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(reportHeight).observe(document.documentElement);
+    }
+
     function handleSubmit(event) {
       event.preventDefault();
       clearErrors();
@@ -176,6 +182,20 @@
       submitLabel.textContent = isLoading ? "Sending" : "Send Message";
       spinner.hidden = !isLoading;
       if (isLoading) retryButton.hidden = true;
+    }
+
+    function reportHeight() {
+      window.top.postMessage(
+        {
+          source: "netyr-contact-form",
+          event: "height_change",
+          height: Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight,
+          ),
+        },
+        "*",
+      );
     }
 
     function setStatus(message, state) {

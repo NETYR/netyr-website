@@ -50,6 +50,8 @@ export type NewsArticle = {
   title: string;
 };
 
+export type SponsorTier = "Patron" | "Sustaining" | "Supporting";
+
 export type Sponsor = {
   active?: boolean;
   description?: string;
@@ -59,7 +61,7 @@ export type Sponsor = {
   logo?: string;
   name: string;
   startDate?: string;
-  tier?: string;
+  tier: SponsorTier;
 };
 
 export type GoverningDocument = {

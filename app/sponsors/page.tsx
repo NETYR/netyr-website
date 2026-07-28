@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { SponsorDirectory } from "@/components/sponsors/sponsor-directory";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
+import { Card } from "@/components/ui/card";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
 import { sponsorProgram, sponsors } from "@/data/sponsors";
@@ -27,27 +27,32 @@ export default function SponsorsPage() {
         title="Support the work. Strengthen the network."
       />
       <Section
-        description="NETYR is developing opportunities for businesses, organizations, and community partners to support our work."
+        description="NETYR recognizes contributing members through the classifications established in the organization’s governing documents."
         eyebrow="Program"
-        title="Partner with NETYR"
+        title="Contributing membership"
         tone="white"
       >
-        {sponsorProgram.tiers.length === 0 ? (
-          <EmptyState
-            action={
-              <Button
-                data-analytics-context="sponsors_page"
-                data-analytics-event="sponsor_interest_click"
-                data-analytics-label="ask_about_sponsorship"
-                href="/contact/"
-              >
-                Ask about sponsorship
-              </Button>
-            }
-            description="Interested in partnering with NETYR? Contact our team to start a conversation."
-            title="Sponsorship opportunities are coming"
-          />
-        ) : null}
+        <div className="grid gap-5 md:grid-cols-3">
+          {sponsorProgram.tiers.map((tier) => (
+            <Card key={tier.name}>
+              <p className="text-brand-blue text-xs font-bold tracking-[0.14em] uppercase">
+                {tier.amount}
+              </p>
+              <h3 className="text-brand-navy mt-2 text-2xl font-bold uppercase">
+                {tier.name}
+              </h3>
+            </Card>
+          ))}
+        </div>
+        <Button
+          className="mt-7"
+          data-analytics-context="sponsors_page"
+          data-analytics-event="sponsor_interest_click"
+          data-analytics-label="ask_about_sponsorship"
+          href="/contact/"
+        >
+          Ask about sponsorship
+        </Button>
       </Section>
       <Section
         description="We are grateful to the community partners who help NETYR connect, serve, and lead."

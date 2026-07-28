@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { trackAnalyticsEvent } from "@/lib/analytics";
 
@@ -26,6 +26,7 @@ function isAllowedContactOrigin(origin: string) {
 
 export function ContactFormEmbed({ src }: { src: string }) {
   const trackedSuccess = useRef(false);
+  const [height, setHeight] = useState(1100);
 
   useEffect(() => {
     trackAnalyticsEvent("contact_form_view", {
@@ -41,7 +42,21 @@ export function ContactFormEmbed({ src }: { src: string }) {
         return;
       }
 
-      const message = event.data as { event?: unknown; source?: unknown };
+      const message = event.data as {
+        event?: unknown;
+        height?: unknown;
+        source?: unknown;
+      };
+
+      if (
+        message.source === "netyr-contact-form" &&
+        message.event === "height_change" &&
+        typeof message.height === "number" &&
+        Number.isFinite(message.height)
+      ) {
+        setHeight(Math.min(1800, Math.max(720, Math.ceil(message.height))));
+        return;
+      }
 
       if (
         !trackedSuccess.current &&
@@ -61,10 +76,11 @@ export function ContactFormEmbed({ src }: { src: string }) {
 
   return (
     <iframe
-      className="block min-h-[1240px] w-full border-0 sm:min-h-[1100px] lg:min-h-[1040px]"
+      className="block w-full border-0 bg-white"
       loading="lazy"
       referrerPolicy="strict-origin-when-cross-origin"
       src={src}
+      style={{ height }}
       title="Contact North East Texas Young Republicans"
     />
   );
