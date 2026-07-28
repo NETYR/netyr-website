@@ -1,4 +1,5 @@
 export const contactConfig = {
+  publicEmail: "president@netyr.org",
   contactFormEmbedUrl:
     process.env.NEXT_PUBLIC_CONTACT_FORM_EMBED_URL?.trim() ?? "",
 } as const;

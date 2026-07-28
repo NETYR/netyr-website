@@ -83,6 +83,7 @@ async function evaluate(expression) {
 await connect(target.webSocketDebuggerUrl);
 await send("Page.enable");
 await send("Runtime.enable");
+await send("Emulation.clearDeviceMetricsOverride");
 await send("Page.navigate", { url: contactEndpoint });
 await delay(5000);
 

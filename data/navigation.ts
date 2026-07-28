@@ -28,6 +28,8 @@ export const footerNavigationItems: NavigationItem[] = [
   { label: "News", href: "/news/" },
   { label: "Sponsors", href: "/sponsors/" },
   { label: "Contact Us", href: "/contact/" },
+  { label: "Privacy", href: "/privacy/" },
+  { label: "Accessibility", href: "/accessibility/" },
   {
     label: "Donate",
     href: "https://my.cheddarup.com/c/north-east-tx-young-republicans-dues/items",

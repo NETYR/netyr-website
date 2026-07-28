@@ -39,17 +39,29 @@ export default function ContactPage() {
         </Section>
       ) : (
         <Section
-          description="Please check back shortly while the contact form is being refreshed."
+          description={`Email ${contactConfig.publicEmail} while the contact form is being refreshed.`}
           eyebrow="Contact"
           title="The contact form is temporarily unavailable"
           tone="white"
         >
           <EmptyState
-            description="NETYR is preparing a secure way to receive your message."
-            title="Please try again soon"
+            description={`Send your inquiry to ${contactConfig.publicEmail}, and a member of the NETYR team will follow up.`}
+            title="Contact NETYR by email"
           />
         </Section>
       )}
+      <Section
+        description="Prefer email? Use the public organization address for membership, event, sponsorship, media, or general questions."
+        eyebrow="Email"
+        title="Another way to reach NETYR"
+      >
+        <a
+          className="text-brand-blue focus-visible:outline-brand-blue inline-flex min-h-11 items-center rounded-sm font-semibold underline decoration-2 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
+          href={`mailto:${contactConfig.publicEmail}`}
+        >
+          {contactConfig.publicEmail}
+        </a>
+      </Section>
     </>
   );
 }

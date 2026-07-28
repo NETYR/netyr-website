@@ -1,4 +1,4 @@
-export const analyticsEventNames = [
+const analyticsEventNames = [
   "membership_link_click",
   "contact_form_view",
   "contact_form_submission_success",

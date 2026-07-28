@@ -1,5 +1,4 @@
-export type ContentStatus =
-  "approved" | "placeholder" | "unavailable" | "vacant";
+type ContentStatus = "approved" | "placeholder" | "unavailable" | "vacant";
 
 export type LeadershipRole = {
   additionalRole?: string;
@@ -32,7 +31,7 @@ export type Event = {
   title: string;
 };
 
-export type NewsCategory =
+type NewsCategory =
   | "Announcement"
   | "Community"
   | "Event"

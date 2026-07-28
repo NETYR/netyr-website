@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { DonateForward } from "@/components/donate/donate-forward";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
@@ -17,7 +16,6 @@ export const metadata: Metadata = buildMetadata({
 export default function DonatePage() {
   return (
     <>
-      <DonateForward href={cheddarUpLinks.donations} />
       <Hero
         compact
         description="Support NETYR through the chapter's approved external payment collection."

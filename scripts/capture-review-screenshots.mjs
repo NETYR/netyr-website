@@ -50,6 +50,7 @@ async function delay(milliseconds) {
 
 async function capture({
   filename,
+  fullPage = true,
   height,
   mobile = false,
   path: pagePath,
@@ -70,10 +71,26 @@ async function capture({
   await send("Runtime.evaluate", {
     expression: `window.scrollTo(0, ${scrollY})`,
   });
-  await delay(250);
+  await delay(500);
+  const metrics = await send("Page.getLayoutMetrics");
+  const contentHeight = Math.min(
+    Math.ceil(metrics.cssContentSize?.height ?? height),
+    12000,
+  );
 
   const screenshot = await send("Page.captureScreenshot", {
-    captureBeyondViewport: false,
+    captureBeyondViewport: fullPage,
+    ...(fullPage
+      ? {
+          clip: {
+            height: contentHeight,
+            scale: 1,
+            width,
+            x: 0,
+            y: 0,
+          },
+        }
+      : {}),
     format: "png",
     fromSurface: true,
   });
@@ -87,50 +104,60 @@ await mkdir(outputDirectory, { recursive: true });
 await send("Page.enable");
 await send("Runtime.enable");
 
+const routes = [
+  ["home", "/"],
+  ["about", "/about/"],
+  ["leadership", "/leadership/"],
+  ["events", "/events/"],
+  ["get-involved", "/get-involved/"],
+  ["membership", "/membership/"],
+  ["news", "/news/"],
+  ["community-partners", "/sponsors/"],
+  ["donate", "/donate/"],
+  ["contact", "/contact/"],
+  ["privacy", "/privacy/"],
+  ["accessibility", "/accessibility/"],
+];
+
+for (const [name, pagePath] of routes) {
+  await capture({
+    filename: `${name}-desktop.png`,
+    height: 900,
+    path: pagePath,
+    wait: pagePath === "/contact/" ? 7000 : 4000,
+    width: 1440,
+  });
+  await capture({
+    filename: `${name}-mobile.png`,
+    height: 844,
+    mobile: true,
+    path: pagePath,
+    wait: pagePath === "/contact/" ? 7000 : 4000,
+    width: 390,
+  });
+}
+
 await capture({
-  filename: "homepage-banner.png",
-  height: 1000,
-  path: "/",
-  width: 1440,
-});
-await capture({
-  filename: "events-monthly.png",
-  height: 1000,
-  path: "/events/?month=2026-07",
-  wait: 7000,
-  width: 1440,
-});
-await capture({
-  filename: "community-partners-desktop.png",
-  height: 1000,
-  path: "/sponsors/",
-  scrollY: 420,
-  wait: 5000,
-  width: 1440,
-});
-await capture({
-  filename: "community-partners-mobile.png",
-  height: 844,
-  mobile: true,
-  path: "/sponsors/",
-  scrollY: 360,
-  wait: 5000,
-  width: 390,
-});
-await capture({
-  filename: "contact-form.png",
+  filename: "contact-form-detail-desktop.png",
+  fullPage: false,
   height: 1000,
   path: "/contact/",
-  wait: 5000,
+  scrollY: 420,
+  wait: 8000,
   width: 1440,
 });
 await capture({
-  filename: "mobile-header-social.png",
+  filename: "contact-form-detail-mobile.png",
+  fullPage: false,
   height: 844,
   mobile: true,
-  path: "/",
+  path: "/contact/",
+  scrollY: 260,
+  wait: 8000,
   width: 390,
 });
 
 socket.close();
-console.log(`Captured 6 review screenshots in ${outputDirectory}`);
+console.log(
+  `Captured ${routes.length * 2 + 2} route screenshots in ${outputDirectory}`,
+);

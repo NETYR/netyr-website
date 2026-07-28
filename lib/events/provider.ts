@@ -1,9 +1,5 @@
 import type { Event, EventStatus } from "@/types/content";
 
-export type EventProvider = {
-  getEvents: () => Promise<Event[]>;
-};
-
 type FeedEvent = {
   allDay?: unknown;
   date?: unknown;
@@ -77,7 +73,7 @@ function eventStatus(
     : "upcoming";
 }
 
-export function normalizeEvent(value: unknown): Event | null {
+function normalizeEvent(value: unknown): Event | null {
   if (!value || typeof value !== "object") return null;
 
   const source = value as FeedEvent;

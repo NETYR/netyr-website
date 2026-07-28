@@ -1,6 +1,6 @@
 import type { Event } from "@/types/content";
 
-export const centralTimeZone = "America/Chicago";
+const centralTimeZone = "America/Chicago";
 
 export function eventMonthKey(value: string) {
   const parsed = new Date(value);
