@@ -13,7 +13,7 @@ assets, SEO defaults, structured data, empty states, and source documentation.
 ## Phase 3 - Leadership content review
 
 Requires NETYR approval of leaders, events, contact methods, payment links,
-sponsors, photos, news, governing-document publication, and legal language.
+community partner names, photos, news, and legal language.
 
 ## Phase 4 - Release candidate
 

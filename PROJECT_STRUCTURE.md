@@ -16,7 +16,7 @@ integrations/         Version-controlled Apps Script source and safe setup notes
     website-sponsors/ Cumulative Community Partner public-feed endpoint
 lib/                  Site configuration and provider utilities
 public/               Static website assets
-  documents/          Approved public governing-document PDF
+  documents/          Retained organizational source files, not publicly linked
   images/             Brand and social-preview images
 styles/               Global styles and design tokens
 types/                Shared TypeScript types

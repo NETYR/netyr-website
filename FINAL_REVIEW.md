@@ -3,7 +3,7 @@
 ## Public pages reviewed
 
 - Home, About, Leadership, Events, Membership, Get Involved, News, Sponsors,
-  Donate, Contact, Governing Documents, and custom 404.
+  Donate, Contact, and custom 404.
 - The former public Privacy and Accessibility routes and navigation links have
   been removed as requested. Accessibility implementation remains throughout
   the public experience.
@@ -13,8 +13,8 @@
 - All Donate actions use the approved public Cheddar Up collection; `/donate/`
   forwards visitors there while retaining a clear no-JavaScript path.
 - Public wording uses “adjacent counties.”
-- The approved signed constitution and bylaws PDF is publicly available through
-  the new Governing Documents page and the About submenu.
+- Internal organizational source files remain retained but are no longer linked
+  from public routes, menus, metadata, or the sitemap.
 - Contact does not display a public organization email. It presents only the
   embedded custom form when the public endpoint is configured.
 - The contact Apps Script writes only to `Website Contacts`, validates and
@@ -22,9 +22,9 @@
   accepted write. Its isolated test suite passes 11 tests.
 - Events use the dedicated `NETYR Public Events` Google Calendar through a
   public Apps Script feed, a native monthly list, and a next-event banner.
-- Community Partners use cumulative valid donations from the existing master
-  workbook. The feed joins by Contact ID, requires Public Display, and returns
-  only approved names grouped as Patron, Sustaining, or Supporting.
+- Community Partners use cumulative positive valid donations from the existing
+  `Donations` ledger. The feed normalizes and aggregates Donor Name values and
+  returns only public names grouped as Patron, Sustaining, or Supporting.
 - The compact social utility bar uses only confirmed NETYR profile URLs.
 - The contact embed remains the existing Apps Script form, removes the external
   window option, and supports parent-driven responsive height updates.
@@ -38,11 +38,11 @@
 - The homepage repeated a large events section below the hero. It is replaced
   by a compact, automatically hidden next-event announcement above the social
   utility row and primary header.
-- Community Partner publishing previously trusted a manually entered
-  Sponsorship Level on `Master Contacts` and never aggregated the transaction
-  table. The corrected feed sums valid donations by stable Contact ID, handles
-  duplicate/refund/reversal controls, and applies the constitutional thresholds
-  before publishing names.
+- Community Partner publishing previously joined the ledger to `Master
+Contacts` and required a `Public Display` approval flag, which prevented
+  existing named ledger records from appearing. The corrected feed reads the
+  actual row-9 ledger schema, sums positive valid amounts by normalized Donor
+  Name, assigns an internal tier, and publishes only the name and tier.
 - Confirmed social links were previously concentrated in the footer. The same
   centralized, verified links now appear as accessible icons near the top
   without duplicating URLs.
@@ -60,10 +60,11 @@
   no-events message.
 - The homepage announcement displayed the next future event before and after
   temporary-event cleanup.
-- Isolated Community Partner tests verify the $20, $250, and $500 thresholds,
-  under-threshold omission, refund/reversal handling, anonymous and private
-  omission, transaction and name deduplication, tier movement after an amount
-  change, and a response limited to `name` and `tier`.
+- Twelve isolated Community Partner tests verify all internal thresholds,
+  under-threshold omission, formatted-currency handling, invalid and
+  nonpositive row omission, optional privacy controls, name normalization,
+  cumulative aggregation, deduplication, sorting, tier movement, and a response
+  limited to `name` and `tier`.
 - The production Community Partners response exposes none of the private
   contact or transaction-field categories.
 - The deployed contact form loaded, enforced required fields, accepted one

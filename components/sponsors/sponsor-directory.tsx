@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { EmptyState } from "@/components/ui/empty-state";
 import { parseSponsorFeed } from "@/lib/sponsors/provider";
 import type { Sponsor, SponsorTier } from "@/types/content";
 
@@ -34,6 +33,13 @@ export function SponsorDirectory({
         if (!response.ok) throw new Error("Sponsor feed request failed.");
 
         const payload: unknown = await response.json();
+        if (
+          !payload ||
+          typeof payload !== "object" ||
+          (payload as { ok?: unknown }).ok !== true
+        ) {
+          throw new Error("Sponsor feed reported an unavailable source.");
+        }
         setSponsors(parseSponsorFeed(payload));
         setCouldNotLoad(false);
       } catch (error) {
@@ -67,19 +73,21 @@ export function SponsorDirectory({
 
   if (couldNotLoad) {
     return (
-      <EmptyState
-        description="The community-partner connection is temporarily unavailable. Please check back soon."
-        title="Community partners could not be loaded"
-      />
+      <p
+        aria-live="polite"
+        className="border-l-4 border-red-700 bg-white px-5 py-4 text-slate-700"
+      >
+        Community partner recognition is temporarily unavailable. Please check
+        back soon.
+      </p>
     );
   }
 
   if (sponsors.length === 0) {
     return (
-      <EmptyState
-        description="Approved contributing members will appear here when they qualify for public recognition."
-        title="Community partner recognition coming soon"
-      />
+      <p className="border-l-4 border-slate-300 bg-white px-5 py-4 text-slate-700">
+        Community partner recognition will be updated soon.
+      </p>
     );
   }
 
@@ -98,7 +106,7 @@ export function SponsorDirectory({
                 className="text-brand-navy text-2xl font-bold uppercase"
                 id={`sponsor-tier-${tier}`}
               >
-                {tier} Community Partners
+                {tier} Partners
               </h3>
             </div>
             <ul className="grid gap-x-10 border-y border-slate-200 bg-white px-5 py-2 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">

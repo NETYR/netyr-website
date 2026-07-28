@@ -48,10 +48,10 @@ only its created row.
 ## Community Partner publishing
 
 The existing master donor/contact workbook is the sole source. Record valid
-transactions in `Donations` with the matching Contact ID and approve
-recognition through `Master Contacts` Public Display. The endpoint aggregates
-signed donations by Contact ID, applies the constitutional thresholds, and
-returns only the approved public name and tier. See
+transactions in `Donations` with Donor Name in column B and Donation Amount in
+column E. The endpoint aggregates positive valid rows by normalized donor name,
+assigns the internal recognition tier, and returns only the public donor name
+and tier. See
 [SPONSOR_INTEGRATION_GUIDE.md](SPONSOR_INTEGRATION_GUIDE.md). After replacing
 the web-app endpoint, update the Sponsor repository variable and redeploy.
 

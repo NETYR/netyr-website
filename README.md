@@ -63,10 +63,9 @@ URLs in a `NEXT_PUBLIC_*` value.
   accepted submission. The website does not expose the workbook or submission
   data.
 - **Community Partners:** The existing master donor/contact workbook remains
-  the sole source of truth. The Apps Script feed joins `Donations` to approved
-  `Master Contacts` records by Contact ID, sums cumulative signed
-  contributions, applies the constitutional thresholds, and returns only the
-  approved public name and tier.
+  the sole source of truth. The Apps Script feed reads the fixed `Donations`
+  ledger, cumulatively aggregates positive valid rows by normalized Donor Name,
+  assigns the internal recognition tier, and returns only the name and tier.
 - **Membership and donations:** The approved public Cheddar Up collection is
   the external destination for membership, dues, and Donate calls to action.
 

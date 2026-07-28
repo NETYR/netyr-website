@@ -2,11 +2,7 @@ import type { NavigationItem } from "@/types/navigation";
 
 export const navigationItems: NavigationItem[] = [
   { label: "Home", href: "/" },
-  {
-    label: "About",
-    href: "/about/",
-    children: [{ label: "Governing Documents", href: "/governing-documents/" }],
-  },
+  { label: "About", href: "/about/" },
   { label: "Leadership", href: "/leadership/" },
   { label: "Events", href: "/events/" },
   {
@@ -36,5 +32,4 @@ export const footerNavigationItems: NavigationItem[] = [
     label: "Donate",
     href: "https://my.cheddarup.com/c/north-east-tx-young-republicans-dues/items",
   },
-  { label: "Governing Documents", href: "/governing-documents/" },
 ];

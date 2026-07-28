@@ -1,8 +1,8 @@
 # NETYR Website Sponsors setup
 
-This package publishes approved Community Partner names from the existing
-NETYR master donor/contact workbook. It uses the fixed `Master Contacts` and
-`Donations` tabs and never accepts a sheet name from a browser.
+This package publishes Community Partner names from the existing NETYR master
+donor workbook. It uses only the fixed `Donations` tab and never accepts a
+sheet name from a browser.
 
 1. Use the organization-owned Apps Script project named **NETYR Website
    Sponsors**.
@@ -16,6 +16,6 @@ NETYR master donor/contact workbook. It uses the fixed `Master Contacts` and
    organization-managed account and allow public access.
 7. Store only its public `/exec` URL in `NEXT_PUBLIC_SPONSORS_FEED_URL`.
 
-Transactions must use the stable Contact ID. `Public Display` controls public
-recognition; manual tier, logo, website, and display-order values do not control
-the Community Partners page.
+The fixed transaction table begins at row 10 beneath the row-9 headers. Donor
+Name is column B and Donation Amount is column E. The endpoint never reads
+`Master Contacts` or requires a membership or approval flag.

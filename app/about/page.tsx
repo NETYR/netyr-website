@@ -117,12 +117,12 @@ export default function AboutPage() {
         actions={
           <>
             <Button href="/membership/">Explore membership</Button>
-            <Button href="/governing-documents/" variant="secondary">
-              Governing documents
+            <Button href="/leadership/" variant="secondary">
+              Meet the leadership
             </Button>
           </>
         }
-        description="Explore membership, meet the leadership team, or review NETYR's governing documents."
+        description="Explore membership, meet the leadership team, and find your place in NETYR."
         title="Learn more about NETYR"
       />
     </>
