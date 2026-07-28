@@ -1,82 +1,85 @@
 # NETYR Website
 
-Official public website for the North East Texas Young Republicans (NETYR).
+Production website for the North East Texas Young Republicans (NETYR), built as
+a statically exported Next.js application and deployed to GitHub Pages.
 
-The project uses Next.js, React, TypeScript, Tailwind CSS, the App Router,
-ESLint, and Prettier. It statically exports to GitHub Pages for
-`https://netyr.org`.
-
-## Prerequisites
-
-- Node.js 24 LTS
-- npm 11 or newer
-- Git
+- Production: <https://netyr.org>
+- Repository: `NETYR/netyr-website`
+- Production branch: `main`
+- Runtime: Node.js 24 and npm 11 or newer
 
 ## Local development
 
-```bash
-npm install
+```powershell
+Copy-Item .env.example .env.local
+npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Populate only the public endpoint values needed for local integration testing.
+Never place a spreadsheet ID, OAuth credential, password, token, private Drive
+URL, or service-account key in an environment file used by the browser.
 
 ## Validation
 
-```bash
-npm run format
+```powershell
+npm run format:check
 npm run lint
 npm run typecheck
 npm run test:contact-integration
 npm run test:public-integrations
 npm run build
+npm run test:links
 npm audit
 ```
 
-`npm run check` runs the project’s combined validation sequence.
+Optional operational checks:
 
-## Public build configuration
-
-Copy `.env.example` to `.env.local` for local work. The GitHub Pages workflow
-receives the same public values through repository variables:
-
-```text
-NEXT_PUBLIC_SITE_URL=https://netyr.org
-NEXT_PUBLIC_EVENTS_ENDPOINT=
-NEXT_PUBLIC_CONTACT_FORM_EMBED_URL=
-NEXT_PUBLIC_SPONSORS_FEED_URL=
-NEXT_PUBLIC_GA_MEASUREMENT_ID=
+```powershell
+npm run test:contact-browser
+npm run test:browser
+npm run screenshots
 ```
 
-These values are visible in a built site. Store only public web-app/feed URLs
-or the public analytics measurement ID. Never store spreadsheet or calendar
-identifiers, private Drive links, credentials, tokens, or Apps Script editor
-URLs in a `NEXT_PUBLIC_*` value.
+`test:contact-live` creates a real contact submission and must be run only by an
+authorized administrator who will remove the exact test row afterward.
 
-## Publishing model
+## Architecture
 
-- **Events:** NETYR administrators create approved events in the dedicated
-  `NETYR Public Events` Google Calendar. The read-only Apps Script endpoint
-  returns only public event fields to the Events page.
-- **Contact:** The custom Apps Script HTML Service form writes only to the
-  `Website Contacts` sheet and sends one private notification after each newly
-  accepted submission. The website does not expose the workbook or submission
-  data.
-- **Community Partners:** The existing master donor/contact workbook remains
-  the sole source of truth. The Apps Script feed reads the fixed `Donations`
-  ledger, cumulatively aggregates positive valid rows by normalized Donor Name,
-  assigns the internal recognition tier, and returns only the name and tier.
-- **Membership and donations:** The approved public Cheddar Up collection is
-  the external destination for membership, dues, and Donate calls to action.
+- `app/` contains public routes and metadata.
+- `components/` contains reusable layout, interface, integration, analytics,
+  social, and SEO components.
+- `data/` contains human-editable public content and public link configuration.
+- `lib/` contains parsing, formatting, analytics, metadata, and site utilities.
+- `integrations/google-apps-script/` is the reviewed source for the three
+  production Google Apps Script projects.
+- `scripts/` contains local and browser validation tools.
+- `public/` contains only active brand and browser assets.
+- `.github/workflows/deploy-pages.yml` validates, builds, and deploys `out/`.
 
-## Deployment
+The site has no server runtime, API routes, middleware, database, or private
+credential in the browser. Google integrations are exposed through
+NETYR-managed Apps Script web applications that return only public fields or
+render the contact form.
 
-`.github/workflows/deploy-pages.yml` runs on pushes to `main` and manual
-dispatch. It installs with `npm ci`, validates, builds the static `out/`
-directory, uploads the Pages artifact, and deploys it with the official GitHub
-Pages actions. Do not add server-only Next.js features without changing the
-hosting architecture.
+## Operations
 
-See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md),
-[CONTENT_UPDATE_GUIDE.md](CONTENT_UPDATE_GUIDE.md), and
-[OPERATIONS_GUIDE.md](OPERATIONS_GUIDE.md) for operating procedures.
+Start with:
+
+- [SITE_INVENTORY.md](SITE_INVENTORY.md)
+- [INTEGRATIONS.md](INTEGRATIONS.md)
+- [DEPLOYMENT.md](DEPLOYMENT.md)
+- [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)
+- [OPERATIONS_AND_RECOVERY.md](OPERATIONS_AND_RECOVERY.md)
+- [ACCOUNT_OWNERSHIP_MATRIX.md](ACCOUNT_OWNERSHIP_MATRIX.md)
+- [GOOGLE_APPS_SCRIPT_AUDIT.md](GOOGLE_APPS_SCRIPT_AUDIT.md)
+- [MIGRATION_PLAN.md](MIGRATION_PLAN.md)
+- [CLEANUP_REPORT.md](CLEANUP_REPORT.md)
+
+## Content guardrails
+
+Do not publish private member, donor, contact, roster, payment, or workbook
+data. Events must be entered in the NETYR public calendar. Community Partner
+recognition must come from the restricted donor workbook through the reviewed
+server-side adapter. News, leadership, links, and organization copy must use
+approved information only.
