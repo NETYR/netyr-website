@@ -2,16 +2,15 @@ import type { Metadata } from "next";
 
 import { SponsorDirectory } from "@/components/sponsors/sponsor-directory";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
 import { sponsorProgram, sponsors } from "@/data/sponsors";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Sponsors",
+  title: "Community Partners",
   description:
-    "Learn about sponsorship opportunities and community partners of the North East Texas Young Republicans.",
+    "Recognizing approved NETYR community partners by cumulative contributing-membership classification.",
   path: "/sponsors/",
 });
 
@@ -23,7 +22,7 @@ export default function SponsorsPage() {
       <Hero
         compact
         description="Community partners can help NETYR create meaningful opportunities while connecting with young conservative leaders across Northeast Texas."
-        eyebrow="Sponsors"
+        eyebrow="Community Partners"
         title="Support the work. Strengthen the network."
       />
       <Section
@@ -32,18 +31,18 @@ export default function SponsorsPage() {
         title="Contributing membership"
         tone="white"
       >
-        <div className="grid gap-5 md:grid-cols-3">
+        <dl className="grid gap-4 border-y border-slate-200 py-5 sm:grid-cols-3">
           {sponsorProgram.tiers.map((tier) => (
-            <Card key={tier.name}>
-              <p className="text-brand-blue text-xs font-bold tracking-[0.14em] uppercase">
-                {tier.amount}
-              </p>
-              <h3 className="text-brand-navy mt-2 text-2xl font-bold uppercase">
+            <div className="border-brand-blue border-l-2 pl-4" key={tier.name}>
+              <dt className="text-brand-navy text-lg font-bold uppercase">
                 {tier.name}
-              </h3>
-            </Card>
+              </dt>
+              <dd className="text-brand-blue mt-1 text-sm font-bold">
+                {tier.amount}
+              </dd>
+            </div>
           ))}
-        </div>
+        </dl>
         <Button
           className="mt-7"
           data-analytics-context="sponsors_page"

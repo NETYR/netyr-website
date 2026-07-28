@@ -26,20 +26,21 @@ editing React components.
 See [EVENTS_INTEGRATION_GUIDE.md](EVENTS_INTEGRATION_GUIDE.md) for endpoint
 maintenance and testing.
 
-## Sponsors
+## Community Partners
 
-1. Open the existing master donor/contact workbook and use only the public
-   sponsor fields on `Master Contacts`.
-2. Choose `Patron`, `Sustaining`, or `Supporting` under Sponsorship Level.
-3. Add an optional public HTTPS website URL, logo URL, and display order.
-4. Check `Public Display` only after recognition is approved.
-5. Review `/sponsors/` after the five-minute feed cache refresh.
-6. To withdraw recognition, clear `Public Display`; do not delete unrelated
-   donor or contact information.
+1. Record each valid contribution in the existing `Donations` transaction
+   table with the donor's stable Contact ID.
+2. Confirm that Contact ID has a matching record on `Master Contacts`.
+3. Check `Public Display` only after the donor has approved public recognition.
+4. Review `/sponsors/` after the five-minute feed cache refresh.
+5. To withdraw recognition, clear `Public Display`; do not delete financial
+   history or unrelated contact information.
 
-The public endpoint reads only first name, last name, organization, and the
-five public sponsor fields. Phone, email, address, notes, contact IDs, donation
-amounts, and other workbook tabs are not read or returned.
+The endpoint calculates each donor's tier from cumulative valid donations:
+Patron at $500 or more, Sustaining from $250 through $499.99, and Supporting
+from $20 through $249.99. Manual sponsorship-level, logo, website, and display
+order fields do not control the page. The browser receives only an approved
+public name and the calculated tier.
 
 ## Leadership and organization copy
 

@@ -45,14 +45,15 @@ repository source, run setup and all 11 isolated tests, update the existing
 production web-app deployment, then conduct one non-sensitive test and remove
 only its created row.
 
-## Sponsor publishing
+## Community Partner publishing
 
-Use only the five public sponsor fields on `Master Contacts`. The public
-endpoint returns only explicitly approved identity, tier, public HTTPS links,
-and display order; private donor/contact fields are not read. See
-[SPONSOR_INTEGRATION_GUIDE.md](SPONSOR_INTEGRATION_GUIDE.md).
-After a replacement endpoint deployment, update the Sponsor repository variable
-and redeploy.
+The existing master donor/contact workbook is the sole source. Record valid
+transactions in `Donations` with the matching Contact ID and approve
+recognition through `Master Contacts` Public Display. The endpoint aggregates
+signed donations by Contact ID, applies the constitutional thresholds, and
+returns only the approved public name and tier. See
+[SPONSOR_INTEGRATION_GUIDE.md](SPONSOR_INTEGRATION_GUIDE.md). After replacing
+the web-app endpoint, update the Sponsor repository variable and redeploy.
 
 ## News, social links, and previews
 

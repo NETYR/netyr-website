@@ -53,14 +53,7 @@ export type NewsArticle = {
 export type SponsorTier = "Patron" | "Sustaining" | "Supporting";
 
 export type Sponsor = {
-  active?: boolean;
-  description?: string;
-  displayOrder?: number;
-  endDate?: string;
-  href?: string;
-  logo?: string;
   name: string;
-  startDate?: string;
   tier: SponsorTier;
 };
 

@@ -1,5 +1,17 @@
 # Release Notes
 
+## Cumulative Community Partners correction
+
+- Replaced manual sponsor-tier publishing with cumulative contribution
+  aggregation from the existing `Donations` transaction table.
+- Joined donations to approved `Master Contacts` records by stable Contact ID.
+- Applied the constitutional Patron, Sustaining, and Supporting thresholds.
+- Reduced the public feed and page to alphabetized recognition names and tiers
+  only; no individual totals, links, logos, or private donor data are exposed.
+- Added isolated coverage for aggregation, refund/reversal handling,
+  deduplication, anonymity, public approval, tier changes, and the minimal
+  public response contract.
+
 ## Production integration refinement
 
 - Published the approved NETYR constitution and bylaws PDF through a dedicated

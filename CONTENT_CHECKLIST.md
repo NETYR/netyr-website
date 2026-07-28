@@ -9,8 +9,9 @@
 - [x] About navigation includes Governing Documents.
 - [x] Dedicated `NETYR Public Events` Calendar and public calendar-feed
       endpoint architecture.
-- [x] Sponsor endpoint reads only approved public-recognition fields from the
-      existing master donor/contact source.
+- [x] Community Partners endpoint cumulatively aggregates valid `Donations` by
+      Contact ID, requires `Public Display`, and returns names and calculated
+      constitutional tiers only.
 - [x] Custom contact form with server-side validation, private sheet write, and
       private submission-notification support.
 - [x] Current officer names, offices, and terms displayed without personal
@@ -22,8 +23,8 @@
 
 - [ ] Add an approved public event to `NETYR Public Events` when one is ready.
       Use only public title, time, location, description, and approved links.
-- [ ] Complete sponsor level, optional public links, and `Public Display` for
-      each sponsor approved for recognition.
+- [ ] Keep donation Contact IDs aligned with `Master Contacts` and set
+      `Public Display` only for donors approved for recognition.
 - [x] GitHub repository variables for the current public Events and Sponsors
       deployments are synchronized. Reconfirm them after any future Apps Script
       deployment replacement.
@@ -34,7 +35,7 @@
 
 - [ ] Approved officer biographies and headshots, if leadership wants them.
 - [ ] Approved upcoming events.
-- [ ] Approved sponsor names.
+- [ ] Approved Community Partner public-display names.
 - [ ] Approved news articles or announcements.
 - [ ] Donation-purpose and legal/tax language review, if more detailed giving
       language is desired.
