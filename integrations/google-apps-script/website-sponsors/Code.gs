@@ -29,8 +29,8 @@ const PARTNER_LEVELS = Object.freeze([
 ]);
 const PARTNER_CONFIG = Object.freeze({
   spreadsheetProperty: "SPREADSHEET_ID",
-  cacheKey: "netyr-public-community-partners-v6",
-  cacheSeconds: 300,
+  cacheKey: "netyr-public-community-partners-v7",
+  cacheSeconds: 60,
   donationHeaderRow: 9,
   contactHeaderRow: 1,
   maximumRows: 20000,
@@ -42,12 +42,19 @@ function doGet() {
     const cached = cache.get(PARTNER_CONFIG.cacheKey);
     if (cached) return jsonText_(cached);
 
-    const partners = readPublicPartners_();
-    const response = JSON.stringify({ ok: true, sponsors: partners });
+    const result = readPublicPartnersWithDiagnostics_();
+    logPartnerDiagnostics_(result.diagnostics);
+    const response = JSON.stringify({ ok: true, sponsors: result.sponsors });
     cache.put(PARTNER_CONFIG.cacheKey, response, PARTNER_CONFIG.cacheSeconds);
     return jsonText_(response);
-  } catch (_error) {
-    console.error("Community Partners feed failed.");
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        event: "community_partners_feed",
+        status: "SOURCE_FAILURE",
+        message: cleanText_(error && error.message, 240),
+      }),
+    );
     return unavailableResponse_();
   }
 }
@@ -86,6 +93,10 @@ function verifySponsorSource() {
 }
 
 function readPublicPartners_() {
+  return readPublicPartnersWithDiagnostics_().sponsors;
+}
+
+function readPublicPartnersWithDiagnostics_() {
   const spreadsheet = getSpreadsheet_();
   const donationSheet = getRequiredSheet_(
     spreadsheet,
@@ -102,7 +113,7 @@ function readPublicPartners_() {
     contactSource,
   );
 
-  return aggregateCommunityPartners_(
+  return aggregateCommunityPartnersWithDiagnostics_(
     readDonationRecords_(donationSheet, donationSource),
     publicDisplayLookup,
   );
@@ -307,6 +318,16 @@ function readPublicDisplayLookup_(sheet, source) {
 }
 
 function aggregateCommunityPartners_(records, publicDisplayLookup) {
+  return aggregateCommunityPartnersWithDiagnostics_(
+    records,
+    publicDisplayLookup,
+  ).sponsors;
+}
+
+function aggregateCommunityPartnersWithDiagnostics_(
+  records,
+  publicDisplayLookup,
+) {
   const lookup = publicDisplayLookup || {
     byId: {},
     byName: {},
@@ -331,26 +352,40 @@ function aggregateCommunityPartners_(records, publicDisplayLookup) {
     const key = contactId ? "id:" + contactId : "name:" + donorNameKey;
     const amountCents = amountToCents_(record && record.amount);
 
-    if (
-      !donorNameKey ||
-      amountCents <= 0 ||
-      isExcludedTransaction_(record) ||
-      !isPublicDonor_(contactId, donorNameKey, lookup)
-    ) {
+    if (!donorNameKey || amountCents <= 0 || isExcludedTransaction_(record)) {
       return;
     }
 
-    if (!totals[key]) totals[key] = { name: donorName, cents: 0 };
+    if (!totals[key]) {
+      totals[key] = {
+        name: donorName,
+        cents: 0,
+        publicDisplay: isPublicDonor_(contactId, donorNameKey, lookup),
+      };
+    }
     totals[key].cents += amountCents;
   });
 
-  return Object.keys(totals)
+  const qualifying = Object.keys(totals)
     .map(function (key) {
       const donor = totals[key];
       const level = levelForCents_(donor.cents);
-      return level ? { name: donor.name, level: level } : null;
+      return level
+        ? {
+            name: donor.name,
+            level: level,
+            publicDisplay: donor.publicDisplay,
+          }
+        : null;
     })
-    .filter(Boolean)
+    .filter(Boolean);
+  const sponsors = qualifying
+    .filter(function (donor) {
+      return donor.publicDisplay;
+    })
+    .map(function (donor) {
+      return { name: donor.name, level: donor.level };
+    })
     .sort(function (left, right) {
       return (
         levelOrder_(left.level) - levelOrder_(right.level) ||
@@ -359,6 +394,35 @@ function aggregateCommunityPartners_(records, publicDisplayLookup) {
         })
       );
     });
+
+  return {
+    sponsors: sponsors,
+    diagnostics: {
+      qualifyingDonorCount: qualifying.length,
+      privateQualifyingDonorCount: qualifying.filter(function (donor) {
+        return !donor.publicDisplay;
+      }).length,
+      publicSponsorCount: sponsors.length,
+    },
+  };
+}
+
+function logPartnerDiagnostics_(diagnostics) {
+  const status =
+    diagnostics.qualifyingDonorCount === 0
+      ? "NO_QUALIFYING_DONATIONS"
+      : diagnostics.publicSponsorCount === 0
+        ? "ALL_QUALIFYING_DONORS_PRIVATE"
+        : "PUBLIC_SPONSORS_READY";
+  console.info(
+    JSON.stringify({
+      event: "community_partners_feed",
+      status: status,
+      qualifyingDonorCount: diagnostics.qualifyingDonorCount,
+      privateQualifyingDonorCount: diagnostics.privateQualifyingDonorCount,
+      publicSponsorCount: diagnostics.publicSponsorCount,
+    }),
+  );
 }
 
 function amountToCents_(value) {
@@ -405,7 +469,8 @@ function isPublicDisplayValue_(value) {
     candidate === "1" ||
     candidate === "public" ||
     candidate === "display" ||
-    candidate === "publish"
+    candidate === "publish" ||
+    candidate === "approved"
   );
 }
 
@@ -487,7 +552,7 @@ function unavailableResponse_() {
   return jsonText_(
     JSON.stringify({
       ok: false,
-      message: "Community partner recognition is temporarily unavailable.",
+      message: "Community partner information is temporarily unavailable.",
       sponsors: [],
     }),
   );
@@ -684,6 +749,45 @@ function runWebsiteSponsorsTests() {
     );
     if (result.length !== 1 || result[0].name !== "Public Donor") {
       throw new Error("Public Display privacy enforcement failed.");
+    }
+  });
+
+  test("checkbox and normalized legacy Public Display values are supported", function () {
+    if (
+      isPublicDisplayValue_("") ||
+      isPublicDisplayValue_(false) ||
+      !isPublicDisplayValue_(true) ||
+      !isPublicDisplayValue_("approved")
+    ) {
+      throw new Error("Public Display value normalization failed.");
+    }
+  });
+
+  test("private-only and no-qualifying diagnostics remain distinct", function () {
+    const privateLookup = publicLookup([
+      {
+        contactId: "PRIVATE-DIAGNOSTIC",
+        name: "Private Diagnostic",
+        publicDisplay: false,
+      },
+    ]);
+    const privateOnly = aggregateCommunityPartnersWithDiagnostics_(
+      [
+        record("Private Diagnostic", 200, {
+          contactId: "PRIVATE-DIAGNOSTIC",
+        }),
+      ],
+      privateLookup,
+    );
+    const noQualifying = aggregateCommunityPartnersWithDiagnostics_([
+      record("Under Minimum Diagnostic", 49.99),
+    ]);
+    if (
+      privateOnly.diagnostics.qualifyingDonorCount !== 1 ||
+      privateOnly.diagnostics.publicSponsorCount !== 0 ||
+      noQualifying.diagnostics.qualifyingDonorCount !== 0
+    ) {
+      throw new Error("Internal empty-state diagnostics failed.");
     }
   });
 

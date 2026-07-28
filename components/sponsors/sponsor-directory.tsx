@@ -54,7 +54,7 @@ export function SponsorDirectory({
     void loadSponsors();
     const refreshTimer = window.setInterval(
       () => void loadSponsors(),
-      5 * 60 * 1000,
+      60 * 1000,
     );
 
     return () => {
@@ -77,8 +77,7 @@ export function SponsorDirectory({
         aria-live="polite"
         className="border-l-4 border-red-700 bg-white px-5 py-4 text-slate-700"
       >
-        Community partner recognition is temporarily unavailable. Please check
-        back soon.
+        Community partner information is temporarily unavailable.
       </p>
     );
   }

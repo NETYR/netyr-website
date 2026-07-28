@@ -30,6 +30,18 @@ level, de-duplicates, sorts, and returns only the public display name and level.
 No amount, date, reason, note, contact field, row number, workbook metadata, or
 identifier enters the browser.
 
+`Master Contacts!M:M` is the administrative recognition control. A checked
+checkbox (the boolean value `TRUE`) permits public name recognition; unchecked,
+`FALSE`, and blank values remain private. The adapter continues to normalize
+legacy positive values for migration safety, but the workbook interface uses
+checkboxes as the authoritative format. The public response is cached for one
+minute, and the page rechecks the endpoint every minute while open.
+
+The adapter logs privacy-safe status codes for administrators:
+`NO_QUALIFYING_DONATIONS`, `ALL_QUALIFYING_DONORS_PRIVATE`,
+`PUBLIC_SPONSORS_READY`, or `SOURCE_FAILURE`. Counts only are logged; donor
+names, IDs, amounts, and contact fields are not.
+
 ## Contact
 
 The contact web app opens only the configured workbook and fixed `Website

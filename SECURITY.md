@@ -21,7 +21,8 @@ another person’s contact submission in a public issue.
   applies the real Public Display and any transaction privacy/status controls,
   and returns only the name and calculated level. Amounts, dates, reasons,
   notes, organizations, IDs, contact details, row numbers, and workbook metadata
-  are never returned.
+  are never returned. Public Display remains deny-by-default, and sponsor-feed
+  diagnostics log only non-identifying status codes and counts.
 
 See the integration-package security notes for the respective trust boundaries
 and operating controls.

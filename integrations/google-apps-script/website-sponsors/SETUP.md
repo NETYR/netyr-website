@@ -16,8 +16,34 @@ Contacts` header is row 1.
    organization-managed account and allow public access.
 7. Store only its public `/exec` URL in `NEXT_PUBLIC_SPONSORS_FEED_URL`.
 
+The deployed sponsor project must point to the institutional **NETYR Master
+Donor & Sponsor Contacts** workbook. If qualifying checked donors are missing,
+verify this private script property before changing filters or donor records. A
+property aimed at another workbook can produce a valid but empty public feed.
+
 The transaction table begins at row 10. `Donor Name` is column B, `Donation
 Amount` is column E, and `Contact ID` is column G. The adapter uses the real
 `Public Display` field in `Master Contacts` to protect donors who have not
 chosen public recognition. Aggregation uses Contact ID when present and a
 trimmed, case-insensitive donor-name fallback otherwise.
+
+## Public Display administration
+
+`Master Contacts` has headers on row 1: first name in A, last name in B, Contact
+ID in I, and Public Display in M. Column M must use native checkbox validation:
+
+- checked / boolean `TRUE`: the donor name may be returned publicly
+- unchecked / boolean `FALSE`: private
+- blank: private
+
+The sheet header note should read: “Checked means the donor’s name may appear on
+the public Community Partners page.”
+
+The adapter also accepts normalized legacy positive values (`true`, `yes`, `y`,
+`1`, `public`, `display`, `publish`, and `approved`) so an older valid record
+does not disappear during migration. Administrators should use only the
+checkbox interface going forward.
+
+Responses are cached for 60 seconds. Run `clearSponsorCache()` after an urgent
+recognition change; otherwise the live site and an open browser tab refresh
+within about one minute.

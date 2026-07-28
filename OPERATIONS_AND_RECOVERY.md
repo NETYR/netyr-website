@@ -15,13 +15,31 @@
 
 ### Community Partners
 
-1. Enter valid transactions in the institutional donor workbook.
-2. Keep donor contact and operational notes private.
-3. The server adapter totals valid transactions by Contact ID when available,
-   applies the real Public Display and any transaction privacy/status controls,
-   and returns names and sponsorship levels only.
-4. Wait up to five minutes or run `clearSponsorCache`.
-5. Verify no amount or private field appears in the response, HTML, or page.
+1. Select an existing donor in the `Donations` entry area and record the
+   transaction through the workbook’s `NETYR Contact Tools` workflow.
+2. Confirm the success line reports the ledger row and whether public
+   recognition is enabled. The workflow writes and verifies the selected
+   contact’s existing Contact ID before reporting success.
+3. In `Master Contacts`, use the `Public Display` checkbox in column M. Checked
+   (`TRUE`) means the donor’s name may appear publicly; unchecked, `FALSE`, and
+   blank remain private. The header note repeats this guidance.
+4. Keep donor contact and operational notes private.
+5. The server adapter totals valid transactions by Contact ID when available,
+   applies Public Display and any real transaction privacy/status controls, and
+   returns names and sponsorship levels only.
+6. Wait up to one minute, reload the Community Partners page, or run
+   `clearSponsorCache` in the **NETYR Website Sponsors** Apps Script project.
+7. Verify no amount or private field appears in the response, HTML, or page.
+
+The container-bound workbook project is named **NETYR Donor and Contact
+Administration**. Its `Refresh Public Recognition Controls` menu command repairs
+checkbox validation and guidance without changing donor choices.
+
+If checked, qualifying donors are still missing, verify that the sponsor web
+app's private `SPREADSHEET_ID` property targets the institutional master donor
+workbook. Do not expose the value in repository files, screenshots, support
+logs, or browser code. After correcting it, update the existing production
+deployment and run `clearSponsorCache`.
 
 ### Contact
 

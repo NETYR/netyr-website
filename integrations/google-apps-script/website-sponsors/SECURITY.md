@@ -8,4 +8,6 @@ contact read is limited to first name, last name, Contact ID, and Public
 Display. Aggregation and classification happen server-side, and the response
 contains only `{name, level}`. Amounts, dates, reasons, notes, organizations,
 IDs, contact details, row numbers, formulas, and workbook metadata never enter
-the response. Errors are generic.
+the response. Public Display remains deny-by-default: only a checked boolean
+`TRUE` or a normalized positive legacy value is public. Errors are generic.
+Administrator logs contain only status codes and aggregate counts.

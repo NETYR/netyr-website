@@ -89,7 +89,7 @@ The audited working tree passed:
 - Node.js 24 and npm 11 verification.
 - Formatting, lint, strict type checking, and static export.
 - Eleven isolated contact tests.
-- Three event-adapter and eighteen Community Partners adapter tests.
+- Three event-adapter and twenty Community Partners adapter tests.
 - Dependency audit with zero known vulnerabilities.
 - Unused-file/export analysis with no unresolved findings.
 - Twenty-four route/viewport browser checks covering every public route at
@@ -141,3 +141,5 @@ totals valid transactions server-side, and returns only `name` and `level`.
 |  16 | All four levels sort from highest to lowest            | Pass   |
 |  17 | Browser receives only `name` and `level`               | Pass   |
 |  18 | No amount or private donor field enters the browser    | Pass   |
+|  19 | Checkbox and normalized legacy display values work     | Pass   |
+|  20 | Private-only and no-qualifying diagnostics differ      | Pass   |

@@ -46,7 +46,7 @@ const sponsorTests = vm.runInContext(
   sponsors.context,
 );
 assert.equal(sponsorTests.ok, true);
-assert.equal(sponsorTests.passed, 18);
+assert.equal(sponsorTests.passed, 20);
 assert.match(sponsors.code, /PARTNER_DONATION_SHEET_NAME = "Donations"/);
 assert.match(sponsors.code, /PARTNER_CONTACT_SHEET_NAME = "Master Contacts"/);
 assert.match(sponsors.code, /donationHeaderRow: 9/);
@@ -55,6 +55,8 @@ assert.match(sponsors.code, /DONOR_NAME_HEADER = "Donor Name"/);
 assert.match(sponsors.code, /DONATION_AMOUNT_HEADER = "Donation Amount"/);
 assert.match(sponsors.code, /CONTACT_ID_HEADER = "Contact ID"/);
 assert.match(sponsors.code, /PUBLIC_DISPLAY_HEADER = "Public Display"/);
+assert.match(sponsors.code, /cacheSeconds: 60/);
+assert.match(sponsors.code, /ALL_QUALIFYING_DONORS_PRIVATE/);
 assert.match(sponsors.code, /amountCents >= 75000/);
 assert.match(sponsors.code, /amountCents >= 50000/);
 assert.match(sponsors.code, /amountCents >= 20000/);
@@ -75,6 +77,10 @@ assert.match(sponsorDirectory, /\{level\}s/);
 assert.match(
   sponsorDirectory,
   /Community partner recognition will be updated soon\./,
+);
+assert.match(
+  sponsorDirectory,
+  /Community partner information is temporarily unavailable\./,
 );
 assert.doesNotMatch(sponsorDirectory, /sponsor\.(logo|href)/);
 
