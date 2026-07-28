@@ -1,6 +1,57 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { createServer } from "node:http";
+import path from "node:path";
 
-const siteOrigin = new URL(process.env.SITE_ORIGIN ?? "http://127.0.0.1:4173");
+let staticServer;
+let siteOrigin;
+
+if (process.env.SITE_ORIGIN) {
+  siteOrigin = new URL(process.env.SITE_ORIGIN);
+} else {
+  const outputDirectory = path.join(process.cwd(), "out");
+  staticServer = createServer(async (request, response) => {
+    const pathname = decodeURIComponent(
+      new URL(request.url ?? "/", "http://127.0.0.1").pathname,
+    );
+    const relativePath =
+      pathname === "/"
+        ? "index.html"
+        : pathname.endsWith("/")
+          ? path.join(pathname.slice(1), "index.html")
+          : pathname.slice(1);
+    const requestedPath = path.resolve(outputDirectory, relativePath);
+
+    if (!requestedPath.startsWith(`${outputDirectory}${path.sep}`)) {
+      response.writeHead(400).end();
+      return;
+    }
+
+    try {
+      const body = await readFile(requestedPath);
+      const extension = path.extname(requestedPath);
+      const contentType = {
+        ".css": "text/css",
+        ".html": "text/html; charset=utf-8",
+        ".jpg": "image/jpeg",
+        ".js": "text/javascript",
+        ".png": "image/png",
+        ".txt": "text/plain; charset=utf-8",
+        ".webp": "image/webp",
+        ".xml": "application/xml",
+      }[extension];
+      response.writeHead(200, { "Content-Type": contentType ?? "text/plain" });
+      response.end(body);
+    } catch {
+      response.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
+      response.end(await readFile(path.join(outputDirectory, "404.html")));
+    }
+  });
+  await new Promise((resolve) => staticServer.listen(0, "127.0.0.1", resolve));
+  const address = staticServer.address();
+  assert.ok(address && typeof address === "object");
+  siteOrigin = new URL(`http://127.0.0.1:${address.port}`);
+}
 const expectedRoutes = [
   "/",
   "/about/",
@@ -125,3 +176,5 @@ console.log(
     routesChecked: expectedRoutes.length,
   }),
 );
+
+await new Promise((resolve) => staticServer?.close(resolve) ?? resolve());
