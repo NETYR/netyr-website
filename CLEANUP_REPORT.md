@@ -7,10 +7,10 @@ Audit branch: `audit/full-site-and-account-cleanup`
 | Measure       |  Baseline | Audited working tree |
 | ------------- | --------: | -------------------: |
 | Tracked files |       123 |                  114 |
-| Tracked bytes | 6,736,990 |            2,113,965 |
-| Tracked MiB   |     6.425 |                2.016 |
+| Tracked bytes | 6,736,990 |            2,118,176 |
+| Tracked MiB   |     6.425 |                2.020 |
 
-The cleanup removed 4,623,025 bytes (68.6%). The dominant reduction is an
+The cleanup removed 4,618,814 bytes (68.6%). The dominant reduction is an
 unlinked 4.6 MB public PDF. The official source logo remains intentionally
 retained.
 
@@ -110,8 +110,9 @@ production build succeeded without approving a new script policy. No
 vulnerability is reported; re-review the transitive package on dependency
 updates rather than granting a blanket approval.
 
-Production deployment and post-deployment verification are recorded after the
-audit pull request is merged.
+The audited commits were merged through pull request review, GitHub Pages
+completed successfully, and post-deployment route, integration, privacy, DNS,
+HTTPS, browser, and screenshot checks passed.
 
 ## Community Partners required test results
 

@@ -1,7 +1,7 @@
 # Site Inventory
 
 Inventory date: July 28, 2026. Baseline: 123 tracked files, 6,736,990 bytes
-(6.425 MiB). Audited working tree: 114 files, 2,113,965 bytes (2.016 MiB).
+(6.425 MiB). Audited working tree: 114 files, 2,118,176 bytes (2.020 MiB).
 Every retained path is listed below. No tracked file contains a production
 secret; integration identifiers are supplied through GitHub variables or
 private Apps Script properties.
