@@ -57,16 +57,6 @@ export type Sponsor = {
   tier: SponsorTier;
 };
 
-export type GoverningDocument = {
-  description: string;
-  effectiveDate?: string;
-  fileSize?: string;
-  fileType: "PDF";
-  href?: string;
-  publicStatus: "approved" | "review-required";
-  title: string;
-};
-
 export type SocialLink = {
   href: string;
   label: "Facebook" | "Instagram" | "TikTok" | "X";

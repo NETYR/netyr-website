@@ -5,13 +5,13 @@
 - [x] NETYR public site and root domain configuration.
 - [x] Approved Cheddar Up destination centralized for membership, dues, and
       Donate calls to action.
-- [x] Public governing-document PDF published at `/governing-documents/`.
-- [x] About navigation includes Governing Documents.
+- [x] Internal organizational source files retained without a public document
+      route or navigation link.
 - [x] Dedicated `NETYR Public Events` Calendar and public calendar-feed
       endpoint architecture.
-- [x] Community Partners endpoint cumulatively aggregates valid `Donations` by
-      Contact ID, requires `Public Display`, and returns names and calculated
-      constitutional tiers only.
+- [x] Community Partners endpoint cumulatively aggregates positive valid
+      `Donations` rows by normalized Donor Name and returns only names and
+      calculated tiers.
 - [x] Custom contact form with server-side validation, private sheet write, and
       private submission-notification support.
 - [x] Current officer names, offices, and terms displayed without personal
@@ -23,8 +23,9 @@
 
 - [ ] Add an approved public event to `NETYR Public Events` when one is ready.
       Use only public title, time, location, description, and approved links.
-- [ ] Keep donation Contact IDs aligned with `Master Contacts` and set
-      `Public Display` only for donors approved for recognition.
+- [ ] Keep Donor Name values consistent in the `Donations` ledger. If an
+      explicit privacy field is added later, use an exact `Anonymous`,
+      `Private`, or `Do Not Publish` header.
 - [x] GitHub repository variables for the current public Events and Sponsors
       deployments are synchronized. Reconfirm them after any future Apps Script
       deployment replacement.
@@ -35,7 +36,8 @@
 
 - [ ] Approved officer biographies and headshots, if leadership wants them.
 - [ ] Approved upcoming events.
-- [ ] Approved Community Partner public-display names.
+- [x] Current qualifying Community Partner names are supplied by the live
+      ledger feed.
 - [ ] Approved news articles or announcements.
 - [ ] Donation-purpose and legal/tax language review, if more detailed giving
       language is desired.

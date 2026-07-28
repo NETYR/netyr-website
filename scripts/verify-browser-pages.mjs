@@ -202,11 +202,21 @@ const sponsorFeed = sponsorsEndpoint
           ? new Set(result.payload.sponsors.map((sponsor) =>
               String(sponsor.name).toLocaleLowerCase()
             )).size === result.payload.sponsors.length
-          : false
+          : false,
+        names: Array.isArray(result.payload?.sponsors)
+          ? result.payload.sponsors.map((sponsor) => sponsor.name)
+          : [],
+        responseContainsCurrency: /\\$\\s*\\d|\\b\\d+\\.\\d{2}\\b/.test(
+          JSON.stringify(result.payload?.sponsors ?? [])
+        )
       }))
       .catch((error) => ({ ok: false, status: 0, count: -1, error: error.name }))`)
   : { ok: false, status: 0, count: -1 };
 const sponsorPage = await evaluate(`document.body.innerText`);
+const sponsorMain = await evaluate(`({
+  html: document.querySelector("main")?.innerHTML ?? "",
+  text: document.querySelector("main")?.innerText ?? ""
+})`);
 assert.equal(sponsorFeed.ok, true, "Browser could not load the Sponsors feed.");
 assert.ok(sponsorFeed.count >= 0);
 assert.equal(
@@ -219,9 +229,25 @@ assert.equal(
   true,
   "The Community Partners response contained duplicate public names.",
 );
-assert.match(sponsorPage, /Patron/i);
-assert.match(sponsorPage, /Sustaining/i);
-assert.match(sponsorPage, /Supporting/i);
+assert.deepEqual(
+  [...sponsorFeed.names].sort((left, right) => left.localeCompare(right)),
+  ["Dana Oatley", "Jill Dutton"],
+);
+assert.equal(sponsorFeed.responseContainsCurrency, false);
+assert.match(sponsorPage, /Supporting Partners/i);
+assert.match(sponsorPage, /Dana Oatley/i);
+assert.match(sponsorPage, /Jill Dutton/i);
+assert.doesNotMatch(sponsorPage, /Patron Partners/i);
+assert.doesNotMatch(sponsorPage, /Sustaining Partners/i);
+assert.doesNotMatch(sponsorMain.text, /\$\s*\d/);
+assert.doesNotMatch(sponsorMain.html, /\$\s*\d/);
+assert.doesNotMatch(sponsorPage, /Approved contributing members/i);
+assert.equal(
+  await evaluate(
+    `document.querySelector('a[href="/contact/#contact-form"]')?.textContent?.trim() ?? ""`,
+  ),
+  "Ask about sponsorship",
+);
 if (expectTemporaryData) {
   assert.match(
     sponsorPage,

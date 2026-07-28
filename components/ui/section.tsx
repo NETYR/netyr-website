@@ -8,6 +8,7 @@ type SectionProps = {
   className?: string;
   description?: string;
   eyebrow?: string;
+  id?: string;
   title?: string;
   tone?: "light" | "white" | "navy";
 };
@@ -17,6 +18,7 @@ export function Section({
   className,
   description,
   eyebrow,
+  id,
   title,
   tone = "light",
 }: SectionProps) {
@@ -31,6 +33,7 @@ export function Section({
         isDark && "bg-brand-navy text-white",
         className,
       )}
+      id={id}
     >
       <Container>
         {title || description ? (

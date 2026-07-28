@@ -17,7 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/sponsors/",
     "/donate/",
     "/contact/",
-    "/governing-documents/",
   ];
 
   const staticRoutes: MetadataRoute.Sitemap = routes.map((path) => ({

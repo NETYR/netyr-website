@@ -101,12 +101,21 @@ await capture({
   width: 1440,
 });
 await capture({
-  filename: "sponsors.png",
+  filename: "community-partners-desktop.png",
   height: 1000,
   path: "/sponsors/",
-  scrollY: 950,
+  scrollY: 420,
   wait: 5000,
   width: 1440,
+});
+await capture({
+  filename: "community-partners-mobile.png",
+  height: 844,
+  mobile: true,
+  path: "/sponsors/",
+  scrollY: 360,
+  wait: 5000,
+  width: 390,
 });
 await capture({
   filename: "contact-form.png",
@@ -124,4 +133,4 @@ await capture({
 });
 
 socket.close();
-console.log(`Captured 5 review screenshots in ${outputDirectory}`);
+console.log(`Captured 6 review screenshots in ${outputDirectory}`);

@@ -31,7 +31,7 @@ export default function MembershipPage() {
         title="Your place to participate"
       />
       <Section
-        description="The following summary is based on the NETYR Constitution and Bylaws adopted October 9, 2025. Eligibility should be reviewed before payment."
+        description="Review the eligibility requirements below before completing membership registration and payment."
         eyebrow="Active Membership"
         title="Who may join as an Active Member"
         tone="white"
@@ -56,7 +56,7 @@ export default function MembershipPage() {
         </ol>
       </Section>
       <Section
-        description={`The governing document currently sets annual NETYR dues at $${membershipContent.annualDues}. It also permits limited special circumstances and a formal amendment process.`}
+        description={`Annual NETYR dues are currently $${membershipContent.annualDues}. Registration and payment are completed through NETYR's public Cheddar Up collection.`}
         eyebrow="Annual dues"
         title={`$${membershipContent.annualDues} per year`}
       >
@@ -94,7 +94,7 @@ export default function MembershipPage() {
       >
         <p className="max-w-3xl leading-7 text-slate-300">
           Associate, Contributing, and non-Active Honorary Members do not vote
-          or hold office under the NETYR Constitution and Bylaws.
+          or hold office.
         </p>
       </Section>
     </>

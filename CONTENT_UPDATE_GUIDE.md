@@ -29,25 +29,27 @@ maintenance and testing.
 ## Community Partners
 
 1. Record each valid contribution in the existing `Donations` transaction
-   table with the donor's stable Contact ID.
-2. Confirm that Contact ID has a matching record on `Master Contacts`.
-3. Check `Public Display` only after the donor has approved public recognition.
+   table beginning at row 10.
+2. Put the public Donor Name in column B and the positive contribution amount in
+   column E.
+3. Use the same spelling for future rows; the feed also trims whitespace and
+   compares names case-insensitively.
 4. Review `/sponsors/` after the five-minute feed cache refresh.
-5. To withdraw recognition, clear `Public Display`; do not delete financial
-   history or unrelated contact information.
+5. If the workbook later adds an `Anonymous`, `Private`, or `Do Not Publish`
+   field, use that field to suppress the affected row.
 
-The endpoint calculates each donor's tier from cumulative valid donations:
-Patron at $500 or more, Sustaining from $250 through $499.99, and Supporting
-from $20 through $249.99. Manual sponsorship-level, logo, website, and display
-order fields do not control the page. The browser receives only an approved
-public name and the calculated tier.
+The endpoint calculates each donor's tier from cumulative valid donations.
+Manual membership, sponsorship-level, organization, logo, website, and display
+order fields do not control the page. The browser receives only the donor name
+and calculated tier; it never receives the amount or ledger fields.
 
 ## Leadership and organization copy
 
 - Update centralized typed records under `data/` only after approval.
 - Use current officer names, offices, and approved terms; do not add private
   contact information.
-- Preserve the Governing Documents link and do not alter the approved PDF.
+- Keep public copy concise and visitor-focused. Preserve internal source files
+  without linking to them from public pages unless leadership later approves it.
 
 ## News
 

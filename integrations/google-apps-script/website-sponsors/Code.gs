@@ -1,28 +1,16 @@
-const SPONSOR_CONTACT_SHEET_NAME = "Master Contacts";
-const SPONSOR_DONATION_SHEET_NAME = "Donations";
-const CONTACT_IDENTITY_HEADERS = Object.freeze([
-  "First Name",
-  "Last Name",
-  "Organization",
+const PARTNER_DONATION_SHEET_NAME = "Donations";
+const DONOR_NAME_HEADER = "Donor Name";
+const DONATION_AMOUNT_HEADER = "Donation Amount";
+const OPTIONAL_PRIVACY_HEADERS = Object.freeze([
+  "Anonymous",
+  "Private",
+  "Do Not Publish",
 ]);
-const CONTACT_ID_HEADER = "Contact ID";
-const PUBLIC_DISPLAY_HEADER = "Public Display";
-const DONATION_HEADERS = Object.freeze([
-  "Donation Date",
-  "Donor Name",
-  "Organization",
-  "Donation Reason",
-  "Donation Amount",
-  "Notes",
-  "Contact ID",
-  "Donation ID",
-  "Date Entered",
-]);
-const SPONSOR_TIERS = Object.freeze(["Patron", "Sustaining", "Supporting"]);
-const SPONSOR_CONFIG = Object.freeze({
+const PARTNER_TIERS = Object.freeze(["Patron", "Sustaining", "Supporting"]);
+const PARTNER_CONFIG = Object.freeze({
   spreadsheetProperty: "SPREADSHEET_ID",
+  cacheKey: "netyr-public-community-partners-v5",
   cacheSeconds: 300,
-  contactMaximumRows: 5000,
   donationHeaderRow: 9,
   donationMaximumRows: 20000,
 });
@@ -30,297 +18,152 @@ const SPONSOR_CONFIG = Object.freeze({
 function doGet() {
   try {
     const cache = CacheService.getScriptCache();
-    const cached = cache.get("netyr-public-sponsors-v3");
+    const cached = cache.get(PARTNER_CONFIG.cacheKey);
     if (cached) return jsonText_(cached);
 
-    const sponsors = readPublicSponsors_();
-    const response = JSON.stringify({ ok: true, sponsors: sponsors });
-    cache.put(
-      "netyr-public-sponsors-v3",
-      response,
-      SPONSOR_CONFIG.cacheSeconds,
-    );
+    const partners = readPublicPartners_();
+    const response = JSON.stringify({ ok: true, sponsors: partners });
+    cache.put(PARTNER_CONFIG.cacheKey, response, PARTNER_CONFIG.cacheSeconds);
     return jsonText_(response);
   } catch (_error) {
+    console.error("Community Partners feed failed.");
     return unavailableResponse_();
   }
 }
 
 function clearSponsorCache() {
-  CacheService.getScriptCache().remove("netyr-public-sponsors-v3");
+  CacheService.getScriptCache().remove(PARTNER_CONFIG.cacheKey);
   return { ok: true };
 }
 
 function verifySponsorSource() {
-  const source = getSponsorSource_();
-  verifyContactHeaders_(source.contacts);
-  verifyDonationHeaders_(source.donations);
+  const sheet = getDonationSheet_();
+  const source = verifyDonationSource_(sheet);
   return {
     ok: true,
-    message:
-      "Master Contacts and Donations are ready for cumulative public recognition.",
+    sheetName: PARTNER_DONATION_SHEET_NAME,
+    headerRow: PARTNER_CONFIG.donationHeaderRow,
+    donorNameColumn: source.donorNameColumn,
+    donationAmountColumn: source.donationAmountColumn,
+    privacyHeader: source.privacyHeader,
+    message: "The Donation Transaction Ledger is ready.",
   };
 }
 
-function readPublicSponsors_() {
-  const source = getSponsorSource_();
-  verifyContactHeaders_(source.contacts);
-  verifyDonationHeaders_(source.donations);
-
+function readPublicPartners_() {
+  const sheet = getDonationSheet_();
+  const source = verifyDonationSource_(sheet);
   return aggregateCommunityPartners_(
-    readContactRecords_(source.contacts),
-    readDonationRecords_(source.donations),
+    readDonationRecords_(sheet, source.privacyColumn),
   );
 }
 
-function readContactRecords_(sheet) {
-  const lastRow = Math.min(
-    sheet.getLastRow(),
-    SPONSOR_CONFIG.contactMaximumRows,
-  );
-  if (lastRow < 2) return [];
+function getDonationSheet_() {
+  const spreadsheet = SpreadsheetApp.openById(getSpreadsheetId_());
+  const sheet = spreadsheet.getSheetByName(PARTNER_DONATION_SHEET_NAME);
+  if (!sheet) {
+    throw new Error("Community Partners source is unavailable.");
+  }
+  return sheet;
+}
 
-  const rowCount = lastRow - 1;
-  const identityRange = sheet.getRange(2, 1, rowCount, 3);
-  const contactIdRange = sheet.getRange(2, 9, rowCount, 1);
-  const publicDisplayRange = sheet.getRange(2, 13, rowCount, 1);
-  const identityValues = identityRange.getDisplayValues();
-  const identityFormulas = identityRange.getFormulas();
-  const contactIds = contactIdRange.getDisplayValues();
-  const contactIdFormulas = contactIdRange.getFormulas();
-  const publicDisplayValues = publicDisplayRange.getValues();
-  const publicDisplayFormulas = publicDisplayRange.getFormulas();
+function verifyDonationSource_(sheet) {
+  const lastColumn = sheet.getLastColumn();
+  if (lastColumn < 5) {
+    throw new Error("Donation Transaction Ledger headers are incomplete.");
+  }
 
-  return identityValues.map(function (identityRow, index) {
-    return {
-      contactId: contactIds[index][0],
-      hasFormula:
-        identityFormulas[index].some(Boolean) ||
-        Boolean(contactIdFormulas[index][0]) ||
-        Boolean(publicDisplayFormulas[index][0]),
-      identityRow: identityRow,
-      publicDisplay: publicDisplayValues[index][0],
-    };
+  const headers = sheet
+    .getRange(PARTNER_CONFIG.donationHeaderRow, 1, 1, lastColumn)
+    .getDisplayValues()[0]
+    .map(function (header) {
+      return cleanText_(header, 120);
+    });
+
+  if (
+    headers[1] !== DONOR_NAME_HEADER ||
+    headers[4] !== DONATION_AMOUNT_HEADER
+  ) {
+    throw new Error("Donation Transaction Ledger headers are unexpected.");
+  }
+
+  const privacyIndex = headers.findIndex(function (header) {
+    return OPTIONAL_PRIVACY_HEADERS.indexOf(header) !== -1;
   });
+
+  return {
+    donorNameColumn: 2,
+    donationAmountColumn: 5,
+    privacyColumn: privacyIndex >= 0 ? privacyIndex + 1 : 0,
+    privacyHeader: privacyIndex >= 0 ? headers[privacyIndex] : "",
+  };
 }
 
-function readDonationRecords_(sheet) {
-  const firstDataRow = SPONSOR_CONFIG.donationHeaderRow + 1;
+function readDonationRecords_(sheet, privacyColumn) {
+  const firstDataRow = PARTNER_CONFIG.donationHeaderRow + 1;
   const lastRow = Math.min(
     sheet.getLastRow(),
-    SPONSOR_CONFIG.donationMaximumRows,
+    PARTNER_CONFIG.donationMaximumRows,
   );
   if (lastRow < firstDataRow) return [];
 
   const rowCount = lastRow - firstDataRow + 1;
+  const names = sheet.getRange(firstDataRow, 2, rowCount, 1).getDisplayValues();
+  const amounts = sheet
+    .getRange(firstDataRow, 5, rowCount, 1)
+    .getDisplayValues();
+  const privacyValues = privacyColumn
+    ? sheet
+        .getRange(firstDataRow, privacyColumn, rowCount, 1)
+        .getDisplayValues()
+    : [];
 
-  // Read only Donation Reason through Donation ID (D:H). Names, dates, and
-  // dashboard cells are not needed for cumulative classification.
-  const donationRange = sheet.getRange(firstDataRow, 4, rowCount, 5);
-  const values = donationRange.getValues();
-  const formulas = donationRange.getFormulas();
-
-  return values.map(function (row, index) {
+  return names.map(function (nameRow, index) {
     return {
-      hasFormula: formulas[index].some(Boolean),
-      row: row,
+      amount: amounts[index][0],
+      donorName: nameRow[0],
+      privateValue: privacyColumn ? privacyValues[index][0] : "",
     };
   });
 }
 
-function aggregateCommunityPartners_(contactRecords, donationRecords) {
-  const contactsById = {};
-  const cumulativeCentsById = {};
-  const seenDonationIds = {};
+function aggregateCommunityPartners_(records) {
+  const totalsByName = {};
 
-  contactRecords.forEach(function (record) {
-    const contact = contactFromRecord_(record);
-    if (!contact || contactsById[contact.id]) return;
-    contactsById[contact.id] = contact;
-  });
+  records.forEach(function (record) {
+    const donorName = cleanText_(record && record.donorName, 180);
+    const amountCents = amountToCents_(record && record.amount);
+    const key = nameKey_(donorName);
 
-  donationRecords.forEach(function (record) {
-    const donation = donationFromRecord_(record);
-    if (!donation) return;
-
-    if (donation.donationId) {
-      if (seenDonationIds[donation.donationId]) return;
-      seenDonationIds[donation.donationId] = true;
+    if (
+      !key ||
+      amountCents <= 0 ||
+      isPrivateValue_(record && record.privateValue)
+    ) {
+      return;
     }
 
-    cumulativeCentsById[donation.contactId] =
-      (cumulativeCentsById[donation.contactId] || 0) + donation.amountCents;
+    if (!totalsByName[key]) {
+      totalsByName[key] = { name: donorName, cents: 0 };
+    }
+    totalsByName[key].cents += amountCents;
   });
 
-  const partners = [];
-  Object.keys(cumulativeCentsById).forEach(function (contactId) {
-    const contact = contactsById[contactId];
-    if (!contact) return;
-
-    const tier = tierForCents_(cumulativeCentsById[contactId]);
-    if (!tier) return;
-    partners.push({ name: contact.name, tier: tier });
-  });
-
-  const unique = [];
-  const seenNames = {};
-  partners
+  return Object.keys(totalsByName)
+    .map(function (key) {
+      const donor = totalsByName[key];
+      const tier = tierForCents_(donor.cents);
+      return tier ? { name: donor.name, tier: tier } : null;
+    })
+    .filter(Boolean)
     .sort(function (left, right) {
       return (
         tierOrder_(left.tier) - tierOrder_(right.tier) ||
-        left.name.localeCompare(right.name)
+        left.name.localeCompare(right.name, undefined, {
+          sensitivity: "base",
+        })
       );
-    })
-    .forEach(function (partner) {
-      const key = partner.name.toLowerCase();
-      if (seenNames[key]) return;
-      seenNames[key] = true;
-      unique.push(partner);
     });
-
-  return unique;
-}
-
-function contactFromRecord_(record) {
-  if (!record || record.hasFormula) return null;
-
-  const identityRow = record.identityRow || [];
-  const firstName = cleanText_(identityRow[0], 80);
-  const lastName = cleanText_(identityRow[1], 80);
-  const organization = cleanText_(identityRow[2], 180);
-  const personName = cleanText_([firstName, lastName].join(" "), 180);
-  const name = organization || personName;
-  const id = idKey_(record.contactId);
-
-  if (
-    !id ||
-    !name ||
-    !publicDisplay_(record.publicDisplay) ||
-    anonymousDisplayName_(name)
-  ) {
-    return null;
-  }
-
-  return { id: id, name: name };
-}
-
-function donationFromRecord_(record) {
-  if (!record || record.hasFormula) return null;
-
-  const row = record.row || [];
-  const reason = cleanText_(row[0], 200);
-  const amountCents = amountToCents_(row[1]);
-  const notes = cleanText_(row[2], 500);
-  const contactId = idKey_(row[3]);
-  const donationId = idKey_(row[4]);
-  const controlText = [reason, notes, donationId].join(" ").toLowerCase();
-
-  if (!contactId || !amountCents) return null;
-  if (/\b(test|dummy|sample)\b/i.test(controlText)) return null;
-  if (/\b(deleted|void(?:ed)?|cancel(?:led|ed))\b/i.test(controlText))
-    return null;
-
-  // A positive row explicitly marked refunded or reversed is excluded. A
-  // negative refund/reversal remains a signed adjustment so it can cancel the
-  // original contribution in the cumulative total.
-  if (
-    amountCents > 0 &&
-    /\b(refund(?:ed)?|revers(?:ed|al))\b/i.test(controlText)
-  ) {
-    return null;
-  }
-
-  return {
-    amountCents: amountCents,
-    contactId: contactId,
-    donationId: donationId,
-  };
-}
-
-function getSponsorSource_() {
-  const spreadsheet = SpreadsheetApp.openById(getSpreadsheetId_());
-  const contacts = spreadsheet.getSheetByName(SPONSOR_CONTACT_SHEET_NAME);
-  const donations = spreadsheet.getSheetByName(SPONSOR_DONATION_SHEET_NAME);
-  if (!contacts || !donations) {
-    throw new Error("Community partner source is unavailable.");
-  }
-  return { contacts: contacts, donations: donations };
-}
-
-function verifyContactHeaders_(sheet) {
-  const identity = sheet
-    .getRange(1, 1, 1, CONTACT_IDENTITY_HEADERS.length)
-    .getDisplayValues()[0];
-  const contactId = sheet.getRange(1, 9).getDisplayValue();
-  const publicDisplay = sheet.getRange(1, 13).getDisplayValue();
-
-  if (
-    !headersMatch_(identity, CONTACT_IDENTITY_HEADERS) ||
-    String(contactId || "").trim() !== CONTACT_ID_HEADER ||
-    String(publicDisplay || "").trim() !== PUBLIC_DISPLAY_HEADER
-  ) {
-    throw new Error(
-      "Master Contacts has unexpected public-recognition headers.",
-    );
-  }
-}
-
-function verifyDonationHeaders_(sheet) {
-  const headers = sheet
-    .getRange(SPONSOR_CONFIG.donationHeaderRow, 1, 1, DONATION_HEADERS.length)
-    .getDisplayValues()[0];
-  if (!headersMatch_(headers, DONATION_HEADERS)) {
-    throw new Error("Donations has unexpected transaction headers.");
-  }
-}
-
-function headersMatch_(actual, expected) {
-  return expected.every(function (header, index) {
-    return String(actual[index] || "").trim() === header;
-  });
-}
-
-function getSpreadsheetId_() {
-  const spreadsheetId = String(
-    PropertiesService.getScriptProperties().getProperty(
-      SPONSOR_CONFIG.spreadsheetProperty,
-    ) || "",
-  ).trim();
-  if (!spreadsheetId)
-    throw new Error("Community partner source is unavailable.");
-  return spreadsheetId;
-}
-
-function cleanText_(value, maxLength) {
-  return String(value == null ? "" : value)
-    .replace(/<[^>]*>/g, "")
-    .replace(/[\u0000-\u001F\u007F]/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, maxLength);
-}
-
-function idKey_(value) {
-  return cleanText_(value, 180).toLowerCase();
-}
-
-function publicDisplay_(value) {
-  if (value === true) return true;
-  const candidate = cleanText_(value, 20).toLowerCase();
-  return (
-    candidate === "true" ||
-    candidate === "yes" ||
-    candidate === "approved" ||
-    candidate === "public"
-  );
-}
-
-function anonymousDisplayName_(value) {
-  const candidate = cleanText_(value, 180)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-  return /^anonymous(?: donor| supporter| member)?$/.test(candidate);
 }
 
 function amountToCents_(value) {
@@ -330,10 +173,10 @@ function amountToCents_(value) {
 
   const candidate = cleanText_(value, 80);
   if (!candidate) return 0;
-  const isParentheticalNegative = /^\(.*\)$/.test(candidate);
+  const parentheticalNegative = /^\(.*\)$/.test(candidate);
   const parsed = Number(candidate.replace(/[,$()\s]/g, ""));
   if (!Number.isFinite(parsed)) return 0;
-  return Math.round((isParentheticalNegative ? -parsed : parsed) * 100);
+  return Math.round((parentheticalNegative ? -parsed : parsed) * 100);
 }
 
 function tierForCents_(amountCents) {
@@ -344,8 +187,46 @@ function tierForCents_(amountCents) {
 }
 
 function tierOrder_(tier) {
-  const index = SPONSOR_TIERS.indexOf(tier);
+  const index = PARTNER_TIERS.indexOf(tier);
   return index >= 0 ? index : Number.MAX_SAFE_INTEGER;
+}
+
+function nameKey_(value) {
+  return cleanText_(value, 180).toLocaleLowerCase();
+}
+
+function isPrivateValue_(value) {
+  if (value === true) return true;
+  const candidate = cleanText_(value, 40).toLocaleLowerCase();
+  return (
+    candidate === "true" ||
+    candidate === "yes" ||
+    candidate === "y" ||
+    candidate === "anonymous" ||
+    candidate === "private" ||
+    candidate === "do not publish"
+  );
+}
+
+function getSpreadsheetId_() {
+  const spreadsheetId = String(
+    PropertiesService.getScriptProperties().getProperty(
+      PARTNER_CONFIG.spreadsheetProperty,
+    ) || "",
+  ).trim();
+  if (!spreadsheetId) {
+    throw new Error("Community Partners source is unavailable.");
+  }
+  return spreadsheetId;
+}
+
+function cleanText_(value, maxLength) {
+  return String(value == null ? "" : value)
+    .replace(/<[^>]*>/g, "")
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
 }
 
 function unavailableResponse_() {
@@ -370,164 +251,129 @@ function runWebsiteSponsorsTests() {
     callback();
     results.push(name);
   };
-  const contact = function (id, name, publicDisplay) {
+  const record = function (donorName, amount, privateValue) {
     return {
-      contactId: id,
-      hasFormula: false,
-      identityRow: ["", "", name],
-      publicDisplay: publicDisplay === undefined ? true : publicDisplay,
+      donorName: donorName,
+      amount: amount,
+      privateValue: privateValue || "",
     };
   };
-  const donation = function (contactId, amount, donationId, reason, notes) {
-    return {
-      hasFormula: false,
-      row: [reason || "", amount, notes || "", contactId, donationId || ""],
-    };
-  };
-  const partners = function (contacts, donations) {
-    return aggregateCommunityPartners_(contacts, donations);
+  const partners = function (records) {
+    return aggregateCommunityPartners_(records);
   };
 
   test("one $20 donation is Supporting", function () {
-    const result = partners(
-      [contact("supporting", "Twenty Donor")],
-      [donation("supporting", 20, "d-20")],
-    );
+    const result = partners([record("Twenty Donor", 20)]);
     if (result.length !== 1 || result[0].tier !== "Supporting") {
       throw new Error("Supporting threshold failed.");
     }
   });
 
   test("multiple donations totaling $250 are Sustaining", function () {
-    const result = partners(
-      [contact("sustaining", "Two Donation Donor")],
-      [
-        donation("sustaining", 125, "d-125-a"),
-        donation("sustaining", 125, "d-125-b"),
-      ],
-    );
+    const result = partners([
+      record("Two Donation Donor", 125),
+      record("two donation donor", 125),
+    ]);
     if (result.length !== 1 || result[0].tier !== "Sustaining") {
       throw new Error("Sustaining aggregation failed.");
     }
   });
 
   test("multiple donations totaling $500 are Patron", function () {
-    const donations = [1, 2, 3, 4, 5].map(function (value) {
-      return donation("patron", 100, "d-100-" + value);
-    });
-    const result = partners(
-      [contact("patron", "Five Donation Donor")],
-      donations,
-    );
+    const result = partners([
+      record("Five Donation Donor", 100),
+      record("Five Donation Donor", 100),
+      record("Five Donation Donor", 100),
+      record("Five Donation Donor", 100),
+      record("Five Donation Donor", 100),
+    ]);
     if (result.length !== 1 || result[0].tier !== "Patron") {
       throw new Error("Patron aggregation failed.");
     }
   });
 
+  test("formatted currency is parsed", function () {
+    const result = partners([record("Currency Donor", "$200.00")]);
+    if (result.length !== 1 || result[0].tier !== "Supporting") {
+      throw new Error("Formatted currency parsing failed.");
+    }
+  });
+
+  test("blank names and invalid amounts are omitted", function () {
+    const result = partners([
+      record("", 500),
+      record("Blank Amount", ""),
+      record("Invalid Amount", "not a number"),
+    ]);
+    if (result.length) throw new Error("Invalid rows were published.");
+  });
+
+  test("nonpositive donations are omitted", function () {
+    const result = partners([
+      record("Zero Donor", 0),
+      record("Negative Donor", -500),
+    ]);
+    if (result.length) throw new Error("Nonpositive rows were published.");
+  });
+
   test("a total below $20 is omitted", function () {
-    const result = partners(
-      [contact("under", "Under Threshold")],
-      [donation("under", 15, "d-15")],
-    );
+    const result = partners([record("Under Threshold", 19.99)]);
     if (result.length) throw new Error("Under-threshold donor was published.");
   });
 
-  test("refunded and reversed donations do not qualify", function () {
-    const result = partners(
-      [
-        contact("refunded", "Refunded Donor"),
-        contact("reversed", "Reversed Donor"),
-      ],
-      [
-        donation("refunded", 500, "refund-1", "Refunded"),
-        donation("reversed", 500, "reverse-1", "Reversed"),
-      ],
-    );
-    if (result.length) throw new Error("Invalid donations were published.");
+  test("optional privacy values are honored", function () {
+    const result = partners([
+      record("Anonymous Donor", 500, "Anonymous"),
+      record("Private Donor", 500, "Yes"),
+      record("Do Not Publish Donor", 500, "Do Not Publish"),
+    ]);
+    if (result.length) throw new Error("Private donors were published.");
   });
 
-  test("negative refunds reduce cumulative contributions", function () {
-    const result = partners(
-      [contact("adjusted", "Adjusted Donor")],
-      [
-        donation("adjusted", 500, "original"),
-        donation("adjusted", -500, "refund", "Refund"),
-      ],
-    );
-    if (result.length) throw new Error("Refund adjustment was not applied.");
-  });
-
-  test("anonymous donors are omitted", function () {
-    const result = partners(
-      [contact("anonymous", "Anonymous Donor")],
-      [donation("anonymous", 500, "anonymous-1")],
-    );
-    if (result.length) throw new Error("Anonymous donor was published.");
-  });
-
-  test("a donor is displayed once after cumulative aggregation", function () {
-    const result = partners(
-      [contact("once", "One Public Name")],
-      [
-        donation("once", 100, "once-1"),
-        donation("once", 100, "once-2"),
-        donation("once", 100, "once-3"),
-      ],
-    );
+  test("names are normalized and donors are listed once", function () {
+    const result = partners([
+      record("  One   Public Name ", 100),
+      record("one public name", 100),
+      record("ONE PUBLIC NAME", 100),
+    ]);
     if (
       result.length !== 1 ||
       result[0].name !== "One Public Name" ||
       result[0].tier !== "Sustaining"
     ) {
-      throw new Error("Cumulative deduplication failed.");
+      throw new Error("Name normalization failed.");
     }
   });
 
-  test("changed amounts move the donor to the correct tier", function () {
-    const contacts = [contact("changed", "Changed Amount Donor")];
-    const supporting = partners(contacts, [
-      donation("changed", 249.99, "changed-1"),
+  test("names are alphabetized inside a tier", function () {
+    const result = partners([
+      record("Zulu Donor", 20),
+      record("Alpha Donor", 20),
     ]);
-    const sustaining = partners(contacts, [
-      donation("changed", 250, "changed-1"),
-    ]);
+    if (
+      result.length !== 2 ||
+      result[0].name !== "Alpha Donor" ||
+      result[1].name !== "Zulu Donor"
+    ) {
+      throw new Error("Alphabetical sorting failed.");
+    }
+  });
+
+  test("changed totals move donors between tiers", function () {
+    const supporting = partners([record("Changed Donor", 249.99)]);
+    const sustaining = partners([record("Changed Donor", 250)]);
     if (
       supporting[0].tier !== "Supporting" ||
       sustaining[0].tier !== "Sustaining"
     ) {
-      throw new Error("Changed-amount classification failed.");
-    }
-  });
-
-  test("private contacts are omitted", function () {
-    const result = partners(
-      [contact("private", "Private Donor", false)],
-      [donation("private", 500, "private-1")],
-    );
-    if (result.length) throw new Error("Private donor was published.");
-  });
-
-  test("duplicate transaction IDs are counted once", function () {
-    const result = partners(
-      [contact("duplicate", "Duplicate Transaction Donor")],
-      [
-        donation("duplicate", 125, "same-id"),
-        donation("duplicate", 125, "same-id"),
-      ],
-    );
-    if (result.length !== 1 || result[0].tier !== "Supporting") {
-      throw new Error("Duplicate donation was counted twice.");
+      throw new Error("Tier reassignment failed.");
     }
   });
 
   test("the public contract contains names and tiers only", function () {
-    const result = partners(
-      [contact("contract", "Public Contract Donor")],
-      [donation("contract", 500, "contract-1")],
-    );
-    const keys = Object.keys(result[0]).sort().join(",");
-    if (keys !== "name,tier") {
-      throw new Error("Private or unnecessary fields entered the public feed.");
+    const result = partners([record("Public Contract Donor", 500)]);
+    if (Object.keys(result[0]).sort().join(",") !== "name,tier") {
+      throw new Error("The public contract exposed unnecessary fields.");
     }
   });
 

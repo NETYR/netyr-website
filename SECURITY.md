@@ -16,11 +16,10 @@ another person’s contact submission in a public issue.
 - The custom contact-form Apps Script writes only to `Website Contacts` and
   never returns private sheet data.
 - The Events feed reads only the dedicated public-events Calendar.
-- The Community Partners feed uses only fixed, server-side fields from
-  `Master Contacts` and `Donations`. It joins by Contact ID, applies public
-  recognition controls, and returns only the approved name and calculated
-  tier. Contact IDs, transaction details, contribution totals, notes, and
-  contact details are never returned.
+- The Community Partners feed reads only fixed server-side fields from
+  `Donations`. It aggregates by normalized Donor Name and returns only the name
+  and calculated tier. Amounts, dates, reasons, notes, organizations, IDs,
+  contact details, row numbers, and workbook metadata are never returned.
 
 See the integration-package security notes for the respective trust boundaries
 and operating controls.

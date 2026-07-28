@@ -1,12 +1,4 @@
 import type { Sponsor } from "@/types/content";
 
-// Public names are normally supplied by the cumulative-donation feed.
+// Public names are supplied by the cumulative Donation Transaction Ledger feed.
 export const sponsors: Sponsor[] = [];
-
-export const sponsorProgram = {
-  tiers: [
-    { amount: "$500 or more", name: "Patron" },
-    { amount: "$250–$499.99", name: "Sustaining" },
-    { amount: "$20–$249.99", name: "Supporting" },
-  ],
-} as const;

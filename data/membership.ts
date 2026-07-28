@@ -28,12 +28,12 @@ export const membershipContent = {
     {
       name: "Contributing Member",
       description:
-        "A non-voting supporting classification recognized by the NETYR governing document.",
+        "A non-voting way to support NETYR and participate in chapter activities.",
     },
     {
       name: "Honorary Member",
       description:
-        "A distinction granted by an affirmative vote under the requirements in the NETYR governing document.",
+        "A non-voting recognition for distinguished support of NETYR and its mission.",
     },
   ],
 } as const;

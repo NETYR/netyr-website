@@ -28,7 +28,11 @@ export default function ContactPage() {
         title="Connect with NETYR"
       />
       {hasEmbeddedForm ? (
-        <Section className="py-10 sm:py-12 lg:py-16" tone="white">
+        <Section
+          className="scroll-mt-28 py-10 sm:py-12 lg:py-16"
+          id="contact-form"
+          tone="white"
+        >
           <div className="mx-auto max-w-4xl overflow-hidden rounded-sm border border-slate-200 bg-white shadow-[0_12px_36px_-24px_rgba(7,26,51,0.35)]">
             <ContactFormEmbed src={contactConfig.contactFormEmbedUrl} />
           </div>
