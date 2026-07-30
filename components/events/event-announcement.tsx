@@ -2,7 +2,7 @@
 
 import { useEvents } from "@/components/events/use-events";
 import {
-  formatEventDate,
+  formatEventDateRange,
   formatEventTime,
   isFutureEvent,
 } from "@/lib/events/format";
@@ -45,11 +45,7 @@ export function EventAnnouncement({
           {nextEvent.title}
         </span>
         <span className="text-blue-100">
-          {formatEventDate(nextEvent, {
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-          })}
+          {formatEventDateRange(nextEvent)}
           <span aria-hidden="true"> · </span>
           {formatEventTime(nextEvent, false)}
         </span>

@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import {
   eventMonthKey,
   formatEventDate,
+  formatEventDateRange,
   formatEventTime,
 } from "@/lib/events/format";
 import { buildAddToCalendarUrl } from "@/lib/events/provider";
@@ -153,6 +154,10 @@ export function EventCalendar({ events }: { events: Event[] }) {
                         {event.title}
                       </h3>
                       <dl className="mt-3 grid gap-2 text-sm text-slate-700">
+                        <div className="flex flex-wrap gap-x-2">
+                          <dt className="font-bold">Date:</dt>
+                          <dd>{formatEventDateRange(event)}</dd>
+                        </div>
                         <div className="flex flex-wrap gap-x-2">
                           <dt className="font-bold">Time:</dt>
                           <dd>{formatEventTime(event)}</dd>
