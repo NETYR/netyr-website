@@ -2,14 +2,14 @@
 
 ## Data-flow summary
 
-| Feature                 | Source                                         | Server-side boundary                   | Public output                                       | Failure state                                             |
-| ----------------------- | ---------------------------------------------- | -------------------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
-| Events and announcement | `NETYR Public Events` calendar                 | NETYR Website Events Apps Script       | Approved event fields only                          | Explicit unavailable state; not treated as an empty month |
-| Community Partners      | Institutional donor workbook, fixed donor tabs | NETYR Website Sponsors Apps Script     | `name` and `level` only                             | Explicit connection-error state                           |
-| Contact                 | Institutional workbook, `Website Contacts` tab | NETYR Website Contact Form Apps Script | Embedded HTML form and generic success/error result | Email alternative and unavailable message                 |
-| Membership and support  | Cheddar Up public collection                   | External Cheddar Up service            | Outbound link only                                  | Link remains a normal external destination                |
-| Analytics               | Browser page and approved interaction events   | Google Analytics 4                     | Aggregate analytics events                          | Site remains functional when disabled                     |
-| Social links            | `data/social-links.ts`                         | None                                   | Verified public profile URLs                        | Link omitted until verified                               |
+| Feature                 | Source                                        | Server-side boundary                   | Public output                                       | Failure state                                             |
+| ----------------------- | --------------------------------------------- | -------------------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
+| Events and announcement | `NETYR Public Events` calendar                | NETYR Website Events Apps Script       | Approved event fields only                          | Explicit unavailable state; not treated as an empty month |
+| Community Partners      | Shared Drive donor workbook, fixed donor tabs | NETYR Website Sponsors Apps Script     | `name` and `level` only                             | Explicit connection-error state                           |
+| Contact                 | Shared Drive workbook, `Website Contacts` tab | NETYR Website Contact Form Apps Script | Embedded HTML form and generic success/error result | Unavailable message                                       |
+| Membership and support  | Cheddar Up public collection                  | External Cheddar Up service            | Outbound link only                                  | Link remains a normal external destination                |
+| Analytics               | Browser page and approved interaction events  | Google Analytics 4                     | Aggregate analytics events                          | Site remains functional when disabled                     |
+| Social links            | `data/social-links.ts`                        | None                                   | Verified public profile URLs                        | Link omitted until verified                               |
 
 ## Events
 
@@ -18,15 +18,18 @@ the NETYR-owned calendar with read-only scope, limits the date window, sanitizes
 text, extracts optional registration/graphic directives, hashes an event ID, and
 returns no owner, attendee, organizer, calendar, or email metadata. Responses
 are cached for five minutes. The calendar itself is not public; the web app is
-the public-data boundary.
+the public-data boundary. The page rechecks every five minutes while open and
+when the tab becomes active if its last successful fetch is older than one
+minute.
 
 ## Community Partners
 
-The Apps Script opens only the configured workbook and fixed `Donations` and
-`Master Contacts` tabs. It verifies the live headers, aggregates valid ledger
-transactions by Contact ID when available, uses a normalized-name fallback,
-enforces the real Public Display control, assigns the finalized sponsorship
-level, de-duplicates, sorts, and returns only the public display name and level.
+The Apps Script opens only the configured organization-managed Shared Drive
+workbook and fixed `Donations` and `Master Contacts` tabs. It verifies the live
+headers, aggregates valid ledger transactions by Contact ID when available,
+uses a normalized-name fallback, enforces the real Public Display control,
+assigns the finalized sponsorship level, de-duplicates, sorts, and returns only
+the public display name and level.
 No amount, date, reason, note, contact field, row number, workbook metadata, or
 identifier enters the browser.
 
@@ -35,7 +38,8 @@ checkbox (the boolean value `TRUE`) permits public name recognition; unchecked,
 `FALSE`, and blank values remain private. The adapter continues to normalize
 legacy positive values for migration safety, but the workbook interface uses
 checkboxes as the authoritative format. The public response is cached for one
-minute, and the page rechecks the endpoint every minute while open.
+minute. The page rechecks every five minutes while open and when the tab becomes
+active if its last successful fetch is older than one minute.
 
 The adapter logs privacy-safe status codes for administrators:
 `NO_QUALIFYING_DONATIONS`, `ALL_QUALIFYING_DONORS_PRIVATE`,

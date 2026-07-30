@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
-import { contactConfig } from "@/data/contact";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -36,12 +35,12 @@ export default function AccessibilityPage() {
           </p>
           <p>
             If you encounter a barrier, please describe the page and the problem
-            in an email to{" "}
+            through the{" "}
             <a
               className="text-brand-blue font-semibold underline decoration-2 underline-offset-4"
-              href={`mailto:${contactConfig.publicEmail}?subject=Website%20accessibility`}
+              href="/contact/#contact-form"
             >
-              {contactConfig.publicEmail}
+              NETYR contact form
             </a>
             . We will review the report and work toward a practical solution.
           </p>

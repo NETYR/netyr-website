@@ -32,6 +32,8 @@ const contactPagePath = resolve("app/contact/page.tsx");
 const sponsorDirectoryPath = resolve(
   "components/sponsors/sponsor-directory.tsx",
 );
+const eventHookPath = resolve("components/events/use-events.ts");
+const runtimeFeedPath = resolve("lib/integrations/runtime-feed.ts");
 
 const events = loadAppsScript(eventsPath);
 const eventTests = vm.runInContext("runWebsiteEventsTests()", events.context);
@@ -73,6 +75,8 @@ const contactPage = readFileSync(contactPagePath, "utf8");
 assert.doesNotMatch(contactPage, /Open the contact form in a new window/i);
 
 const sponsorDirectory = readFileSync(sponsorDirectoryPath, "utf8");
+const eventHook = readFileSync(eventHookPath, "utf8");
+const runtimeFeed = readFileSync(runtimeFeedPath, "utf8");
 assert.match(sponsorDirectory, /\{level\}s/);
 assert.match(
   sponsorDirectory,
@@ -83,6 +87,12 @@ assert.match(
   /Community partner information is temporarily unavailable\./,
 );
 assert.doesNotMatch(sponsorDirectory, /sponsor\.(logo|href)/);
+assert.match(sponsorDirectory, /visibilitychange/);
+assert.match(sponsorDirectory, /withRuntimeCacheBust/);
+assert.match(eventHook, /visibilitychange/);
+assert.match(eventHook, /withRuntimeCacheBust/);
+assert.match(runtimeFeed, /runtimeFeedRefreshMilliseconds = 5 \* 60 \* 1000/);
+assert.match(runtimeFeed, /runtimeFeedFocusStaleMilliseconds = 60 \* 1000/);
 
 const publicSources = ["app", "components", "data", "lib", "types"].flatMap(
   (directory) => readPublicSourceTree(resolve(directory)),

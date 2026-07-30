@@ -8,7 +8,8 @@
 2. Use only public title, time, location, and description content.
 3. Optional description directives supported by the server adapter are
    documented in the Events Apps Script `SETUP.md`.
-4. Wait up to five minutes for cache expiration or run `clearEventsCache`.
+4. Allow up to five minutes for the feed cache to expire. No script run or
+   website deployment is required.
 5. Verify the homepage banner, selected-month listing, time zone, links, graphic
    fallback, and event structured data.
 6. Remove temporary inactive test content.
@@ -27,19 +28,21 @@
 5. The server adapter totals valid transactions by Contact ID when available,
    applies Public Display and any real transaction privacy/status controls, and
    returns names and sponsorship levels only.
-6. Wait up to one minute, reload the Community Partners page, or run
-   `clearSponsorCache` in the **NETYR Website Sponsors** Apps Script project.
+6. Allow up to one minute for the feed cache to expire. The open page refreshes
+   every five minutes and rechecks on tab focus when its data is older than one
+   minute. No script run or website deployment is required.
 7. Verify no amount or private field appears in the response, HTML, or page.
 
-The container-bound workbook project is named **NETYR Donor and Contact
-Administration**. Its `Refresh Public Recognition Controls` menu command repairs
-checkbox validation and guidance without changing donor choices.
+The organization-managed Shared Drive workbook has a container-bound project
+named **NETYR Donor and Contact Administration**. Its
+`Refresh Public Recognition Controls` menu command repairs checkbox validation
+and guidance without changing donor choices.
 
 If checked, qualifying donors are still missing, verify that the sponsor web
-app's private `SPREADSHEET_ID` property targets the institutional master donor
-workbook. Do not expose the value in repository files, screenshots, support
-logs, or browser code. After correcting it, update the existing production
-deployment and run `clearSponsorCache`.
+app's private `SPREADSHEET_ID` property targets the organization-managed Shared
+Drive workbook. Do not expose the value in repository files, screenshots,
+support logs, or browser code. Script Property changes do not require a new web
+app deployment.
 
 ### Contact
 

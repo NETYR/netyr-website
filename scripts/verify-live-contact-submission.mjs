@@ -150,7 +150,9 @@ await evaluate(`(() => {
     county: "Test County",
     inquiryType: "General Question",
     preferredContactMethod: "Email",
-    message: "NETYR automated contact validation - remove after test - 2026-07-27 17:31 CT."
+    message:
+      "NETYR automated contact validation - remove after test - " +
+      new Date().toISOString()
   };
   for (const [id, value] of Object.entries(values)) {
     const field = frameDocument.getElementById(id);

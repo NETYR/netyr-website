@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import {
+  runtimeFeedFocusStaleMilliseconds,
+  runtimeFeedRefreshMilliseconds,
+  withRuntimeCacheBust,
+} from "@/lib/integrations/runtime-feed";
 import { parseSponsorFeed, sponsorLevels } from "@/lib/sponsors/provider";
 import type { Sponsor } from "@/types/content";
 
@@ -17,19 +22,28 @@ export function SponsorDirectory({
   const [sponsors, setSponsors] = useState(initialSponsors);
   const [isLoading, setIsLoading] = useState(Boolean(feedUrl));
   const [couldNotLoad, setCouldNotLoad] = useState(false);
+  const lastRequestAt = useRef(0);
+  const requestInFlight = useRef(false);
 
   useEffect(() => {
     if (!feedUrl) return;
+    const feedEndpoint = feedUrl;
 
-    const endpoint = feedUrl;
     const controller = new AbortController();
 
     async function loadSponsors() {
+      if (requestInFlight.current) return;
+      requestInFlight.current = true;
+      lastRequestAt.current = Date.now();
+
       try {
-        const response = await fetch(endpoint, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          withRuntimeCacheBust(feedEndpoint, lastRequestAt.current),
+          {
+            cache: "no-store",
+            signal: controller.signal,
+          },
+        );
         if (!response.ok) throw new Error("Sponsor feed request failed.");
 
         const payload: unknown = await response.json();
@@ -47,6 +61,7 @@ export function SponsorDirectory({
           return;
         setCouldNotLoad(true);
       } finally {
+        requestInFlight.current = false;
         setIsLoading(false);
       }
     }
@@ -54,12 +69,22 @@ export function SponsorDirectory({
     void loadSponsors();
     const refreshTimer = window.setInterval(
       () => void loadSponsors(),
-      60 * 1000,
+      runtimeFeedRefreshMilliseconds,
     );
+    const handleVisibilityChange = () => {
+      if (
+        document.visibilityState === "visible" &&
+        Date.now() - lastRequestAt.current >= runtimeFeedFocusStaleMilliseconds
+      ) {
+        void loadSponsors();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       controller.abort();
       window.clearInterval(refreshTimer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [feedUrl]);
 

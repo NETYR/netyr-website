@@ -44,6 +44,7 @@ The adapter also accepts normalized legacy positive values (`true`, `yes`, `y`,
 does not disappear during migration. Administrators should use only the
 checkbox interface going forward.
 
-Responses are cached for 60 seconds. Run `clearSponsorCache()` after an urgent
-recognition change; otherwise the live site and an open browser tab refresh
-within about one minute.
+Responses are cached for 60 seconds. The live site checks for fresh data every
+five minutes while open and when a visitor returns to a tab whose last request
+is more than one minute old. Routine recognition changes do not require a
+manual script run, cache clear, site rebuild, or deployment.

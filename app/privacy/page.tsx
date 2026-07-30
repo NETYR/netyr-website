@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
-import { contactConfig } from "@/data/contact";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
@@ -69,12 +68,12 @@ export default function PrivacyPage() {
             under their own terms and privacy practices.
           </p>
           <p>
-            Questions about this page may be sent to{" "}
+            Questions about this page may be submitted through the{" "}
             <a
               className="text-brand-blue font-semibold underline decoration-2 underline-offset-4"
-              href={`mailto:${contactConfig.publicEmail}`}
+              href="/contact/#contact-form"
             >
-              {contactConfig.publicEmail}
+              NETYR contact form
             </a>
             .
           </p>
