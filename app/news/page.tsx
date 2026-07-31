@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/ui/empty-state";
+import { Card } from "@/components/ui/card";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
 import { newsArticles } from "@/data/news";
@@ -11,6 +12,13 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Read approved announcements, meeting recaps, community updates, and public statements from NETYR.",
   path: "/news/",
+});
+
+const newsDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+  year: "numeric",
 });
 
 export default function NewsPage() {
@@ -36,17 +44,33 @@ export default function NewsPage() {
         ) : (
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {newsArticles.map((article) => (
-              <article
-                className="rounded-sm border border-slate-200 bg-white p-6"
-                key={article.slug}
-              >
-                <p className="text-brand-blue text-xs font-bold tracking-wider uppercase">
-                  {article.category}
-                </p>
-                <h2 className="text-brand-navy mt-2 text-2xl font-bold uppercase">
-                  <a href={`/news/${article.slug}/`}>{article.title}</a>
-                </h2>
-                <p className="mt-3 text-slate-600">{article.excerpt}</p>
+              <article key={article.slug}>
+                <a
+                  className="group block h-full rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4"
+                  href={`/news/${article.slug}/`}
+                >
+                  <Card className="h-full transition-colors group-hover:border-blue-300 group-hover:bg-blue-50/40">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold tracking-wider uppercase">
+                      <span className="text-brand-blue">
+                        {article.category}
+                      </span>
+                      <time className="text-slate-500" dateTime={article.date}>
+                        {newsDateFormatter.format(
+                          new Date(`${article.date}T00:00:00Z`),
+                        )}
+                      </time>
+                    </div>
+                    <h2 className="text-brand-navy mt-3 text-2xl font-bold text-balance uppercase group-hover:underline">
+                      {article.title}
+                    </h2>
+                    <p className="mt-4 leading-7 text-slate-600">
+                      {article.excerpt}
+                    </p>
+                    <span className="text-brand-red-dark mt-6 inline-flex min-h-11 items-center text-sm font-bold tracking-wider uppercase group-hover:underline">
+                      Read More
+                    </span>
+                  </Card>
+                </a>
               </article>
             ))}
           </div>
