@@ -340,6 +340,7 @@ const publicRoutes = [
   "/get-involved/",
   "/membership/",
   "/news/",
+  "/news/matt-proper-appointed-treasurer/",
   "/sponsors/",
   "/donate/",
   "/contact/",

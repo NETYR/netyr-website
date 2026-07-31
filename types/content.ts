@@ -45,6 +45,14 @@ export type NewsArticle = {
   date: string;
   excerpt: string;
   featuredImage?: string;
+  kicker?: string;
+  mediaContact?: {
+    email: string;
+    name: string;
+    organization: string;
+    title: string;
+  };
+  metaDescription: string;
   slug: string;
   title: string;
 };
