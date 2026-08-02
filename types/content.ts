@@ -2,6 +2,7 @@ type ContentStatus = "approved" | "placeholder" | "unavailable" | "vacant";
 
 export type LeadershipRole = {
   additionalRole?: string;
+  appointmentNote?: string;
   biography?: string;
   image?: string;
   name?: string;

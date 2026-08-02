@@ -207,9 +207,11 @@ assert.doesNotMatch(
 const leadership = await request(new URL("/leadership/", siteOrigin));
 assert.match(leadership.text, /Matt Proper/);
 assert.match(leadership.text, />Treasurer</);
-assert.match(
+assert.match(leadership.text, /July 2026(?:â€“|&#x2013;|–)January 2028/);
+assert.match(leadership.text, /\(Appointed July 2026\)/);
+assert.doesNotMatch(
   leadership.text,
-  /Remainder of current term (?:â€”|&#x2014;|—) through January 2028/,
+  /Remainder of current term|Through January 2028|Appointed to fill vacancy|Interim Treasurer/i,
 );
 assert.doesNotMatch(
   leadership.text,
