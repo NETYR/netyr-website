@@ -51,6 +51,11 @@ export default function LeadershipPage() {
                       {leader.term}
                     </p>
                   ) : null}
+                  {leader.appointmentNote ? (
+                    <p className="mt-1 text-xs text-slate-500">
+                      {leader.appointmentNote}
+                    </p>
+                  ) : null}
                 </>
               )}
             </FeatureCard>

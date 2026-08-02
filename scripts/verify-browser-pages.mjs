@@ -355,9 +355,11 @@ const leadershipPage = await evaluate(
 );
 assert.match(leadershipPage, /Matt Proper/);
 assert.match(leadershipPage, /Treasurer/);
-assert.match(
+assert.match(leadershipPage, /July 2026–January 2028/);
+assert.match(leadershipPage, /\(Appointed July 2026\)/);
+assert.doesNotMatch(
   leadershipPage,
-  /Remainder of current term — through January 2028/,
+  /Remainder of current term|Through January 2028|Appointed to fill vacancy|Interim Treasurer/i,
 );
 assert.doesNotMatch(leadershipPage, /Treasurer\s+Vacant|Vacant\s+Treasurer/i);
 
