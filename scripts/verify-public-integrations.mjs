@@ -116,8 +116,9 @@ for (const eventName of [
 }
 assert.doesNotMatch(siteAnalytics, /window\.location\.search/);
 assert.match(siteAnalytics, /productionAnalyticsHosts/);
-assert.match(siteAnalytics, /event_callback: navigate/);
-assert.match(siteAnalytics, /event_timeout: 700/);
+assert.match(siteAnalytics, /send_page_view: false/);
+assert.match(siteAnalytics, /setTimeout\(.*location\.assign/s);
+assert.match(siteAnalytics, /350/);
 assert.match(siteAnalytics, /handleTrackedClick, true/);
 assert.match(siteAnalytics, /"netyr\.org"/);
 assert.match(siteAnalytics, /"www\.netyr\.org"/);
