@@ -105,7 +105,7 @@ export function SiteAnalytics() {
       event.preventDefault();
 
       trackAnalyticsEvent(eventName, parameters);
-      window.setTimeout(() => window.location.assign(anchor.href), 350);
+      window.setTimeout(() => window.location.assign(anchor.href), 750);
     }
 
     document.addEventListener("click", handleTrackedClick, true);
