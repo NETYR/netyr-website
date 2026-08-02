@@ -113,7 +113,7 @@ async function request(url) {
     finalUrl: response.url,
     ok: response.ok,
     status: response.status,
-    text: /(text|html|xml|json)/i.test(contentType)
+    text: /(text|html|xml|json|javascript)/i.test(contentType)
       ? await response.text()
       : "",
   };
