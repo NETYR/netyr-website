@@ -16,6 +16,11 @@ const analyticsEventNames = [
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];
 
 type AnalyticsParameters = Record<string, boolean | number | string>;
+const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
+
+function withAnalyticsDestination(parameters: AnalyticsParameters) {
+  return measurementId ? { ...parameters, send_to: measurementId } : parameters;
+}
 
 declare global {
   interface Window {
@@ -46,7 +51,7 @@ export function trackAnalyticsEvent(
     return;
   }
 
-  window.gtag("event", name, parameters);
+  window.gtag("event", name, withAnalyticsDestination(parameters));
 }
 
 export function flushPendingAnalyticsEvents() {
@@ -57,6 +62,6 @@ export function flushPendingAnalyticsEvents() {
   window.netyrAnalyticsQueue = [];
 
   queue.forEach(({ name, parameters }) => {
-    window.gtag?.("event", name, parameters);
+    window.gtag?.("event", name, withAnalyticsDestination(parameters));
   });
 }
