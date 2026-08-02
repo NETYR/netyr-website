@@ -116,6 +116,7 @@ for (const eventName of [
 }
 assert.doesNotMatch(siteAnalytics, /window\.location\.search/);
 assert.match(siteAnalytics, /productionAnalyticsHosts/);
+assert.match(siteAnalytics, /queueMicrotask/);
 assert.match(siteAnalytics, /"netyr\.org"/);
 assert.match(siteAnalytics, /"www\.netyr\.org"/);
 assert.match(analytics, /send_to: measurementId/);
