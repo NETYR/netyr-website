@@ -32,21 +32,25 @@ export function SiteAnalytics() {
     )
       return;
 
-    window.gtag("config", measurementId, {
-      allow_ad_personalization_signals: false,
-      allow_google_signals: false,
-      anonymize_ip: true,
-      page_location: `${window.location.origin}${pathname}`,
-      page_path: pathname,
-      page_title: document.title,
-      send_page_view: false,
-    });
-    window.gtag("event", "page_view", {
-      page_location: `${window.location.origin}${pathname}`,
-      page_path: pathname,
-      page_title: document.title,
-      send_to: measurementId,
-    });
+    const timeout = window.setTimeout(() => {
+      window.gtag?.("config", measurementId, {
+        allow_ad_personalization_signals: false,
+        allow_google_signals: false,
+        anonymize_ip: true,
+        page_location: `${window.location.origin}${pathname}`,
+        page_path: pathname,
+        page_title: document.title,
+        send_page_view: false,
+      });
+      window.gtag?.("event", "page_view", {
+        page_location: `${window.location.origin}${pathname}`,
+        page_path: pathname,
+        page_title: document.title,
+        send_to: measurementId,
+      });
+    }, 100);
+
+    return () => window.clearTimeout(timeout);
   }, [isEnabled, isReady, pathname]);
 
   useEffect(() => {
