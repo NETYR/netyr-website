@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -7,6 +8,10 @@ import {
   runtimeFeedRefreshMilliseconds,
   withRuntimeCacheBust,
 } from "@/lib/integrations/runtime-feed";
+import {
+  applySponsorPresentation,
+  getSponsorPresentation,
+} from "@/lib/sponsors/presentation";
 import { parseSponsorFeed, sponsorLevels } from "@/lib/sponsors/provider";
 import type { Sponsor } from "@/types/content";
 
@@ -19,7 +24,9 @@ export function SponsorDirectory({
   feedUrl,
   initialSponsors,
 }: SponsorDirectoryProps) {
-  const [sponsors, setSponsors] = useState(initialSponsors);
+  const [sponsors, setSponsors] = useState(() =>
+    parseSponsorFeed({ sponsors: applySponsorPresentation(initialSponsors) }),
+  );
   const [isLoading, setIsLoading] = useState(Boolean(feedUrl));
   const [couldNotLoad, setCouldNotLoad] = useState(false);
   const lastRequestAt = useRef(0);
@@ -54,7 +61,11 @@ export function SponsorDirectory({
         ) {
           throw new Error("Sponsor feed reported an unavailable source.");
         }
-        setSponsors(parseSponsorFeed(payload));
+        setSponsors(
+          parseSponsorFeed({
+            sponsors: applySponsorPresentation(parseSponsorFeed(payload)),
+          }),
+        );
         setCouldNotLoad(false);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError")
@@ -130,18 +141,35 @@ export function SponsorDirectory({
                 className="text-brand-navy text-2xl font-bold uppercase"
                 id={`sponsor-level-${level}`}
               >
-                {level}s
+                {level === "President’s Posse Sponsor"
+                  ? "President’s Posse Tier Sponsors"
+                  : `${level}s`}
               </h3>
             </div>
             <ul className="grid gap-x-10 border-y border-slate-200 bg-white px-5 py-2 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">
-              {levelSponsors.map((sponsor) => (
-                <li
-                  className="text-brand-navy border-b border-slate-100 py-4 text-lg font-bold last:border-b-0 sm:last:border-b"
-                  key={`${level}-${sponsor.name}`}
-                >
-                  {sponsor.name}
-                </li>
-              ))}
+              {levelSponsors.map((sponsor) => {
+                const presentation = getSponsorPresentation(sponsor.name);
+
+                return (
+                  <li
+                    className="text-brand-navy flex min-h-16 items-center border-b border-slate-100 py-4 text-lg font-bold last:border-b-0 sm:last:border-b"
+                    key={`${level}-${sponsor.name}`}
+                  >
+                    {presentation ? (
+                      <Image
+                        alt={presentation.logo.alt}
+                        className="h-auto w-full max-w-[340px] object-contain"
+                        height={presentation.logo.height}
+                        sizes="(max-width: 640px) calc(100vw - 5.5rem), 340px"
+                        src={presentation.logo.src}
+                        width={presentation.logo.width}
+                      />
+                    ) : (
+                      sponsor.name
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         );

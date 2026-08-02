@@ -32,6 +32,7 @@ const contactPagePath = resolve("app/contact/page.tsx");
 const sponsorDirectoryPath = resolve(
   "components/sponsors/sponsor-directory.tsx",
 );
+const sponsorPresentationPath = resolve("lib/sponsors/presentation.ts");
 const eventHookPath = resolve("components/events/use-events.ts");
 const runtimeFeedPath = resolve("lib/integrations/runtime-feed.ts");
 const analyticsPath = resolve("lib/analytics.ts");
@@ -77,9 +78,10 @@ const contactPage = readFileSync(contactPagePath, "utf8");
 assert.doesNotMatch(contactPage, /Open the contact form in a new window/i);
 
 const sponsorDirectory = readFileSync(sponsorDirectoryPath, "utf8");
+const sponsorPresentation = readFileSync(sponsorPresentationPath, "utf8");
 const eventHook = readFileSync(eventHookPath, "utf8");
 const runtimeFeed = readFileSync(runtimeFeedPath, "utf8");
-assert.match(sponsorDirectory, /\{level\}s/);
+assert.match(sponsorDirectory, /President’s Posse Tier Sponsors/);
 assert.match(
   sponsorDirectory,
   /Community partner recognition will be updated soon\./,
@@ -89,6 +91,16 @@ assert.match(
   /Community partner information is temporarily unavailable\./,
 );
 assert.doesNotMatch(sponsorDirectory, /sponsor\.(logo|href)/);
+assert.match(sponsorDirectory, /applySponsorPresentation/);
+assert.match(sponsorDirectory, /getSponsorPresentation/);
+assert.match(sponsorPresentation, /name: "VZTV"/);
+assert.match(sponsorPresentation, /level: "President’s Posse Sponsor"/);
+assert.match(sponsorPresentation, /src: "\/images\/sponsors\/vztv\.png"/);
+assert.match(
+  sponsorPresentation,
+  /alt: "VZTV — Grand Saline Sun, Live Local NOW!"/,
+);
+assert.match(sponsorPresentation, /Grand Saline Sun \/ VZTV/);
 assert.match(sponsorDirectory, /visibilitychange/);
 assert.match(sponsorDirectory, /withRuntimeCacheBust/);
 assert.match(eventHook, /visibilitychange/);
