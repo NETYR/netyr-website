@@ -39,7 +39,13 @@ export function SiteAnalytics() {
       page_location: `${window.location.origin}${pathname}`,
       page_path: pathname,
       page_title: document.title,
-      send_page_view: true,
+      send_page_view: false,
+    });
+    window.gtag("event", "page_view", {
+      page_location: `${window.location.origin}${pathname}`,
+      page_path: pathname,
+      page_title: document.title,
+      send_to: measurementId,
     });
   }, [isEnabled, isReady, pathname]);
 
