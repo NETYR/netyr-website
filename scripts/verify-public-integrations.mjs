@@ -33,6 +33,8 @@ const sponsorDirectoryPath = resolve(
   "components/sponsors/sponsor-directory.tsx",
 );
 const sponsorPresentationPath = resolve("lib/sponsors/presentation.ts");
+const homepagePath = resolve("app/page.tsx");
+const newsSelectionPath = resolve("lib/news.ts");
 const eventHookPath = resolve("components/events/use-events.ts");
 const runtimeFeedPath = resolve("lib/integrations/runtime-feed.ts");
 const analyticsPath = resolve("lib/analytics.ts");
@@ -79,6 +81,8 @@ assert.doesNotMatch(contactPage, /Open the contact form in a new window/i);
 
 const sponsorDirectory = readFileSync(sponsorDirectoryPath, "utf8");
 const sponsorPresentation = readFileSync(sponsorPresentationPath, "utf8");
+const homepage = readFileSync(homepagePath, "utf8");
+const newsSelection = readFileSync(newsSelectionPath, "utf8");
 const eventHook = readFileSync(eventHookPath, "utf8");
 const runtimeFeed = readFileSync(runtimeFeedPath, "utf8");
 assert.match(sponsorDirectory, /President’s Posse Tier Sponsors/);
@@ -101,6 +105,15 @@ assert.match(
   /alt: "VZTV — Grand Saline Sun, Live Local NOW!"/,
 );
 assert.match(sponsorPresentation, /Grand Saline Sun \/ VZTV/);
+assert.match(sponsorDirectory, /w-\[180px\]/);
+assert.match(sponsorDirectory, /sm:w-\[220px\]/);
+assert.match(homepage, /getLatestPublishedNews\(newsArticles\)/);
+assert.match(homepage, /latestNewsArticle\.excerpt/);
+assert.match(homepage, /\/news\/\$\{latestNewsArticle\.slug\}\//);
+assert.match(newsSelection, /publicationStatus !== "draft"/);
+assert.match(newsSelection, /publicationStatus !== "archived"/);
+assert.match(newsSelection, /publishedTime <= asOf\.getTime\(\)/);
+assert.match(newsSelection, /left\.slug\.localeCompare\(right\.slug\)/);
 assert.match(sponsorDirectory, /visibilitychange/);
 assert.match(sponsorDirectory, /withRuntimeCacheBust/);
 assert.match(eventHook, /visibilitychange/);

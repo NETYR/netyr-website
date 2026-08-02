@@ -158,9 +158,9 @@ export function SponsorDirectory({
                     {presentation ? (
                       <Image
                         alt={presentation.logo.alt}
-                        className="h-auto w-full max-w-[340px] object-contain"
+                        className="h-auto w-[180px] max-w-[85%] object-contain sm:w-[220px] sm:max-w-full"
                         height={presentation.logo.height}
-                        sizes="(max-width: 640px) calc(100vw - 5.5rem), 340px"
+                        sizes="(max-width: 640px) 180px, 220px"
                         src={presentation.logo.src}
                         width={presentation.logo.width}
                       />
