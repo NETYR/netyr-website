@@ -64,7 +64,7 @@ export function SiteAnalytics() {
         }
       }
 
-      trackAnalyticsEvent(eventName, {
+      const parameters = {
         link_location: target.dataset.analyticsContext ?? "website",
         link_label:
           target.dataset.analyticsLabel ??
@@ -73,7 +73,9 @@ export function SiteAnalytics() {
         ...(outboundDomain ? { outbound_domain: outboundDomain } : {}),
         page_path: window.location.pathname,
         page_title: document.title,
-      });
+      };
+
+      window.queueMicrotask(() => trackAnalyticsEvent(eventName, parameters));
     }
 
     document.addEventListener("click", handleTrackedClick);
