@@ -4,7 +4,7 @@ export const siteConfig = {
   name: "North East Texas Young Republicans",
   shortName: "NETYR",
   description:
-    "North East Texas Young Republicans cultivates Republican leaders, strengthens East Texas communities, and connects grassroots engagement with political leadership.",
+    "Connect with the North East Texas Young Republicans, discover upcoming events, become a member, and help develop the next generation of conservative leaders.",
   url: configuredSiteUrl ?? "https://netyr.org",
   locale: "en_US",
   logo: "/images/brand/netyr-logo.webp",

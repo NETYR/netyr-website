@@ -160,6 +160,9 @@ export function MobileNavigation() {
           <div className="mx-auto mt-4 grid max-w-3xl grid-cols-2 gap-3 border-t border-slate-200 pt-4">
             <a
               className={buttonStyles({ variant: "secondary" })}
+              data-analytics-context="mobile_navigation"
+              data-analytics-event="donate_click"
+              data-analytics-label="donate"
               href={cheddarUpLinks.donations}
               rel="noopener noreferrer"
               target="_blank"
@@ -169,6 +172,9 @@ export function MobileNavigation() {
             </a>
             <a
               className={buttonStyles()}
+              data-analytics-context="mobile_navigation"
+              data-analytics-event="join_click"
+              data-analytics-label="join"
               href="/membership/"
               onClick={() => setIsOpen(false)}
             >

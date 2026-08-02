@@ -62,6 +62,7 @@ const expectedRoutes = [
   "/news/",
   "/news/matt-proper-appointed-treasurer/",
   "/sponsors/",
+  "/governing-documents/",
   "/donate/",
   "/contact/",
   "/privacy/",
@@ -70,6 +71,8 @@ const expectedRoutes = [
 
 const checked = new Map();
 const discovered = new Set(expectedRoutes);
+const descriptions = new Map();
+const titles = new Map();
 
 function decodeHtml(value) {
   return value
@@ -88,6 +91,15 @@ function extractAttributes(html, attribute) {
   return [...html.matchAll(expression)].map((match) =>
     decodeHtml(match[1] ?? match[2] ?? ""),
   );
+}
+
+function extractMetaContent(html, attribute, value) {
+  for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const attributeValue = extractAttributes(tag, attribute)[0];
+    if (attributeValue?.toLowerCase() !== value.toLowerCase()) continue;
+    return extractAttributes(tag, "content")[0] ?? "";
+  }
+  return "";
 }
 
 async function request(url) {
@@ -113,17 +125,39 @@ for (const route of expectedRoutes) {
   const result = await request(new URL(route, siteOrigin));
   assert.equal(result.status, 200, `${route} returned ${result.status}.`);
   assert.match(result.contentType, /text\/html/i, `${route} is not HTML.`);
-  assert.match(result.text, /<title>[^<]+<\/title>/i, `${route} has no title.`);
-  assert.match(
-    result.text,
-    /<meta\s+name="description"\s+content="[^"]+"/i,
-    `${route} has no meta description.`,
+  const title = decodeHtml(
+    result.text.match(/<title>([^<]+)<\/title>/i)?.[1] ?? "",
   );
+  const description = extractMetaContent(result.text, "name", "description");
+  assert.ok(title, `${route} has no title.`);
+  assert.ok(description, `${route} has no meta description.`);
+  titles.set(route, title);
+  descriptions.set(route, description);
   assert.match(
     result.text,
     /<link\s+rel="canonical"\s+href="https:\/\/netyr\.org\/[^"]*"/i,
     `${route} has no production canonical URL.`,
   );
+  assert.doesNotMatch(
+    result.text,
+    /<meta\b[^>]*name="robots"[^>]*content="[^"]*noindex/i,
+    `${route} is unexpectedly marked noindex.`,
+  );
+  for (const [attribute, name] of [
+    ["property", "og:title"],
+    ["property", "og:description"],
+    ["property", "og:url"],
+    ["property", "og:image"],
+    ["name", "twitter:card"],
+    ["name", "twitter:title"],
+    ["name", "twitter:description"],
+    ["name", "twitter:image"],
+  ]) {
+    assert.ok(
+      extractMetaContent(result.text, attribute, name),
+      `${route} is missing ${name}.`,
+    );
+  }
   for (const attribute of ["href", "src"]) {
     for (const value of extractAttributes(result.text, attribute)) {
       if (
@@ -140,6 +174,47 @@ for (const route of expectedRoutes) {
     }
   }
 }
+
+assert.equal(
+  new Set(titles.values()).size,
+  titles.size,
+  "Public page titles must be unique.",
+);
+assert.equal(
+  new Set(descriptions.values()).size,
+  descriptions.size,
+  "Public page descriptions must be unique.",
+);
+
+const homepage = await request(new URL("/", siteOrigin));
+const jsonLdPayloads = [
+  ...homepage.text.matchAll(
+    /<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi,
+  ),
+].map((match) => JSON.parse(decodeHtml(match[1])));
+const schemaTypes = jsonLdPayloads.flatMap((payload) =>
+  Array.isArray(payload?.["@graph"])
+    ? payload["@graph"].map((entry) => entry?.["@type"])
+    : [payload?.["@type"]],
+);
+assert.ok(schemaTypes.includes("Organization"));
+assert.ok(schemaTypes.includes("WebSite"));
+assert.doesNotMatch(
+  JSON.stringify(jsonLdPayloads),
+  /"(?:email|telephone|contactPoint|address)"\s*:/i,
+  "Organization schema contains unsupported public contact fields.",
+);
+const leadership = await request(new URL("/leadership/", siteOrigin));
+assert.match(leadership.text, /Matt Proper/);
+assert.match(leadership.text, />Treasurer</);
+assert.match(
+  leadership.text,
+  /Remainder of current term (?:â€”|&#x2014;|—) through January 2028/,
+);
+assert.doesNotMatch(
+  leadership.text,
+  /Treasurer[\s\S]{0,120}Vacant|Vacant[\s\S]{0,120}Treasurer/i,
+);
 
 for (const path of discovered) {
   const result = await request(new URL(path, siteOrigin));
@@ -169,6 +244,21 @@ for (const icon of ["/favicon.png", "/apple-touch-icon.png"]) {
   assert.equal(result.status, 200);
   assert.match(result.contentType, /image\/png/i);
 }
+
+const builtJavaScript = [...checked.values()]
+  .filter(({ contentType }) => /javascript/i.test(contentType))
+  .map(({ text }) => text)
+  .join("\n");
+assert.match(
+  builtJavaScript,
+  /G-EBJ8ZHMVVG/,
+  "The approved Analytics measurement configuration is missing.",
+);
+assert.match(
+  builtJavaScript,
+  /netyr\.org.*www\.netyr\.org|www\.netyr\.org.*netyr\.org/,
+  "Analytics must be restricted to production hostnames.",
+);
 
 console.log(
   JSON.stringify({

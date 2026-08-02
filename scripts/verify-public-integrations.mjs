@@ -34,6 +34,8 @@ const sponsorDirectoryPath = resolve(
 );
 const eventHookPath = resolve("components/events/use-events.ts");
 const runtimeFeedPath = resolve("lib/integrations/runtime-feed.ts");
+const analyticsPath = resolve("lib/analytics.ts");
+const siteAnalyticsPath = resolve("components/analytics/site-analytics.tsx");
 
 const events = loadAppsScript(eventsPath);
 const eventTests = vm.runInContext("runWebsiteEventsTests()", events.context);
@@ -94,19 +96,42 @@ assert.match(eventHook, /withRuntimeCacheBust/);
 assert.match(runtimeFeed, /runtimeFeedRefreshMilliseconds = 5 \* 60 \* 1000/);
 assert.match(runtimeFeed, /runtimeFeedFocusStaleMilliseconds = 60 \* 1000/);
 
+const analytics = readFileSync(analyticsPath, "utf8");
+const siteAnalytics = readFileSync(siteAnalyticsPath, "utf8");
+for (const eventName of [
+  "join_click",
+  "membership_link_click",
+  "donate_click",
+  "contact_form_view",
+  "contact_form_submission_success",
+  "event_view",
+  "event_registration_click",
+  "social_link_click",
+  "sponsor_interest_click",
+  "news_article_view",
+  "governing_document_view",
+  "governing_document_download",
+]) {
+  assert.match(analytics, new RegExp(`"${eventName}"`));
+}
+assert.doesNotMatch(siteAnalytics, /window\.location\.search/);
+assert.match(siteAnalytics, /productionAnalyticsHosts/);
+assert.match(siteAnalytics, /"netyr\.org"/);
+assert.match(siteAnalytics, /"www\.netyr\.org"/);
+assert.doesNotMatch(
+  `${analytics}\n${siteAnalytics}`,
+  /\b(?:firstName|lastName|email|phone|message|contactId|spreadsheetId)\b/i,
+  "Analytics source includes a prohibited personal-data field.",
+);
+
 const publicSources = ["app", "components", "data", "lib", "types"].flatMap(
   (directory) => readPublicSourceTree(resolve(directory)),
 );
-const forbiddenPublicLanguage =
-  /\b(?:governing documents?|constitution|bylaws?|constitutional classifications?|bylaw classifications?)\b/i;
-const publicLanguageFindings = publicSources.filter(({ source }) =>
-  forbiddenPublicLanguage.test(source),
+const governingDocumentsPage = publicSources.find(({ path }) =>
+  path.endsWith(resolve("app/governing-documents/page.tsx")),
 );
-assert.deepEqual(
-  publicLanguageFindings.map(({ path }) => path),
-  [],
-  "Public source still contains governing-document language.",
-);
+assert.ok(governingDocumentsPage, "The public-records route is missing.");
+assert.match(governingDocumentsPage.source, /governing_document_view/);
 console.log(
   `Public integration verification passed (${eventTests.passed} event tests, ${sponsorTests.passed} sponsor tests).`,
 );

@@ -8,9 +8,9 @@ import { newsArticles } from "@/data/news";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "News",
+  title: "NETYR News | North East Texas Young Republicans",
   description:
-    "Read approved announcements, meeting recaps, community updates, and public statements from NETYR.",
+    "Read announcements, organizational updates, event recaps, and public news from the North East Texas Young Republicans.",
   path: "/news/",
 });
 

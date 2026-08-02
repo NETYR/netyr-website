@@ -342,11 +342,24 @@ const publicRoutes = [
   "/news/",
   "/news/matt-proper-appointed-treasurer/",
   "/sponsors/",
+  "/governing-documents/",
   "/donate/",
   "/contact/",
   "/privacy/",
   "/accessibility/",
 ];
+
+await navigate("/leadership/", 2500);
+const leadershipPage = await evaluate(
+  `document.querySelector("main")?.innerText ?? ""`,
+);
+assert.match(leadershipPage, /Matt Proper/);
+assert.match(leadershipPage, /Treasurer/);
+assert.match(
+  leadershipPage,
+  /Remainder of current term — through January 2028/,
+);
+assert.doesNotMatch(leadershipPage, /Treasurer\s+Vacant|Vacant\s+Treasurer/i);
 
 await send("Emulation.setDeviceMetricsOverride", {
   deviceScaleFactor: 1,

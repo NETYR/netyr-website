@@ -27,6 +27,7 @@ export const footerNavigationItems: NavigationItem[] = [
   { label: "Membership", href: "/membership/" },
   { label: "News", href: "/news/" },
   { label: "Sponsors", href: "/sponsors/" },
+  { label: "Governing Documents", href: "/governing-documents/" },
   { label: "Contact Us", href: "/contact/" },
   { label: "Privacy", href: "/privacy/" },
   { label: "Accessibility", href: "/accessibility/" },

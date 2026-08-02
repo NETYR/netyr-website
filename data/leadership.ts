@@ -26,7 +26,9 @@ export const leadershipRoles: LeadershipRole[] = [
     term: "January 2026 – January 2028",
   },
   {
+    name: "Matt Proper",
     role: "Treasurer",
-    status: "vacant",
+    status: "approved",
+    term: "Remainder of current term — through January 2028",
   },
 ];

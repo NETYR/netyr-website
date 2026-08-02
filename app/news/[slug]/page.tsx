@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { AnalyticsView } from "@/components/analytics/analytics-view";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
@@ -36,8 +37,9 @@ export async function generateMetadata({
   if (!article) return {};
 
   return buildMetadata({
-    title: article.title,
+    title: `${article.title} | NETYR`,
     description: article.metaDescription,
+    openGraphType: "article",
     path: `/news/${article.slug}/`,
   });
 }
@@ -79,6 +81,10 @@ export default async function NewsArticlePage({
 
   return (
     <>
+      <AnalyticsView
+        category={article.category.toLowerCase()}
+        event="news_article_view"
+      />
       <script
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c"),

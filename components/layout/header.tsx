@@ -41,6 +41,9 @@ export function Header() {
               className: "px-4",
               variant: "secondary",
             })}
+            data-analytics-context="desktop_header"
+            data-analytics-event="donate_click"
+            data-analytics-label="donate"
             href={cheddarUpLinks.donations}
             rel="noopener noreferrer"
             target="_blank"
@@ -49,6 +52,9 @@ export function Header() {
           </a>
           <a
             className={buttonStyles({ className: "px-4" })}
+            data-analytics-context="desktop_header"
+            data-analytics-event="join_click"
+            data-analytics-label="join"
             href="/membership/"
           >
             Join

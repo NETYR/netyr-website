@@ -179,7 +179,7 @@ export function EventCalendar({ events }: { events: Event[] }) {
                           <a
                             className="text-brand-blue inline-flex min-h-11 items-center font-bold underline underline-offset-4"
                             data-analytics-context="events"
-                            data-analytics-event="event_link_click"
+                            data-analytics-event="event_registration_click"
                             data-analytics-label="registration_or_details"
                             href={detailsUrl}
                             rel="noopener noreferrer"
@@ -196,7 +196,7 @@ export function EventCalendar({ events }: { events: Event[] }) {
                           <a
                             className="text-brand-blue inline-flex min-h-11 items-center font-bold underline underline-offset-4"
                             data-analytics-context="events"
-                            data-analytics-event="event_link_click"
+                            data-analytics-event="event_view"
                             data-analytics-label="add_to_google_calendar"
                             href={buildAddToCalendarUrl(event)}
                             rel="noopener noreferrer"

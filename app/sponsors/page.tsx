@@ -8,9 +8,9 @@ import { sponsors } from "@/data/sponsors";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Community Partners",
+  title: "NETYR Community Partners and Sponsors",
   description:
-    "Meet the community partners whose support helps NETYR connect, serve, and lead across Northeast Texas.",
+    "Recognizing the community partners and sponsors who support the mission of the North East Texas Young Republicans.",
   path: "/sponsors/",
 });
 

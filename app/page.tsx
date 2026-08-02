@@ -19,7 +19,14 @@ export default function HomePage() {
       <Hero
         actions={
           <>
-            <Button href="/membership/">Join NETYR</Button>
+            <Button
+              data-analytics-context="homepage_hero"
+              data-analytics-event="join_click"
+              data-analytics-label="join_netyr"
+              href="/membership/"
+            >
+              Join NETYR
+            </Button>
             <Button href="/events/" variant="secondary">
               View events
             </Button>
@@ -186,6 +193,9 @@ export default function HomePage() {
         tone="white"
       >
         <Button
+          data-analytics-context="homepage_support"
+          data-analytics-event="donate_click"
+          data-analytics-label="support_netyr"
           href={cheddarUpLinks.donations}
           rel="noopener noreferrer"
           target="_blank"
@@ -197,7 +207,14 @@ export default function HomePage() {
       <Callout
         actions={
           <>
-            <Button href="/membership/">Join NETYR</Button>
+            <Button
+              data-analytics-context="homepage_final_callout"
+              data-analytics-event="join_click"
+              data-analytics-label="join_netyr"
+              href="/membership/"
+            >
+              Join NETYR
+            </Button>
             <Button href="/contact/" variant="secondary">
               Contact NETYR
             </Button>

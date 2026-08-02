@@ -7,9 +7,9 @@ import { cheddarUpLinks } from "@/data/cheddar-up";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Donate",
+  title: "Donate to NETYR | North East Texas Young Republicans",
   description:
-    "Support NETYR through its approved external payment collection.",
+    "Support the North East Texas Young Republicans through its secure external contribution collection.",
   path: "/donate/",
 });
 
@@ -29,6 +29,9 @@ export default function DonatePage() {
         tone="white"
       >
         <Button
+          data-analytics-context="donate_page"
+          data-analytics-event="donate_click"
+          data-analytics-label="continue_to_cheddar_up"
           href={cheddarUpLinks.donations}
           rel="noopener noreferrer"
           target="_blank"

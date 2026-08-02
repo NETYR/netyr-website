@@ -4,29 +4,31 @@ import { siteConfig } from "@/lib/site";
 
 type PageMetadata = {
   description: string;
+  openGraphType?: "article" | "website";
   path: string;
   title: string;
 };
 
 export function buildMetadata({
   description,
+  openGraphType = "website",
   path,
   title,
 }: PageMetadata): Metadata {
   const canonicalPath = path.startsWith("/") ? path : `/${path}`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: canonicalPath,
     },
     openGraph: {
-      type: "website",
+      type: openGraphType,
       locale: siteConfig.locale,
       url: canonicalPath,
       siteName: siteConfig.name,
-      title: `${title} | ${siteConfig.shortName}`,
+      title,
       description,
       images: [
         {
@@ -40,7 +42,7 @@ export function buildMetadata({
     twitter: {
       card: "summary_large_image",
       site: siteConfig.xHandle,
-      title: `${title} | ${siteConfig.shortName}`,
+      title,
       description,
       images: [siteConfig.socialImage],
     },

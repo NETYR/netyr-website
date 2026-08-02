@@ -5,7 +5,7 @@ import { Section } from "@/components/ui/section";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Accessibility",
+  title: "NETYR Website Accessibility | North East Texas Young Republicans",
   description:
     "Read NETYR's accessibility commitment and learn how to report a website access barrier.",
   path: "/accessibility/",

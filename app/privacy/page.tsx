@@ -5,7 +5,7 @@ import { Section } from "@/components/ui/section";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Privacy",
+  title: "NETYR Website Privacy | North East Texas Young Republicans",
   description:
     "Learn how the NETYR website handles analytics, contact inquiries, event information, and external payment links.",
   path: "/privacy/",
