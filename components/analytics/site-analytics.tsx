@@ -75,12 +75,44 @@ export function SiteAnalytics() {
         page_title: document.title,
       };
 
-      window.queueMicrotask(() => trackAnalyticsEvent(eventName, parameters));
+      const shouldDelayNavigation =
+        anchor &&
+        !anchor.download &&
+        anchor.target !== "_blank" &&
+        event.button === 0 &&
+        !event.altKey &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.shiftKey &&
+        isReady &&
+        typeof window.gtag === "function";
+
+      if (!shouldDelayNavigation) {
+        trackAnalyticsEvent(eventName, parameters);
+        return;
+      }
+
+      event.preventDefault();
+
+      let hasNavigated = false;
+      const navigate = () => {
+        if (hasNavigated) return;
+        hasNavigated = true;
+        window.location.assign(anchor.href);
+      };
+
+      trackAnalyticsEvent(eventName, {
+        ...parameters,
+        event_callback: navigate,
+        event_timeout: 700,
+      });
+      window.setTimeout(navigate, 750);
     }
 
-    document.addEventListener("click", handleTrackedClick);
-    return () => document.removeEventListener("click", handleTrackedClick);
-  }, [isEnabled]);
+    document.addEventListener("click", handleTrackedClick, true);
+    return () =>
+      document.removeEventListener("click", handleTrackedClick, true);
+  }, [isEnabled, isReady]);
 
   if (!measurementId || !isEnabled) return null;
 

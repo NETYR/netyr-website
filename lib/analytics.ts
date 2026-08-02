@@ -15,7 +15,10 @@ const analyticsEventNames = [
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];
 
-type AnalyticsParameters = Record<string, boolean | number | string>;
+type AnalyticsParameters = Record<
+  string,
+  boolean | number | string | (() => void)
+>;
 const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
 
 function withAnalyticsDestination(parameters: AnalyticsParameters) {
