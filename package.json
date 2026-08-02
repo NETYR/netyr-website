@@ -16,6 +16,7 @@
     "test:contact-live": "node scripts/verify-live-contact-submission.mjs",
     "test:public-integrations": "node scripts/verify-public-integrations.mjs",
     "test:browser": "node scripts/verify-browser-pages.mjs",
+    "test:homepage-slideshow": "node scripts/verify-homepage-slideshow.mjs",
     "test:links": "node scripts/verify-links-and-metadata.mjs",
     "screenshots": "node scripts/capture-review-screenshots.mjs",
     "format": "prettier --write .",

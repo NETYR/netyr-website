@@ -1,18 +1,15 @@
-import Image from "next/image";
-
+import { HomepageCarousel } from "@/components/homepage/homepage-carousel";
 import { Button } from "@/components/ui/button";
 import { Callout } from "@/components/ui/callout";
 import { Card } from "@/components/ui/card";
 import { FeatureCard } from "@/components/ui/feature-card";
-import { Hero } from "@/components/ui/hero";
 import { Section } from "@/components/ui/section";
 import { cheddarUpLinks } from "@/data/cheddar-up";
 import { membershipContent } from "@/data/membership";
 import { newsArticles } from "@/data/news";
-import { homepageContent, organizationContent } from "@/data/site";
+import { organizationContent } from "@/data/site";
 import { sponsors } from "@/data/sponsors";
 import { getLatestPublishedNews } from "@/lib/news";
-import { siteConfig } from "@/lib/site";
 
 const newsDateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
@@ -26,36 +23,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Hero
-        actions={
-          <>
-            <Button
-              data-analytics-context="homepage_hero"
-              data-analytics-event="join_click"
-              data-analytics-label="join_netyr"
-              href="/membership/"
-            >
-              Join NETYR
-            </Button>
-            <Button href="/events/" variant="secondary">
-              View events
-            </Button>
-          </>
-        }
-        description={homepageContent.description}
-        eyebrow={homepageContent.eyebrow}
-        media={
-          <Image
-            alt={siteConfig.name}
-            className="h-auto w-full drop-shadow-2xl"
-            height={512}
-            priority
-            src={siteConfig.logo}
-            width={512}
-          />
-        }
-        title={homepageContent.title}
-      />
+      <HomepageCarousel />
 
       <Section
         description={organizationContent.purpose}
