@@ -53,6 +53,7 @@ export type NewsArticle = {
     title: string;
   };
   metaDescription: string;
+  publicationStatus?: "archived" | "draft" | "published";
   slug: string;
   title: string;
 };

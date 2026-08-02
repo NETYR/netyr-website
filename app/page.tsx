@@ -11,9 +11,19 @@ import { membershipContent } from "@/data/membership";
 import { newsArticles } from "@/data/news";
 import { homepageContent, organizationContent } from "@/data/site";
 import { sponsors } from "@/data/sponsors";
+import { getLatestPublishedNews } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
 
+const newsDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+  year: "numeric",
+});
+
 export default function HomePage() {
+  const latestNewsArticle = getLatestPublishedNews(newsArticles);
+
   return (
     <>
       <Hero
@@ -156,7 +166,34 @@ export default function HomePage() {
         title="Latest news"
         tone="white"
       >
-        {newsArticles.length === 0 ? (
+        {latestNewsArticle ? (
+          <article className="max-w-3xl">
+            <a
+              className="group block rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4"
+              href={`/news/${latestNewsArticle.slug}/`}
+            >
+              <Card className="transition-colors group-hover:border-blue-300 group-hover:bg-blue-50/40">
+                <time
+                  className="text-brand-blue text-xs font-bold tracking-wider uppercase"
+                  dateTime={latestNewsArticle.date}
+                >
+                  {newsDateFormatter.format(
+                    new Date(`${latestNewsArticle.date}T00:00:00Z`),
+                  )}
+                </time>
+                <h3 className="text-brand-navy mt-3 text-2xl font-bold text-balance uppercase group-hover:underline">
+                  {latestNewsArticle.title}
+                </h3>
+                <p className="mt-4 leading-7 text-slate-600">
+                  {latestNewsArticle.excerpt}
+                </p>
+                <span className="text-brand-red-dark mt-6 inline-flex min-h-11 items-center text-sm font-bold tracking-wider uppercase group-hover:underline">
+                  Read More
+                </span>
+              </Card>
+            </a>
+          </article>
+        ) : (
           <div>
             <p className="max-w-2xl leading-7 text-slate-600">
               New updates will be shared here soon.
@@ -165,7 +202,7 @@ export default function HomePage() {
               Visit the news page
             </Button>
           </div>
-        ) : null}
+        )}
       </Section>
 
       <Section
