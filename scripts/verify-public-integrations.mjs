@@ -118,6 +118,7 @@ assert.doesNotMatch(siteAnalytics, /window\.location\.search/);
 assert.match(siteAnalytics, /productionAnalyticsHosts/);
 assert.match(siteAnalytics, /"netyr\.org"/);
 assert.match(siteAnalytics, /"www\.netyr\.org"/);
+assert.match(analytics, /send_to: measurementId/);
 assert.doesNotMatch(
   `${analytics}\n${siteAnalytics}`,
   /\b(?:firstName|lastName|email|phone|message|contactId|spreadsheetId)\b/i,
