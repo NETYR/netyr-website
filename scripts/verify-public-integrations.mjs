@@ -117,7 +117,8 @@ for (const eventName of [
 assert.doesNotMatch(siteAnalytics, /window\.location\.search/);
 assert.match(siteAnalytics, /productionAnalyticsHosts/);
 assert.match(siteAnalytics, /send_page_view: false/);
-assert.match(siteAnalytics, /window\.gtag\("event", "page_view"/);
+assert.match(siteAnalytics, /window\.gtag\?\.\("event", "page_view"/);
+assert.match(siteAnalytics, /}, 100\)/);
 assert.match(siteAnalytics, /setTimeout\(.*location\.assign/s);
 assert.match(siteAnalytics, /350/);
 assert.match(siteAnalytics, /handleTrackedClick, true/);
