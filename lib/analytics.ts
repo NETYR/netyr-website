@@ -19,7 +19,9 @@ type AnalyticsParameters = Record<string, boolean | number | string>;
 const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
 
 function withAnalyticsDestination(parameters: AnalyticsParameters) {
-  return measurementId ? { ...parameters, send_to: measurementId } : parameters;
+  return measurementId
+    ? { ...parameters, send_to: measurementId, transport_type: "beacon" }
+    : parameters;
 }
 
 declare global {
