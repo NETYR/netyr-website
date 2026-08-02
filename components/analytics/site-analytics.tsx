@@ -94,19 +94,8 @@ export function SiteAnalytics() {
 
       event.preventDefault();
 
-      let hasNavigated = false;
-      const navigate = () => {
-        if (hasNavigated) return;
-        hasNavigated = true;
-        window.location.assign(anchor.href);
-      };
-
-      trackAnalyticsEvent(eventName, {
-        ...parameters,
-        event_callback: navigate,
-        event_timeout: 700,
-      });
-      window.setTimeout(navigate, 750);
+      trackAnalyticsEvent(eventName, parameters);
+      window.setTimeout(() => window.location.assign(anchor.href), 350);
     }
 
     document.addEventListener("click", handleTrackedClick, true);
@@ -132,6 +121,12 @@ export function SiteAnalytics() {
             security_storage: "granted"
           });
           window.gtag("js", new Date());
+          window.gtag("config", ${JSON.stringify(measurementId)}, {
+            allow_ad_personalization_signals: false,
+            allow_google_signals: false,
+            anonymize_ip: true,
+            send_page_view: false
+          });
         `}
       </Script>
       <Script
