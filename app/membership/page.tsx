@@ -9,9 +9,9 @@ import { membershipContent } from "@/data/membership";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Membership",
+  title: "Join NETYR | North East Texas Young Republicans Membership",
   description:
-    "Review NETYR membership eligibility, classifications, voting rights, annual dues, and the approved external joining process.",
+    "Review NETYR membership eligibility, learn about annual dues, and join the North East Texas Young Republicans.",
   path: "/membership/",
 });
 
@@ -93,8 +93,8 @@ export default function MembershipPage() {
         tone="navy"
       >
         <p className="max-w-3xl leading-7 text-slate-300">
-          Associate, Contributing, and non-Active Honorary Members do not vote
-          or hold office.
+          Associate Members, Community Supporters, and non-Active Honorary
+          Members do not vote or hold office.
         </p>
       </Section>
     </>

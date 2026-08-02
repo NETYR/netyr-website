@@ -1,11 +1,16 @@
 const analyticsEventNames = [
+  "join_click",
   "membership_link_click",
+  "donate_click",
   "contact_form_view",
   "contact_form_submission_success",
   "social_link_click",
-  "event_link_click",
+  "event_view",
+  "event_registration_click",
   "sponsor_interest_click",
   "news_article_view",
+  "governing_document_view",
+  "governing_document_download",
 ] as const;
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];

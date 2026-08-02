@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/get-involved/",
     "/news/",
     "/sponsors/",
+    "/governing-documents/",
     "/donate/",
     "/contact/",
     "/privacy/",

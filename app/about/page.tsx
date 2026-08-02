@@ -8,9 +8,9 @@ import { Section } from "@/components/ui/section";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "About",
+  title: "About NETYR | North East Texas Young Republicans",
   description:
-    "Learn about the mission, purpose, geographic identity, and federation relationship of the North East Texas Young Republicans.",
+    "Learn about the mission, purpose, and community focus of the North East Texas Young Republicans.",
   path: "/about/",
 });
 

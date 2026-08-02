@@ -8,7 +8,7 @@ import { contactConfig, isAppsScriptContactFormUrl } from "@/data/contact";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Contact",
+  title: "Contact NETYR | North East Texas Young Republicans",
   description:
     "Contact the North East Texas Young Republicans about membership, events, volunteering, sponsorship, media, and other questions.",
   path: "/contact/",

@@ -10,9 +10,9 @@ import { socialLinks } from "@/data/social-links";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Get Involved",
+  title: "Get Involved with NETYR | Join, Volunteer and Participate",
   description:
-    "Find ways to join, attend, volunteer, connect, and support the North East Texas Young Republicans.",
+    "Join the North East Texas Young Republicans, attend an event, volunteer, or support conservative leadership in Northeast Texas.",
   path: "/get-involved/",
 });
 
@@ -83,17 +83,24 @@ export default function GetInvolvedPage() {
               <Button
                 className="mt-5"
                 data-analytics-context={
-                  opportunity.href === "/sponsors/" ? "get_involved" : undefined
+                  opportunity.href === "/sponsors/" ||
+                  opportunity.href === "/membership/"
+                    ? "get_involved"
+                    : undefined
                 }
                 data-analytics-event={
                   opportunity.href === "/sponsors/"
                     ? "sponsor_interest_click"
-                    : undefined
+                    : opportunity.href === "/membership/"
+                      ? "join_click"
+                      : undefined
                 }
                 data-analytics-label={
                   opportunity.href === "/sponsors/"
                     ? "explore_sponsorship"
-                    : undefined
+                    : opportunity.href === "/membership/"
+                      ? opportunity.title.toLowerCase().replaceAll(" ", "_")
+                      : undefined
                 }
                 href={opportunity.href}
                 variant="secondary"
@@ -114,7 +121,14 @@ export default function GetInvolvedPage() {
       <Callout
         actions={
           <>
-            <Button href="/membership/">Join NETYR</Button>
+            <Button
+              data-analytics-context="get_involved_callout"
+              data-analytics-event="join_click"
+              data-analytics-label="join_netyr"
+              href="/membership/"
+            >
+              Join NETYR
+            </Button>
             <Button href="/contact/" variant="secondary">
               Contact us
             </Button>
