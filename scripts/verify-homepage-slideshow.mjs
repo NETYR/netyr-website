@@ -5,6 +5,16 @@ import path from "node:path";
 
 import slides from "../data/homepage-slideshow.generated.json" with { type: "json" };
 
+assert.equal(slides.length, 32);
+assert.equal(
+  slides.some(({ src }) =>
+    ["community-leadership.webp", "community-interview.webp"].some((removed) =>
+      src.endsWith(removed),
+    ),
+  ),
+  false,
+);
+
 const cdpOrigin = process.env.CDP_ORIGIN ?? "http://127.0.0.1:9333";
 const siteOrigin = process.env.SITE_ORIGIN ?? "http://localhost:3000";
 const screenshotDirectory = process.env.SCREENSHOT_DIRECTORY ?? os.tmpdir();
@@ -153,6 +163,12 @@ assert.equal(desktop.hasJoin, true);
 assert.equal(desktop.hasEvents, true);
 assert.equal(desktop.hasGetInvolved, true);
 assert.equal(desktop.indicatorCount, slides.length);
+assert.equal(
+  await evaluate(
+    `Boolean(document.querySelector('button[aria-label="Pause slideshow"], button[aria-label="Resume slideshow"]'))`,
+  ),
+  false,
+);
 assert.equal(desktop.carouselHeight, 540);
 assert.ok(desktop.pageWidth <= desktop.viewportWidth + 1);
 
@@ -240,7 +256,7 @@ const mobile = await evaluate(`(() => {
   };
 })()`);
 assert.equal(mobile.carouselHeight, 420);
-assert.match(mobile.counter, /^1 \/ 12$/);
+assert.equal(mobile.counter, `1 / ${slides.length}`);
 assert.ok(mobile.pageWidth <= mobile.viewportWidth + 1);
 
 const beforeSwipe = await currentImageSource();
