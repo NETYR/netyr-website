@@ -5,7 +5,7 @@ import path from "node:path";
 
 import slides from "../data/homepage-slideshow.generated.json" with { type: "json" };
 
-assert.equal(slides.length, 32);
+assert.equal(slides.length, 29);
 assert.equal(
   slides.some(({ src }) =>
     ["community-leadership.webp", "community-interview.webp"].some((removed) =>
