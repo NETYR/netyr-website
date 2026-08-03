@@ -20,7 +20,7 @@ export function HomepageCarousel() {
   const [hovered, setHovered] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
+  const [touchActive, setTouchActive] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
   const showSlide = useCallback((index: number) => {
@@ -68,7 +68,13 @@ export function HomepageCarousel() {
   }, []);
 
   useEffect(() => {
-    if (reducedMotion || userPaused || hovered || focusWithin || !pageVisible) {
+    if (
+      reducedMotion ||
+      hovered ||
+      focusWithin ||
+      touchActive ||
+      !pageVisible
+    ) {
       return;
     }
 
@@ -83,7 +89,7 @@ export function HomepageCarousel() {
     pageVisible,
     reducedMotion,
     showNextSlide,
-    userPaused,
+    touchActive,
   ]);
 
   useEffect(() => {
@@ -118,6 +124,7 @@ export function HomepageCarousel() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onTouchEnd={(event) => {
+        setTouchActive(false);
         if (touchStartX.current === null) return;
         const distance = event.changedTouches[0].clientX - touchStartX.current;
         touchStartX.current = null;
@@ -127,7 +134,12 @@ export function HomepageCarousel() {
         else showNextSlide();
       }}
       onTouchStart={(event) => {
+        setTouchActive(true);
         touchStartX.current = event.changedTouches[0].clientX;
+      }}
+      onTouchCancel={() => {
+        setTouchActive(false);
+        touchStartX.current = null;
       }}
     >
       <Image
@@ -187,14 +199,14 @@ export function HomepageCarousel() {
       <div className="absolute inset-x-0 bottom-4 z-20 flex items-center justify-between gap-3 px-4 sm:bottom-5 sm:px-6 lg:px-8">
         <div className="flex min-h-11 items-center rounded-full bg-slate-950/70 px-3 backdrop-blur-sm">
           <span
-            className="text-xs font-bold tracking-wider sm:hidden"
+            className="text-xs font-bold tracking-wider xl:hidden"
             data-carousel-counter
           >
             {activeIndex + 1} / {homepageSlides.length}
           </span>
           <div
             aria-label="Choose a slide"
-            className="hidden items-center gap-1.5 sm:flex"
+            className="hidden items-center gap-1 xl:flex"
             role="group"
           >
             {homepageSlides.map((slide, index) => (
@@ -202,7 +214,7 @@ export function HomepageCarousel() {
                 aria-label={`Show slide ${index + 1}: ${slide.alt}`}
                 aria-pressed={index === activeIndex}
                 className={cn(
-                  "h-3.5 w-3.5 rounded-full border-2 border-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+                  "h-3 w-3 rounded-full border-2 border-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
                   index === activeIndex ? "bg-white" : "bg-transparent",
                 )}
                 key={slide.src}
@@ -214,16 +226,6 @@ export function HomepageCarousel() {
         </div>
 
         <div className="flex items-center gap-2">
-          {!reducedMotion ? (
-            <button
-              aria-label={userPaused ? "Resume slideshow" : "Pause slideshow"}
-              className="flex h-11 min-w-11 items-center justify-center rounded-full border border-white/70 bg-slate-950/70 px-3 text-xs font-bold tracking-wide uppercase backdrop-blur-sm hover:bg-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              onClick={() => setUserPaused((paused) => !paused)}
-              type="button"
-            >
-              {userPaused ? "Play" : "Pause"}
-            </button>
-          ) : null}
           <button
             aria-label="Show previous slide"
             className="flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-slate-950/70 text-xl backdrop-blur-sm hover:bg-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -243,10 +245,7 @@ export function HomepageCarousel() {
         </div>
       </div>
 
-      <p
-        aria-live={focusWithin || userPaused ? "polite" : "off"}
-        className="sr-only"
-      >
+      <p aria-live={focusWithin ? "polite" : "off"} className="sr-only">
         Slide {activeIndex + 1} of {homepageSlides.length}: {activeSlide.alt}
       </p>
     </section>
