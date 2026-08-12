@@ -105,8 +105,15 @@ assert.match(
   /alt: "VZTV — Grand Saline Sun, Live Local NOW!"/,
 );
 assert.match(sponsorPresentation, /Grand Saline Sun \/ VZTV/);
-assert.match(sponsorDirectory, /w-\[180px\]/);
-assert.match(sponsorDirectory, /sm:w-\[220px\]/);
+assert.match(sponsorPresentation, /name: "Sen\. Bob Hall"/);
+assert.match(sponsorPresentation, /name: "State Rep\. Keith Bell"/);
+assert.match(sponsorPresentation, /aliases: \["Bob Hall", "Sen\. Bob Hall"/);
+assert.match(sponsorPresentation, /"Representative Keith Bell"/);
+assert.match(sponsorPresentation, /src: "\/images\/sponsors\/bob-hall\.png"/);
+assert.match(sponsorPresentation, /src: "\/images\/sponsors\/keith-bell\.png"/);
+assert.match(sponsorDirectory, /max-w-\[170px\]/);
+assert.match(sponsorDirectory, /sm:max-w-\[210px\]/);
+assert.match(sponsorDirectory, /presentation\.name/);
 assert.match(homepage, /getLatestPublishedNews\(newsArticles\)/);
 assert.match(homepage, /latestNewsArticle\.excerpt/);
 assert.match(homepage, /\/news\/\$\{latestNewsArticle\.slug\}\//);
