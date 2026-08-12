@@ -252,6 +252,14 @@ const sponsorMain = await evaluate(`({
   html: document.querySelector("main")?.innerHTML ?? "",
   text: document.querySelector("main")?.innerText ?? ""
 })`);
+const presidentPossePresentations = await evaluate(`({
+  names: [...document.querySelectorAll("main li span")]
+    .map((element) => element.textContent?.trim())
+    .filter((name) => ["VZTV", "Sen. Bob Hall", "State Rep. Keith Bell"].includes(name)),
+  logos: [...document.querySelectorAll("main img")]
+    .filter((image) => ["VZTV — Grand Saline Sun, Live Local NOW!", "Sen. Bob Hall", "State Rep. Keith Bell"].includes(image.alt))
+    .map((image) => ({ alt: image.alt, complete: image.complete, naturalWidth: image.naturalWidth }))
+})`);
 assert.equal(sponsorFeed.ok, true, "Browser could not load the Sponsors feed.");
 assert.ok(sponsorFeed.count >= 0);
 assert.equal(
@@ -270,6 +278,18 @@ assert.doesNotMatch(sponsorMain.html, /\$\s*\d/);
 assert.doesNotMatch(
   sponsorMain.html,
   /(?:Donation Amount|Donation Date|Donation Reason|Contact ID|Spreadsheet ID)/i,
+);
+assert.deepEqual(presidentPossePresentations.names.sort(), [
+  "Sen. Bob Hall",
+  "State Rep. Keith Bell",
+  "VZTV",
+]);
+assert.equal(presidentPossePresentations.logos.length, 3);
+assert.ok(
+  presidentPossePresentations.logos.every(
+    (logo) => logo.complete && logo.naturalWidth > 0,
+  ),
+  "Every President's Posse logo must load successfully.",
 );
 assert.equal(
   await evaluate(
