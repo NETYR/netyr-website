@@ -30,7 +30,40 @@ const vztvPresentation: SponsorPresentation = {
   name: "VZTV",
 };
 
-const sponsorPresentations = [vztvPresentation] as const;
+const bobHallPresentation: SponsorPresentation = {
+  aliases: ["Bob Hall", "Sen. Bob Hall", "Senator Bob Hall"],
+  level: "President’s Posse Sponsor",
+  logo: {
+    alt: "Sen. Bob Hall",
+    height: 242,
+    src: "/images/sponsors/bob-hall.png",
+    width: 242,
+  },
+  name: "Sen. Bob Hall",
+};
+
+const keithBellPresentation: SponsorPresentation = {
+  aliases: [
+    "Keith Bell",
+    "State Rep. Keith Bell",
+    "Rep. Keith Bell",
+    "Representative Keith Bell",
+  ],
+  level: "President’s Posse Sponsor",
+  logo: {
+    alt: "State Rep. Keith Bell",
+    height: 554,
+    src: "/images/sponsors/keith-bell.png",
+    width: 554,
+  },
+  name: "State Rep. Keith Bell",
+};
+
+const sponsorPresentations = [
+  vztvPresentation,
+  bobHallPresentation,
+  keithBellPresentation,
+] as const;
 
 export function getSponsorPresentation(name: string) {
   const normalizedName = normalizeSponsorName(name);

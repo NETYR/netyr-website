@@ -152,18 +152,27 @@ export function SponsorDirectory({
 
                 return (
                   <li
-                    className="text-brand-navy flex min-h-16 items-center border-b border-slate-100 py-4 text-lg font-bold last:border-b-0 sm:last:border-b"
+                    className={`text-brand-navy flex min-h-16 items-center border-b border-slate-100 py-4 text-lg font-bold last:border-b-0 sm:last:border-b ${
+                      presentation
+                        ? "flex-col justify-center gap-3 py-6 text-center"
+                        : ""
+                    }`}
                     key={`${level}-${sponsor.name}`}
                   >
                     {presentation ? (
-                      <Image
-                        alt={presentation.logo.alt}
-                        className="h-auto w-[180px] max-w-[85%] object-contain sm:w-[220px] sm:max-w-full"
-                        height={presentation.logo.height}
-                        sizes="(max-width: 640px) 180px, 220px"
-                        src={presentation.logo.src}
-                        width={presentation.logo.width}
-                      />
+                      <>
+                        <Image
+                          alt={presentation.logo.alt}
+                          className="max-h-[150px] w-auto max-w-[170px] object-contain sm:max-h-[170px] sm:max-w-[210px]"
+                          height={presentation.logo.height}
+                          sizes="(max-width: 640px) 170px, 210px"
+                          src={presentation.logo.src}
+                          width={presentation.logo.width}
+                        />
+                        <span className="text-base font-bold">
+                          {presentation.name}
+                        </span>
+                      </>
                     ) : (
                       sponsor.name
                     )}
