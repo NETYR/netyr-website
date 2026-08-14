@@ -52,9 +52,9 @@ const keithBellPresentation: SponsorPresentation = {
   level: "President’s Posse Sponsor",
   logo: {
     alt: "State Rep. Keith Bell",
-    height: 554,
-    src: "/images/sponsors/keith-bell.png",
-    width: 554,
+    height: 1034,
+    src: "/images/sponsors/keith-bell.jpg",
+    width: 1179,
   },
   name: "State Rep. Keith Bell",
 };

@@ -110,7 +110,7 @@ assert.match(sponsorPresentation, /name: "State Rep\. Keith Bell"/);
 assert.match(sponsorPresentation, /aliases: \["Bob Hall", "Sen\. Bob Hall"/);
 assert.match(sponsorPresentation, /"Representative Keith Bell"/);
 assert.match(sponsorPresentation, /src: "\/images\/sponsors\/bob-hall\.png"/);
-assert.match(sponsorPresentation, /src: "\/images\/sponsors\/keith-bell\.png"/);
+assert.match(sponsorPresentation, /src: "\/images\/sponsors\/keith-bell\.jpg"/);
 assert.match(sponsorDirectory, /max-w-\[170px\]/);
 assert.match(sponsorDirectory, /sm:max-w-\[210px\]/);
 assert.match(sponsorDirectory, /presentation\.name/);
