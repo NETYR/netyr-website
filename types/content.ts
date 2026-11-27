@@ -41,6 +41,10 @@ type NewsCategory =
   | "Statement";
 
 export type NewsArticle = {
+  attachment?: {
+    image: string;
+    pdf: string;
+  };
   body: string[];
   category: NewsCategory;
   date: string;
@@ -48,10 +52,11 @@ export type NewsArticle = {
   featuredImage?: string;
   kicker?: string;
   mediaContact?: {
-    email: string;
+    email?: string;
     name: string;
     organization: string;
     title: string;
+    website?: string;
   };
   metaDescription: string;
   publicationStatus?: "archived" | "draft" | "published";

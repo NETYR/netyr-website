@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { AnalyticsView } from "@/components/analytics/analytics-view";
@@ -99,6 +100,27 @@ export default async function NewsArticlePage({
       />
       <Section tone="white">
         <article className="mx-auto max-w-3xl">
+          {article.attachment ? (
+            <figure className="mb-10">
+              <a href={article.attachment.pdf}>
+                <Image
+                  alt="Official post-election statement of the North East Texas Young Republicans Executive Board"
+                  className="h-auto w-full border border-slate-200"
+                  height={1584}
+                  src={article.attachment.image}
+                  width={1224}
+                />
+              </a>
+              <figcaption className="mt-3 text-sm text-slate-600">
+                <a
+                  className="text-brand-blue font-semibold underline underline-offset-4"
+                  href={article.attachment.pdf}
+                >
+                  View or download the full statement (PDF)
+                </a>
+              </figcaption>
+            </figure>
+          ) : null}
           {article.kicker ? (
             <p className="text-brand-blue mb-8 text-sm font-bold tracking-[0.18em] uppercase">
               {article.kicker}
@@ -131,12 +153,22 @@ export default async function NewsArticlePage({
                 <br />
                 {article.mediaContact.organization}
                 <br />
-                <a
-                  className="text-brand-blue font-semibold underline underline-offset-4"
-                  href={`mailto:${article.mediaContact.email}`}
-                >
-                  {article.mediaContact.email}
-                </a>
+                {article.mediaContact.email ? (
+                  <a
+                    className="text-brand-blue font-semibold underline underline-offset-4"
+                    href={`mailto:${article.mediaContact.email}`}
+                  >
+                    {article.mediaContact.email}
+                  </a>
+                ) : null}
+                {article.mediaContact.website ? (
+                  <a
+                    className="text-brand-blue font-semibold underline underline-offset-4"
+                    href={article.mediaContact.website}
+                  >
+                    NETYR.org
+                  </a>
+                ) : null}
               </address>
             </aside>
           ) : null}
